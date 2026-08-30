@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #F5F7FA; }
+  * { box-sizing: border-box; }
+  a { color: #1256B3; text-decoration: none; }
+  a:hover { color: #0E4693; text-decoration: underline; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #C9D2DE; border-radius: 6px; border: 2px solid #F5F7FA; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  @keyframes nx-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @keyframes nx-toast { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes nx-pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+</style>
+</helmet>
+
+<div style="width: 100%; height: 100vh; overflow-x: auto; overflow-y: hidden; background: #F5F7FA;">
+<div style="display: flex; height: 100vh; min-width: 1480px; overflow: hidden; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #16283C; background: #F5F7FA; -webkit-font-smoothing: antialiased;">
+
+  <!-- ======================= SIDEBAR ======================= -->
+  <aside style="width: 246px; flex: 0 0 246px; background: linear-gradient(180deg, #0B1F33 0%, #0C2540 100%); display: flex; flex-direction: column; border-right: 1px solid #071523;">
+    <div style="height: 56px; display: flex; align-items: center; gap: 10px; padding: 0 18px; border-bottom: 1px solid rgba(255,255,255,.08);">
+      <div style="width: 24px; height: 24px; border-radius: 3px; background: linear-gradient(135deg, #17A3AE 0%, #1256B3 100%); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff;">N</div>
+      <div style="display: flex; flex-direction: column; line-height: 1.05;">
+        <span style="font-size: 14px; font-weight: 600; letter-spacing: .16em; color: #fff;">NEXORA</span>
+        <span style="font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: #6E88A4; font-weight: 500;">Financial Ops</span>
+      </div>
+    </div>
+
+    <div style="padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; flex: 1;">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="13">
+        <sc-if value="{{ n.isGroup }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 14px 10px 6px; font-size: 9.5px; letter-spacing: .13em; text-transform: uppercase; color: #5E7691; font-weight: 600;">{{ n.label }}</div>
+        </sc-if>
+        <sc-if value="{{ n.isItem }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ n.go }}" style="display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; transition: background .12s ease, color .12s ease; background: {{ n.bg }}; color: {{ n.fg }}; box-shadow: {{ n.shadow }};" style-hover="background: rgba(255,255,255,.07); color: #fff;">
+            <span style="width: 15px; text-align: center; font-size: 12px; opacity: .9;">{{ n.icon }}</span>
+            <span style="flex: 1;">{{ n.label }}</span>
+            <sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 1px 5px; border-radius: 8px; background: {{ n.badgeBg }}; color: #fff;">{{ n.badge }}</span>
+            </sc-if>
+          </div>
+        </sc-if>
+      </sc-for>
+    </div>
+
+    <div style="border-top: 1px solid rgba(255,255,255,.08); padding: 12px 14px;">
+      <div style="font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: #5E7691; font-weight: 600; margin-bottom: 7px;">NEXORA Score</div>
+      <div style="display: flex; align-items: baseline; gap: 6px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 600; color: #fff; line-height: 1;">87</span>
+        <span style="font-size: 11px; color: #4FBE93; font-weight: 600;">▲ 4</span>
+        <span style="font-size: 10px; color: #6E88A4; margin-left: auto;">30 dias</span>
+      </div>
+      <div style="height: 4px; border-radius: 3px; background: rgba(255,255,255,.12); margin-top: 8px; overflow: hidden;">
+        <div style="height: 100%; width: 87%; background: linear-gradient(90deg, #17A3AE, #4FBE93);"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ======================= MAIN ======================= -->
+  <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
+
+    <!-- TOPBAR -->
+    <header style="height: 56px; flex: 0 0 56px; background: #fff; border-bottom: 1px solid #E2E7EE; display: flex; align-items: center; padding: 0 20px; gap: 18px;">
+      <div style="display: flex; flex-direction: column; line-height: 1.15; min-width: 210px;">
+        <span style="font-size: 14px; font-weight: 600; letter-spacing: -.01em;">{{ pageTitle }}</span>
+        <span style="font-size: 11px; color: #7A8798;">{{ pageSub }}</span>
+      </div>
+
+      <div style="flex: 1; max-width: 380px; position: relative;">
+        <input placeholder="Procurar despesa, fornecedor, referência…" style="width: 100%; height: 32px; border: 1px solid #DDE3EB; border-radius: 4px; background: #F7F9FC; padding: 0 12px 0 30px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12.5px; color: #16283C; outline: none;" style-focus="border-color: #1256B3; background: #fff; box-shadow: 0 0 0 3px rgba(18,86,179,.1);" />
+        <span style="position: absolute; left: 10px; top: 8px; font-size: 12px; color: #97A3B4;">⌕</span>
+      </div>
+
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 7px; height: 32px; padding: 0 11px; border: 1px solid #DDE3EB; border-radius: 4px; font-size: 12.5px; cursor: pointer; background: #fff;" style-hover="border-color: #B9C4D2;">
+          <span style="color: #7A8798;">Entidade</span>
+          <span style="font-weight: 600;">{{ orgName }}</span>
+          <span style="color: #97A3B4; font-size: 9px;">▼</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 7px; height: 32px; padding: 0 11px; border: 1px solid #DDE3EB; border-radius: 4px; font-size: 12.5px; cursor: pointer; background: #fff;" style-hover="border-color: #B9C4D2;">
+          <span style="color: #7A8798;">Período</span>
+          <span style="font-weight: 600;">Agosto 2026</span>
+          <span style="color: #97A3B4; font-size: 9px;">▼</span>
+        </div>
+        <div onClick="{{ goWatch }}" style="position: relative; width: 32px; height: 32px; border: 1px solid #DDE3EB; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #fff;" style-hover="border-color: #B9C4D2;">
+          <span style="font-size: 14px; color: #45566B;">◔</span>
+          <span style="position: absolute; top: -5px; right: -5px; min-width: 16px; height: 16px; border-radius: 8px; background: #C0392B; color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; padding: 0 4px;">6</span>
+        </div>
+        <div style="width: 1px; height: 24px; background: #E2E7EE;"></div>
+        <div style="display: flex; align-items: center; gap: 9px; cursor: pointer;">
+          <div style="width: 28px; height: 28px; border-radius: 50%; background: #0C2540; color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center;">AM</div>
+          <div style="display: flex; flex-direction: column; line-height: 1.15;">
+            <span style="font-size: 12.5px; font-weight: 600;">Alcino Maido</span>
+            <span style="font-size: 10.5px; color: #7A8798;">Direcção Financeira</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- SCROLL AREA -->
+    <main style="flex: 1; overflow-y: auto; padding: 22px 26px 40px;">
+
+      <!-- ============ DASHBOARD ============ -->
+      <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+        <div style="animation: nx-in .28s ease both; display: flex; flex-direction: column; gap: 16px;">
+
+          <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;">
+            <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="6">
+              <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; padding: 13px 14px 11px; display: flex; flex-direction: column; gap: 7px;" style-hover="border-color: #C9D5E4;">
+                <span style="font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: #6B7A8D; font-weight: 600;">{{ k.label }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 21px; font-weight: 600; letter-spacing: -.02em; line-height: 1; white-space: nowrap;">{{ k.value }}</span>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-size: 11px; font-weight: 600; color: {{ k.deltaColor }};">{{ k.delta }}</span>
+                  <span style="font-size: 10.5px; color: #93A0B0;">{{ k.unit }}</span>
+                </div>
+                <div style="height: 3px; border-radius: 2px; background: #EEF2F7; overflow: hidden;">
+                  <div style="height: 100%; width: {{ k.pct }}%; background: {{ k.bar }};"></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.45fr 1fr; gap: 16px;">
+            <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+              <div style="padding: 13px 16px; border-bottom: 1px solid #EEF2F7; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                  <div style="font-size: 13px; font-weight: 600;">Posição de caixa projectada</div>
+                  <div style="font-size: 11px; color: #7A8798; margin-top: 2px;">Saldo actual, pagamentos aprovados e recorrências · 90 dias</div>
+                </div>
+                <div style="display: flex; gap: 12px; font-size: 11px; color: #6B7A8D;">
+                  <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 9px; height: 2px; background: #1256B3; display: inline-block;"></span>Projectado</span>
+                  <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 9px; height: 2px; background: #C0392B; display: inline-block;"></span>Limite mínimo</span>
+                </div>
+              </div>
+              <div style="padding: 14px 16px 8px;">
+                <svg viewBox="0 0 760 200" style="width: 100%; height: 200px; display: block;">
+                  <defs>
+                    <linearGradient id="nxArea" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#1256B3" stop-opacity="0.20" />
+                      <stop offset="100%" stop-color="#1256B3" stop-opacity="0.01" />
+                    </linearGradient>
+                  </defs>
+                  <line x1="0" y1="20" x2="760" y2="20" stroke="#EEF2F7" stroke-width="1"></line>
+                  <line x1="0" y1="65" x2="760" y2="65" stroke="#EEF2F7" stroke-width="1"></line>
+                  <line x1="0" y1="110" x2="760" y2="110" stroke="#EEF2F7" stroke-width="1"></line>
+                  <line x1="0" y1="155" x2="760" y2="155" stroke="#EEF2F7" stroke-width="1"></line>
+                  <rect x="545" y="0" width="120" height="175" fill="#C0392B" opacity="0.05"></rect>
+                  <path d="M0 96 L63 88 L126 104 L190 84 L253 100 L316 78 L380 96 L443 118 L506 132 L570 152 L633 136 L696 118 L760 106 L760 175 L0 175 Z" fill="url(#nxArea)"></path>
+                  <polyline points="0,96 63,88 126,104 190,84 253,100 316,78 380,96 443,118 506,132 570,152 633,136 696,118 760,106" fill="none" stroke="#1256B3" stroke-width="2.2" stroke-linejoin="round"></polyline>
+                  <line x1="0" y1="160" x2="760" y2="160" stroke="#C0392B" stroke-width="1.4" stroke-dasharray="5 4"></line>
+                  <circle cx="570" cy="152" r="4.5" fill="#fff" stroke="#C0392B" stroke-width="2.2"></circle>
+                  <line x1="380" y1="0" x2="380" y2="175" stroke="#C9D5E4" stroke-width="1" stroke-dasharray="3 3"></line>
+                </svg>
+                <div style="display: flex; justify-content: space-between; font-size: 10.5px; color: #93A0B0; font-family: 'IBM Plex Mono', monospace; padding-top: 4px;">
+                  <span>Hoje</span><span>+15d</span><span>+30d</span><span>+45d</span><span>+60d</span><span>+75d</span><span>+90d</span>
+                </div>
+              </div>
+              <div style="margin: 0 16px 16px; border: 1px solid #F0DAD6; background: #FDF6F5; border-radius: 4px; padding: 10px 12px; display: flex; align-items: center; gap: 10px;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #C0392B; flex: 0 0 6px;"></span>
+                <span style="font-size: 12px; color: #7A2E24;">Entre <strong>18 e 29 de Outubro</strong> a projecção aproxima-se do limite mínimo de tesouraria — 3 pagamentos de projecto concentram-se na mesma semana.</span>
+                <span onClick="{{ goTesouraria }}" style="margin-left: auto; font-size: 11.5px; font-weight: 600; color: #1256B3; cursor: pointer; white-space: nowrap;">Ver previsão →</span>
+              </div>
+            </div>
+
+            <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; display: flex; flex-direction: column;">
+              <div style="padding: 13px 16px; border-bottom: 1px solid #EEF2F7; display: flex; align-items: center; justify-content: space-between;">
+                <div style="font-size: 13px; font-weight: 600;">Execução orçamental por projecto</div>
+                <span onClick="{{ goProjectos }}" style="font-size: 11.5px; color: #1256B3; cursor: pointer; font-weight: 500;">Detalhe</span>
+              </div>
+              <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 14px;">
+                <sc-for list="{{ projectos }}" as="p" hint-placeholder-count="4">
+                  <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                      <span style="font-size: 12.5px; font-weight: 500;">{{ p.nome }}</span>
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: {{ p.cor }}; font-weight: 600;">{{ p.pct }}%</span>
+                    </div>
+                    <div style="height: 7px; border-radius: 4px; background: #EEF2F7; position: relative; overflow: hidden;">
+                      <div style="position: absolute; left: 0; top: 0; height: 100%; width: {{ p.pctComprometido }}%; background: {{ p.corClara }};"></div>
+                      <div style="position: absolute; left: 0; top: 0; height: 100%; width: {{ p.pct }}%; background: {{ p.cor }};"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 10.5px; color: #7A8798; font-family: 'IBM Plex Mono', monospace;">
+                      <span>{{ p.executado }} de {{ p.orcamento }}</span>
+                      <span>{{ p.financiador }}</span>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+              <div style="padding: 13px 16px; border-bottom: 1px solid #EEF2F7; display: flex; align-items: center; justify-content: space-between;">
+                <div style="font-size: 13px; font-weight: 600;">Situações que exigem atenção</div>
+                <span onClick="{{ goExcepcoes }}" style="font-size: 11.5px; color: #1256B3; cursor: pointer; font-weight: 500;">Centro de excepções</span>
+              </div>
+              <div>
+                <sc-for list="{{ atencao }}" as="a" hint-placeholder-count="5">
+                  <div style="display: flex; align-items: center; gap: 11px; padding: 11px 16px; border-bottom: 1px solid #F4F7FA; cursor: pointer;" style-hover="background: #F9FBFD;">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background: {{ a.cor }}; flex: 0 0 7px;"></span>
+                    <span style="font-size: 12.5px; flex: 1;">{{ a.texto }}</span>
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #45566B;">{{ a.valor }}</span>
+                    <span style="font-size: 11px; font-weight: 600; color: #1256B3; white-space: nowrap;">{{ a.acao }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+              <div style="padding: 13px 16px; border-bottom: 1px solid #EEF2F7; display: flex; align-items: center; justify-content: space-between;">
+                <div style="font-size: 13px; font-weight: 600;">Despesa por natureza · Agosto</div>
+                <span style="font-size: 11px; color: #7A8798; font-family: 'IBM Plex Mono', monospace;">1 932 400 MT</span>
+              </div>
+              <div style="padding: 16px; display: flex; align-items: center; gap: 22px;">
+                <svg viewBox="0 0 120 120" style="width: 132px; height: 132px; flex: 0 0 132px;">
+                  <circle cx="60" cy="60" r="46" fill="none" stroke="#EEF2F7" stroke-width="16"></circle>
+                  <circle cx="60" cy="60" r="46" fill="none" stroke="#1256B3" stroke-width="16" stroke-dasharray="101 288" stroke-dashoffset="0" transform="rotate(-90 60 60)"></circle>
+                  <circle cx="60" cy="60" r="46" fill="none" stroke="#17A3AE" stroke-width="16" stroke-dasharray="72 288" stroke-dashoffset="-101" transform="rotate(-90 60 60)"></circle>
+                  <circle cx="60" cy="60" r="46" fill="none" stroke="#C67A12" stroke-width="16" stroke-dasharray="52 288" stroke-dashoffset="-173" transform="rotate(-90 60 60)"></circle>
+                  <circle cx="60" cy="60" r="46" fill="none" stroke="#6E62B6" stroke-width="16" stroke-dasharray="38 288" stroke-dashoffset="-225" transform="rotate(-90 60 60)"></circle>
+                  <circle cx="60" cy="60" r="46" fill="none" stroke="#B9C4D2" stroke-width="16" stroke-dasharray="26 288" stroke-dashoffset="-263" transform="rotate(-90 60 60)"></circle>
+                </svg>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 9px;">
+                  <sc-for list="{{ naturezas }}" as="n" hint-placeholder-count="5">
+                    <div style="display: flex; align-items: center; gap: 9px;">
+                      <span style="width: 9px; height: 9px; border-radius: 2px; background: {{ n.cor }}; flex: 0 0 9px;"></span>
+                      <span style="font-size: 12px; flex: 1;">{{ n.nome }}</span>
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #45566B;">{{ n.valor }}</span>
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #93A0B0; width: 34px; text-align: right;">{{ n.pct }}%</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ WATCH ============ -->
+      <sc-if value="{{ isWatch }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .28s ease both; display: flex; flex-direction: column; gap: 16px;">
+          <div style="background: linear-gradient(100deg, #0B1F33 0%, #143A5C 100%); border-radius: 5px; padding: 20px 24px; display: flex; align-items: center; gap: 34px; color: #fff;">
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; gap: 9px;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: #4FBE93; animation: nx-pulse 2.4s ease-in-out infinite;"></span>
+                <span style="font-size: 10px; letter-spacing: .13em; text-transform: uppercase; color: #8FA8C0; font-weight: 600;">NEXORA WATCH · vigilância activa</span>
+              </div>
+              <div style="font-size: 19px; font-weight: 600; margin-top: 9px; letter-spacing: -.01em;">Resumo de 12 de Agosto, 06:00</div>
+              <div style="font-size: 12.5px; color: #A9BDD0; margin-top: 5px; max-width: 620px;">Seis situações exigem a sua atenção hoje. Cada uma traz a acção correspondente — resolva aqui, sem abrir outro ecrã.</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 26px;">
+              <div style="text-align: center;">
+                <svg viewBox="0 0 120 74" style="width: 130px; height: 80px;">
+                  <path d="M14 66 A46 46 0 0 1 106 66" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="9" stroke-linecap="round"></path>
+                  <path d="M14 66 A46 46 0 0 1 96 38" fill="none" stroke="#4FBE93" stroke-width="9" stroke-linecap="round"></path>
+                  <text x="60" y="60" text-anchor="middle" fill="#fff" font-family="IBM Plex Mono, monospace" font-size="27" font-weight="600">87</text>
+                </svg>
+                <div style="font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #8FA8C0; font-weight: 600;">Score operacional</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 7px; font-size: 12px;">
+                <div style="display: flex; gap: 10px;"><span style="color: #8FA8C0; width: 118px;">Reconciliação</span><span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600;">96%</span></div>
+                <div style="display: flex; gap: 10px;"><span style="color: #8FA8C0; width: 118px;">Docs de suporte</span><span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600;">91%</span></div>
+                <div style="display: flex; gap: 10px;"><span style="color: #8FA8C0; width: 118px;">Aprovação &lt; 48h</span><span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600;">78%</span></div>
+                <div style="display: flex; gap: 10px;"><span style="color: #8FA8C0; width: 118px;">Excepções abertas</span><span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600;">11</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; align-items: start;">
+            <sc-for list="{{ watch }}" as="w" hint-placeholder-count="4">
+              <div style="background: #fff; border: 1px solid #E2E7EE; border-top: 3px solid {{ w.cor }}; border-radius: 4px; overflow: hidden;">
+                <div style="padding: 12px 14px 10px; border-bottom: 1px solid #F0F4F8; display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-size: 11px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: {{ w.cor }};">{{ w.nivel }}</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600;">{{ w.n }}</span>
+                </div>
+                <sc-for list="{{ w.itens }}" as="i" hint-placeholder-count="2">
+                  <div style="padding: 11px 14px; border-bottom: 1px solid #F4F7FA;">
+                    <div style="font-size: 12.5px; line-height: 1.45;">{{ i.texto }}</div>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 9px;">
+                      <span onClick="{{ i.resolve }}" style="font-size: 11.5px; font-weight: 600; color: #fff; background: #1256B3; padding: 4px 10px; border-radius: 3px; cursor: pointer;" style-hover="background: #0E4693;">{{ i.acao }}</span>
+                      <span style="font-size: 11.5px; color: #7A8798; cursor: pointer;" style-hover="color: #45566B;">Adiar</span>
+                      <span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #93A0B0;">{{ i.meta }}</span>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; padding: 14px 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+              <div style="font-size: 13px; font-weight: 600;">Evolução do NEXORA Score · 12 semanas</div>
+              <div style="font-size: 11px; color: #7A8798;">O sistema registou quando cada problema surgiu e quando deixou de existir.</div>
+            </div>
+            <div style="display: flex; align-items: flex-end; gap: 8px; height: 92px;">
+              <sc-for list="{{ scoreHist }}" as="s" hint-placeholder-count="12">
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end;">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #7A8798;">{{ s.v }}</span>
+                  <div style="width: 100%; border-radius: 2px 2px 0 0; background: {{ s.cor }}; height: {{ s.h }}px;"></div>
+                  <span style="font-size: 9.5px; color: #A6B2C1;">{{ s.sem }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ DESPESAS ============ -->
+      <sc-if value="{{ isDespesas }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .28s ease both; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="display: flex; background: #fff; border: 1px solid #DDE3EB; border-radius: 4px; overflow: hidden;">
+              <sc-for list="{{ filtros }}" as="f" hint-placeholder-count="4">
+                <div onClick="{{ f.set }}" style="padding: 7px 14px; font-size: 12.5px; font-weight: 500; cursor: pointer; border-right: 1px solid #EEF2F7; background: {{ f.bg }}; color: {{ f.fg }};" style-hover="background: #F2F6FB;">
+                  {{ f.label }}
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: {{ f.countFg }}; margin-left: 6px;">{{ f.n }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: flex; align-items: center; gap: 7px; height: 33px; padding: 0 11px; border: 1px solid #DDE3EB; background: #fff; border-radius: 4px; font-size: 12.5px; cursor: pointer; color: #45566B;">
+              <span style="font-size: 11px;">⚲</span><span>Rubrica</span><span style="color: #97A3B4; font-size: 9px;">▼</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 7px; height: 33px; padding: 0 11px; border: 1px solid #DDE3EB; background: #fff; border-radius: 4px; font-size: 12.5px; cursor: pointer; color: #45566B;">
+              <span style="font-size: 11px;">⚲</span><span>Fonte de financiamento</span><span style="color: #97A3B4; font-size: 9px;">▼</span>
+            </div>
+            <div style="margin-left: auto; display: flex; gap: 9px;">
+              <div onClick="{{ toast }}" style="height: 33px; padding: 0 14px; display: flex; align-items: center; gap: 7px; border: 1px solid #DDE3EB; background: #fff; border-radius: 4px; font-size: 12.5px; font-weight: 500; cursor: pointer;" style-hover="border-color: #B9C4D2;">
+                <span style="color: #17A3AE;">⇪</span> Importar factura (PDF)
+              </div>
+              <div onClick="{{ toast }}" style="height: 33px; padding: 0 15px; display: flex; align-items: center; gap: 7px; background: #1256B3; color: #fff; border-radius: 4px; font-size: 12.5px; font-weight: 600; cursor: pointer;" style-hover="background: #0E4693;">
+                <span style="font-size: 13px;">+</span> Nova despesa
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0; background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; overflow: hidden;">
+            <sc-for list="{{ resumoDespesas }}" as="r" hint-placeholder-count="4">
+              <div style="flex: 1; padding: 12px 16px; border-right: 1px solid #EEF2F7; display: flex; flex-direction: column; gap: 4px;">
+                <span style="font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: #6B7A8D; font-weight: 600;">{{ r.label }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 17px; font-weight: 600; white-space: nowrap;">{{ r.valor }}</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; overflow: hidden;">
+            <div style="display: grid; grid-template-columns: 34px 1.5fr 1.9fr 1fr 0.9fr 1.1fr 1fr 130px; align-items: center; gap: 10px; padding: 9px 14px; background: #F8FAFC; border-bottom: 1px solid #E2E7EE; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #6B7A8D; font-weight: 600;">
+              <span><input type="checkbox" style="cursor: pointer;" /></span>
+              <span>Referência / Fornecedor</span>
+              <span>Descrição</span>
+              <span style="text-align: right;">Valor</span>
+              <span>Vencimento</span>
+              <span>Rubrica</span>
+              <span>Projecto</span>
+              <span>Estado</span>
+            </div>
+            <sc-for list="{{ despesas }}" as="d" hint-placeholder-count="10">
+              <div onClick="{{ d.open }}" style="display: grid; grid-template-columns: 34px 1.5fr 1.9fr 1fr 0.9fr 1.1fr 1fr 130px; align-items: center; gap: 10px; padding: 11px 14px; border-bottom: 1px solid #F4F7FA; cursor: pointer; font-size: 12.5px;" style-hover="background: #F9FBFD;">
+                <span><input type="checkbox" style="cursor: pointer;" /></span>
+                <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
+                  <span style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ d.fornecedor }}</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #8894A5;">{{ d.ref }}</span>
+                </span>
+                <span style="color: #45566B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ d.descricao }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; text-align: right; font-weight: 600;">{{ d.valor }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: {{ d.vencCor }};">{{ d.vencimento }}</span>
+                <span style="color: #45566B; font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ d.rubrica }}</span>
+                <span style="color: #45566B; font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ d.projecto }}</span>
+                <span>
+                  <span style="display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; background: {{ d.estadoBg }}; color: {{ d.estadoFg }};">
+                    <span style="width: 5px; height: 5px; border-radius: 50%; background: {{ d.estadoFg }};"></span>{{ d.estado }}
+                  </span>
+                </span>
+              </div>
+            </sc-for>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; font-size: 12px; color: #7A8798;">
+              <span>A mostrar 10 de 214 despesas · Agosto 2026</span>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="padding: 4px 9px; border: 1px solid #DDE3EB; border-radius: 3px; cursor: pointer; background: #fff;">‹</span>
+                <span style="padding: 4px 9px; border: 1px solid #1256B3; background: #1256B3; color: #fff; border-radius: 3px; cursor: pointer; font-family: 'IBM Plex Mono', monospace;">1</span>
+                <span style="padding: 4px 9px; border: 1px solid #DDE3EB; border-radius: 3px; cursor: pointer; background: #fff; font-family: 'IBM Plex Mono', monospace;">2</span>
+                <span style="padding: 4px 9px; border: 1px solid #DDE3EB; border-radius: 3px; cursor: pointer; background: #fff; font-family: 'IBM Plex Mono', monospace;">3</span>
+                <span style="padding: 4px 9px; border: 1px solid #DDE3EB; border-radius: 3px; cursor: pointer; background: #fff;">›</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ DETALHE DA DESPESA ============ -->
+      <sc-if value="{{ isDetalhe }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .28s ease both; display: flex; flex-direction: column; gap: 14px;">
+          <div onClick="{{ goDespesas }}" style="font-size: 12px; color: #1256B3; cursor: pointer; font-weight: 500;">← Voltar a Controlo de Despesas</div>
+
+          <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; padding: 16px 18px; display: flex; align-items: center; gap: 22px;">
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 17px; font-weight: 600;">{{ sel.fornecedor }}</span>
+                <span style="display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 3px; font-size: 11px; font-weight: 600; background: {{ sel.estadoBg }}; color: {{ sel.estadoFg }};">{{ sel.estado }}</span>
+              </div>
+              <div style="font-size: 12.5px; color: #7A8798; margin-top: 5px;">{{ sel.descricao }} · <span style="font-family: 'IBM Plex Mono', monospace;">{{ sel.ref }}</span></div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 600; letter-spacing: -.02em;">{{ sel.valor }}</div>
+              <div style="font-size: 11.5px; color: #7A8798;">IVA 16% incluído · Vence {{ sel.vencimento }}</div>
+            </div>
+            <div style="display: flex; gap: 9px;">
+              <div onClick="{{ toast }}" style="height: 34px; padding: 0 14px; display: flex; align-items: center; border: 1px solid #DDE3EB; border-radius: 4px; font-size: 12.5px; font-weight: 500; cursor: pointer; background: #fff;" style-hover="border-color: #B9C4D2;">Devolver</div>
+              <div onClick="{{ toast }}" style="height: 34px; padding: 0 14px; display: flex; align-items: center; border: 1px solid #1256B3; color: #1256B3; border-radius: 4px; font-size: 12.5px; font-weight: 600; cursor: pointer; background: #fff;" style-hover="background: #F2F6FB;">Gerar documento de autorização</div>
+              <div onClick="{{ toast }}" style="height: 34px; padding: 0 16px; display: flex; align-items: center; background: #1E8A5F; color: #fff; border-radius: 4px; font-size: 12.5px; font-weight: 600; cursor: pointer;" style-hover="background: #17714D;">Aprovar</div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.35fr 1fr; gap: 16px; align-items: start;">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+                <div style="padding: 12px 16px; border-bottom: 1px solid #EEF2F7; font-size: 13px; font-weight: 600;">Dados da despesa</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0;">
+                  <sc-for list="{{ campos }}" as="c" hint-placeholder-count="12">
+                    <div style="padding: 12px 16px; border-bottom: 1px solid #F4F7FA; border-right: 1px solid #F4F7FA; display: flex; flex-direction: column; gap: 4px;">
+                      <span style="font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #8894A5; font-weight: 600;">{{ c.label }}</span>
+                      <span style="font-size: 12.5px; font-weight: 500; color: #16283C;">{{ c.valor }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+                <div style="padding: 12px 16px; border-bottom: 1px solid #EEF2F7; display: flex; align-items: center; justify-content: space-between;">
+                  <div style="font-size: 13px; font-weight: 600;">Documento de suporte · leitura automática</div>
+                  <span style="font-size: 11px; color: #17714D; background: #E8F5EE; padding: 3px 8px; border-radius: 3px; font-weight: 600;">Extraído com 94% de confiança</span>
+                </div>
+                <div style="display: flex; gap: 16px; padding: 16px;">
+                  <div style="width: 152px; flex: 0 0 152px; height: 196px; border: 1px solid #E2E7EE; border-radius: 3px; background: #F8FAFC; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #8894A5;">
+                    <span style="font-size: 26px;">▤</span>
+                    <span style="font-size: 11px; text-align: center; line-height: 1.4;">FAC-2026-0841.pdf<br />2 páginas · 418 KB</span>
+                    <span style="font-size: 11px; color: #1256B3; font-weight: 600; cursor: pointer;">Abrir</span>
+                  </div>
+                  <div style="flex: 1; display: flex; flex-direction: column; gap: 9px;">
+                    <div style="font-size: 12px; color: #7A8798; margin-bottom: 2px;">Confirme os campos lidos da factura — não é necessário transcrever.</div>
+                    <sc-for list="{{ extraidos }}" as="e" hint-placeholder-count="5">
+                      <div style="display: flex; align-items: center; gap: 12px; padding: 8px 11px; border: 1px solid #E7ECF3; border-radius: 3px; background: #FCFDFE;">
+                        <span style="font-size: 11.5px; color: #7A8798; width: 132px;">{{ e.label }}</span>
+                        <span style="font-size: 12.5px; font-weight: 600; flex: 1; font-family: 'IBM Plex Mono', monospace;">{{ e.valor }}</span>
+                        <span style="font-size: 10.5px; font-weight: 600; padding: 2px 7px; border-radius: 3px; background: {{ e.bg }}; color: {{ e.fg }};">{{ e.conf }}</span>
+                        <span style="font-size: 11.5px; color: #1256B3; font-weight: 600; cursor: pointer;">Corrigir</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+
+              <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+                <div style="padding: 12px 16px; border-bottom: 1px solid #EEF2F7; font-size: 13px; font-weight: 600;">Lista de verificação financeira <span style="font-weight: 400; color: #7A8798; font-size: 11.5px;">· definida pela organização</span></div>
+                <sc-for list="{{ checklist }}" as="c" hint-placeholder-count="5">
+                  <div onClick="{{ c.toggle }}" style="display: flex; align-items: center; gap: 11px; padding: 11px 16px; border-bottom: 1px solid #F4F7FA; cursor: pointer;" style-hover="background: #F9FBFD;">
+                    <span style="width: 17px; height: 17px; border-radius: 3px; border: 1.5px solid {{ c.borda }}; background: {{ c.fundo }}; color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; flex: 0 0 17px;">{{ c.marca }}</span>
+                    <span style="font-size: 12.5px; flex: 1; color: {{ c.corTexto }};">{{ c.texto }}</span>
+                    <span style="font-size: 11px; color: #93A0B0; font-family: 'IBM Plex Mono', monospace;">{{ c.autor }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+                <div style="padding: 12px 16px; border-bottom: 1px solid #EEF2F7; font-size: 13px; font-weight: 600;">Percurso de aprovação</div>
+                <div style="padding: 14px 16px;">
+                  <sc-for list="{{ percurso }}" as="p" hint-placeholder-count="5">
+                    <div style="display: flex; gap: 12px;">
+                      <div style="display: flex; flex-direction: column; align-items: center; flex: 0 0 18px;">
+                        <span style="width: 15px; height: 15px; border-radius: 50%; border: 2px solid {{ p.cor }}; background: {{ p.fundo }}; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #fff;">{{ p.marca }}</span>
+                        <span style="width: 2px; flex: 1; background: {{ p.linha }}; min-height: 22px;"></span>
+                      </div>
+                      <div style="padding-bottom: 16px; flex: 1;">
+                        <div style="font-size: 12.5px; font-weight: 600; color: {{ p.corTitulo }};">{{ p.etapa }}</div>
+                        <div style="font-size: 11.5px; color: #7A8798; margin-top: 3px;">{{ p.detalhe }}</div>
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #A6B2C1; margin-top: 3px;">{{ p.quando }}</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="background: #FCFDFE; border: 1px solid #E2E7EE; border-radius: 4px; padding: 14px 16px;">
+                <div style="font-size: 13px; font-weight: 600; margin-bottom: 10px;">Regra aplicada</div>
+                <div style="font-size: 12.5px; color: #45566B; line-height: 1.6;">Valor entre <strong>250 000</strong> e <strong>1 000 000 MT</strong> em despesa de <strong>Serviços</strong>, financiada por <strong>Fundo Doador UE</strong> → exige <strong>verificação financeira</strong> e <strong>dois aprovadores</strong>, sendo um o gestor do projecto.</div>
+                <div style="margin-top: 11px; padding-top: 11px; border-top: 1px solid #EEF2F7; font-size: 11.5px; color: #7A8798;">Matriz vigente a 12/08/2026 · v4 · <a href="#">ver matriz</a></div>
+              </div>
+
+              <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+                <div style="padding: 12px 16px; border-bottom: 1px solid #EEF2F7; font-size: 13px; font-weight: 600;">Registo de auditoria</div>
+                <sc-for list="{{ auditoria }}" as="a" hint-placeholder-count="4">
+                  <div style="padding: 10px 16px; border-bottom: 1px solid #F4F7FA; display: flex; gap: 10px; font-size: 11.5px;">
+                    <span style="font-family: 'IBM Plex Mono', monospace; color: #93A0B0; flex: 0 0 96px;">{{ a.quando }}</span>
+                    <span style="flex: 1; color: #45566B;">{{ a.acao }}</span>
+                    <span style="font-weight: 600;">{{ a.autor }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ APROVAÇÕES ============ -->
+      <sc-if value="{{ isAprovacoes }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .28s ease both; display: grid; grid-template-columns: 1fr 320px; gap: 16px; align-items: start;">
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 13px; font-weight: 600;">Caixa de entrada de aprovações</span>
+              <span style="font-size: 12px; color: #7A8798;">{{ pendentesTexto }}</span>
+              <div onClick="{{ toast }}" style="margin-left: auto; height: 31px; padding: 0 13px; display: flex; align-items: center; border: 1px solid #DDE3EB; background: #fff; border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer;" style-hover="border-color: #B9C4D2;">Aprovar seleccionadas</div>
+            </div>
+            <sc-for list="{{ aprovacoes }}" as="a" hint-placeholder-count="4">
+              <div style="background: #fff; border: 1px solid #E2E7EE; border-left: 3px solid {{ a.urgCor }}; border-radius: 4px; padding: 14px 16px; display: flex; gap: 18px; align-items: center;" style-hover="border-color: #C9D5E4;">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="display: flex; align-items: center; gap: 9px;">
+                    <span style="font-size: 13.5px; font-weight: 600;">{{ a.fornecedor }}</span>
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8894A5;">{{ a.ref }}</span>
+                    <span style="font-size: 10.5px; font-weight: 600; padding: 2px 7px; border-radius: 3px; background: {{ a.urgBg }}; color: {{ a.urgCor }};">{{ a.urgencia }}</span>
+                  </div>
+                  <div style="font-size: 12.5px; color: #45566B; margin-top: 5px;">{{ a.descricao }}</div>
+                  <div style="display: flex; gap: 18px; margin-top: 9px; font-size: 11.5px; color: #7A8798;">
+                    <span>Rubrica <strong style="color: #45566B; font-weight: 600;">{{ a.rubrica }}</strong></span>
+                    <span>Projecto <strong style="color: #45566B; font-weight: 600;">{{ a.projecto }}</strong></span>
+                    <span>Fonte <strong style="color: #45566B; font-weight: 600;">{{ a.fonte }}</strong></span>
+                    <span>Saldo da rubrica <strong style="color: #17714D; font-weight: 600;">{{ a.saldo }}</strong></span>
+                  </div>
+                  <div style="margin-top: 10px; font-size: 11.5px; color: #6B7A8D; background: #F8FAFC; border: 1px solid #EEF2F7; border-radius: 3px; padding: 7px 10px;">
+                    <strong style="color: #45566B;">Chegou a você porque:</strong> {{ a.porque }}
+                  </div>
+                </div>
+                <div style="text-align: right; flex: 0 0 150px;">
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 19px; font-weight: 600;">{{ a.valor }}</div>
+                  <div style="font-size: 11px; color: #7A8798; margin-top: 3px;">Vence {{ a.vencimento }}</div>
+                  <div style="display: flex; flex-direction: column; gap: 7px; margin-top: 12px;">
+                    <div onClick="{{ a.aprovar }}" style="height: 32px; display: flex; align-items: center; justify-content: center; background: #1E8A5F; color: #fff; border-radius: 4px; font-size: 12.5px; font-weight: 600; cursor: pointer;" style-hover="background: #17714D;">Aprovar</div>
+                    <div style="display: flex; gap: 7px;">
+                      <div onClick="{{ toast }}" style="flex: 1; height: 30px; display: flex; align-items: center; justify-content: center; border: 1px solid #DDE3EB; border-radius: 4px; font-size: 12px; cursor: pointer; background: #fff;" style-hover="border-color: #B9C4D2;">Devolver</div>
+                      <div onClick="{{ a.open }}" style="flex: 1; height: 30px; display: flex; align-items: center; justify-content: center; border: 1px solid #DDE3EB; border-radius: 4px; font-size: 12px; cursor: pointer; background: #fff;" style-hover="border-color: #B9C4D2;">Abrir</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+              <div style="padding: 12px 14px; border-bottom: 1px solid #EEF2F7; font-size: 12.5px; font-weight: 600;">Delegação activa</div>
+              <div style="padding: 13px 14px; font-size: 12px; color: #45566B; line-height: 1.6;">Substituto por ausência: <strong>Helena Cossa</strong>, de 24 a 31 de Agosto. As aprovações de valor até <strong>500 000 MT</strong> seguem para ela automaticamente.</div>
+            </div>
+            <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+              <div style="padding: 12px 14px; border-bottom: 1px solid #EEF2F7; font-size: 12.5px; font-weight: 600;">Tempo médio de aprovação</div>
+              <div style="padding: 13px 14px; display: flex; flex-direction: column; gap: 11px;">
+                <sc-for list="{{ tempos }}" as="t" hint-placeholder-count="3">
+                  <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;">
+                      <span>{{ t.nome }}</span><span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: {{ t.cor }};">{{ t.valor }}</span>
+                    </div>
+                    <div style="height: 5px; border-radius: 3px; background: #EEF2F7; overflow: hidden;"><div style="height: 100%; width: {{ t.pct }}%; background: {{ t.cor }};"></div></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background: #F8FAFC; border: 1px solid #E2E7EE; border-radius: 4px; padding: 13px 14px; font-size: 11.5px; color: #6B7A8D; line-height: 1.6;">
+              Nenhum utilizador pode criar, aprovar e pagar a mesma despesa. O sistema recusa e registta a tentativa.
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ PAGAMENTOS ============ -->
+      <sc-if value="{{ isPagamentos }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .28s ease both; display: flex; flex-direction: column; gap: 16px;">
+          <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; padding: 16px 18px;">
+            <div style="font-size: 13px; font-weight: 600; margin-bottom: 14px;">Estados do ciclo de pagamento</div>
+            <div style="display: flex; align-items: stretch; gap: 0;">
+              <sc-for list="{{ pipeline }}" as="p" hint-placeholder-count="6">
+                <div style="flex: 1; display: flex; align-items: center; gap: 10px;">
+                  <div style="flex: 1; border: 1px solid {{ p.borda }}; background: {{ p.fundo }}; border-radius: 4px; padding: 11px 13px;">
+                    <div style="font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; color: #6B7A8D; font-weight: 600;">{{ p.nome }}</div>
+                    <div style="display: flex; align-items: baseline; gap: 7px; margin-top: 6px;">
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 19px; font-weight: 600; color: {{ p.cor }};">{{ p.n }}</span>
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7A8798;">{{ p.valor }}</span>
+                    </div>
+                  </div>
+                  <sc-if value="{{ p.seta }}" hint-placeholder-val="{{ true }}">
+                    <span style="color: #C9D5E4; font-size: 13px;">›</span>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; overflow: hidden;">
+            <div style="padding: 13px 16px; border-bottom: 1px solid #E2E7EE; display: flex; align-items: center; gap: 14px;">
+              <div style="font-size: 13px; font-weight: 600;">Fila de pagamento · prontos para pagar</div>
+              <span style="font-size: 12px; color: #7A8798;">{{ filaTexto }}</span>
+              <div style="margin-left: auto; display: flex; gap: 9px;">
+                <div onClick="{{ toast }}" style="height: 32px; padding: 0 13px; display: flex; align-items: center; border: 1px solid #DDE3EB; border-radius: 4px; font-size: 12.5px; cursor: pointer; background: #fff;" style-hover="border-color: #B9C4D2;">Exportar ficheiro bancário</div>
+                <div onClick="{{ criarLote }}" style="height: 32px; padding: 0 15px; display: flex; align-items: center; background: #1256B3; color: #fff; border-radius: 4px; font-size: 12.5px; font-weight: 600; cursor: pointer;" style-hover="background: #0E4693;">Criar lote de pagamento</div>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 34px 1.4fr 1.1fr 1fr 1.3fr 1fr 118px; gap: 10px; align-items: center; padding: 9px 14px; background: #F8FAFC; border-bottom: 1px solid #E2E7EE; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #6B7A8D; font-weight: 600;">
+              <span><input type="checkbox" style="cursor: pointer;" /></span>
+              <span>Beneficiário</span>
+              <span style="text-align: right;">Valor</span>
+              <span>Vencimento</span>
+              <span>Conta de origem</span>
+              <span>Fonte</span>
+              <span>Estado</span>
+            </div>
+            <sc-for list="{{ fila }}" as="f" hint-placeholder-count="6">
+              <div style="display: grid; grid-template-columns: 34px 1.4fr 1.1fr 1fr 1.3fr 1fr 118px; gap: 10px; align-items: center; padding: 11px 14px; border-bottom: 1px solid #F4F7FA; font-size: 12.5px;" style-hover="background: #F9FBFD;">
+                <span><input type="checkbox" style="cursor: pointer;" /></span>
+                <span style="display: flex; flex-direction: column; gap: 2px;">
+                  <span style="font-weight: 600;">{{ f.nome }}</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #8894A5;">{{ f.ref }}</span>
+                </span>
+                <span style="font-family: 'IBM Plex Mono', monospace; text-align: right; font-weight: 600;">{{ f.valor }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: {{ f.vencCor }};">{{ f.vencimento }}</span>
+                <span style="font-size: 11.5px; color: #45566B;">{{ f.conta }}</span>
+                <span style="font-size: 11.5px; color: #45566B;">{{ f.fonte }}</span>
+                <span><span style="display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; background: {{ f.bg }}; color: {{ f.fg }};">{{ f.estado }}</span></span>
+              </div>
+            </sc-for>
+            <div style="display: flex; align-items: center; gap: 22px; padding: 12px 16px; background: #F8FAFC;">
+              <span style="font-size: 12px; color: #6B7A8D;">Total da fila</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600;">1 286 900 MT</span>
+              <span style="font-size: 12px; color: #6B7A8D; margin-left: 22px;">Vencem nos próximos 7 dias</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600; color: #C67A12;">742 300 MT</span>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ RECONCILIAÇÃO ============ -->
+      <sc-if value="{{ isReconciliacao }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .28s ease both; display: flex; flex-direction: column; gap: 14px;">
+          <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; padding: 14px 16px; display: flex; align-items: center; gap: 26px;">
+            <div>
+              <div style="font-size: 13px; font-weight: 600;">Extrato BCI · Conta operacional 1234567</div>
+              <div style="font-size: 11.5px; color: #7A8798; margin-top: 3px;">extrato_bci_ago2026.ofx · importado hoje às 07:12 · 128 movimentos</div>
+            </div>
+            <div style="display: flex; gap: 26px; margin-left: auto;">
+              <div><div style="font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #6B7A8D; font-weight: 600;">Correspondidos</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 600; color: #1E8A5F;">{{ reconciliados }}</div></div>
+              <div><div style="font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #6B7A8D; font-weight: 600;">Propostos</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 600; color: #1256B3;">{{ propostosN }}</div></div>
+              <div><div style="font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #6B7A8D; font-weight: 600;">Sem correspondência</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 600; color: #C0392B;">7</div></div>
+            </div>
+            <div onClick="{{ confirmarTodas }}" style="height: 34px; padding: 0 16px; display: flex; align-items: center; background: #1256B3; color: #fff; border-radius: 4px; font-size: 12.5px; font-weight: 600; cursor: pointer;" style-hover="background: #0E4693;">Confirmar correspondências propostas</div>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; overflow: hidden;">
+            <div style="display: grid; grid-template-columns: 1fr 118px 1fr 150px; gap: 12px; padding: 9px 16px; background: #F8FAFC; border-bottom: 1px solid #E2E7EE; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #6B7A8D; font-weight: 600;">
+              <span>Movimento bancário</span>
+              <span style="text-align: center;">Confiança</span>
+              <span>Despesa proposta no NEXORA</span>
+              <span style="text-align: right;">Acção</span>
+            </div>
+            <sc-for list="{{ propostas }}" as="m" hint-placeholder-count="5">
+              <div style="display: grid; grid-template-columns: 1fr 118px 1fr 150px; gap: 12px; align-items: center; padding: 12px 16px; border-bottom: 1px solid #F4F7FA;" style-hover="background: #F9FBFD;">
+                <div>
+                  <div style="font-size: 12.5px; font-weight: 600;">{{ m.descBanco }}</div>
+                  <div style="display: flex; gap: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7A8798; margin-top: 3px;">
+                    <span>{{ m.dataBanco }}</span><span style="font-weight: 600; color: #45566B;">{{ m.valorBanco }}</span><span>{{ m.refBanco }}</span>
+                  </div>
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: {{ m.confCor }};">{{ m.conf }}%</div>
+                  <div style="height: 4px; border-radius: 2px; background: #EEF2F7; margin-top: 5px; overflow: hidden;"><div style="height: 100%; width: {{ m.conf }}%; background: {{ m.confCor }};"></div></div>
+                </div>
+                <div>
+                  <div style="font-size: 12.5px; font-weight: 600;">{{ m.descNexora }}</div>
+                  <div style="display: flex; gap: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7A8798; margin-top: 3px;">
+                    <span>{{ m.refNexora }}</span><span style="font-weight: 600; color: #45566B;">{{ m.valorNexora }}</span><span>{{ m.estadoNexora }}</span>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 7px; justify-content: flex-end;">
+                  <span onClick="{{ m.confirmar }}" style="padding: 5px 11px; background: #1E8A5F; color: #fff; border-radius: 3px; font-size: 11.5px; font-weight: 600; cursor: pointer;" style-hover="background: #17714D;">Confirmar</span>
+                  <span onClick="{{ toast }}" style="padding: 5px 11px; border: 1px solid #DDE3EB; border-radius: 3px; font-size: 11.5px; cursor: pointer; background: #fff;" style-hover="border-color: #B9C4D2;">Outra</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; overflow: hidden;">
+            <div style="padding: 12px 16px; border-bottom: 1px solid #E2E7EE; display: flex; align-items: center; gap: 10px;">
+              <span style="width: 7px; height: 7px; border-radius: 50%; background: #C0392B;"></span>
+              <span style="font-size: 13px; font-weight: 600;">Movimentos sem despesa correspondente</span>
+              <span style="font-size: 11.5px; color: #7A8798;">7 movimentos · 214 800 MT · exigem decisão</span>
+            </div>
+            <sc-for list="{{ semPar }}" as="s" hint-placeholder-count="3">
+              <div style="display: flex; align-items: center; gap: 14px; padding: 11px 16px; border-bottom: 1px solid #F4F7FA; font-size: 12.5px;" style-hover="background: #F9FBFD;">
+                <span style="flex: 1; font-weight: 500;">{{ s.desc }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7A8798;">{{ s.data }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600;">{{ s.valor }}</span>
+                <span onClick="{{ toast }}" style="font-size: 11.5px; font-weight: 600; color: #1256B3; cursor: pointer;">Criar despesa a partir do movimento</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ EXCEPÇÕES ============ -->
+      <sc-if value="{{ isExcepcoes }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .28s ease both; display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;">
+            <sc-for list="{{ categoriasExc }}" as="c" hint-placeholder-count="6">
+              <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; padding: 13px 14px; cursor: pointer; border-top: 3px solid {{ c.cor }};" style-hover="border-color: #C9D5E4;">
+                <div style="font-size: 11.5px; color: #45566B; line-height: 1.35; height: 32px;">{{ c.nome }}</div>
+                <div style="display: flex; align-items: baseline; gap: 7px; margin-top: 9px;">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600;">{{ c.n }}</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7A8798;">{{ c.valor }}</span>
+                </div>
+                <div style="font-size: 10.5px; color: #93A0B0; margin-top: 4px;">mais antiga: {{ c.antiguidade }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; overflow: hidden;">
+            <div style="padding: 13px 16px; border-bottom: 1px solid #E2E7EE; display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 13px; font-weight: 600;">Excepções abertas</span>
+              <span style="font-size: 11.5px; color: #7A8798;">Ordenadas por antiguidade e valor em risco</span>
+              <span style="margin-left: auto; font-size: 11.5px; color: #1256B3; font-weight: 600; cursor: pointer;">Exportar lista</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 170px 1.7fr 1fr 130px 1fr 170px; gap: 12px; padding: 9px 16px; background: #F8FAFC; border-bottom: 1px solid #E2E7EE; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #6B7A8D; font-weight: 600;">
+              <span>Tipo</span><span>Situação</span><span style="text-align: right;">Valor em risco</span><span>Antiguidade</span><span>Responsável</span><span style="text-align: right;">Acção sugerida</span>
+            </div>
+            <sc-for list="{{ excepcoes }}" as="e" hint-placeholder-count="7">
+              <div style="display: grid; grid-template-columns: 170px 1.7fr 1fr 130px 1fr 170px; gap: 12px; align-items: center; padding: 11px 16px; border-bottom: 1px solid #F4F7FA; font-size: 12.5px;" style-hover="background: #F9FBFD;">
+                <span><span style="display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 10.5px; font-weight: 600; background: {{ e.bg }}; color: {{ e.fg }};">{{ e.tipo }}</span></span>
+                <span style="color: #16283C;">{{ e.situacao }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; text-align: right; font-weight: 600;">{{ e.valor }}</span>
+                <span style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: {{ e.fg }};">{{ e.dias }}d</span>
+                  <span style="flex: 1; height: 4px; border-radius: 2px; background: #EEF2F7; overflow: hidden;"><span style="display: block; height: 100%; width: {{ e.pct }}%; background: {{ e.fg }};"></span></span>
+                </span>
+                <span style="font-size: 11.5px; color: #45566B;">{{ e.responsavel }}</span>
+                <span style="text-align: right;"><span onClick="{{ toast }}" style="font-size: 11.5px; font-weight: 600; color: #1256B3; cursor: pointer;">{{ e.acao }}</span></span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ TESOURARIA ============ -->
+      <sc-if value="{{ isTesouraria }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .28s ease both; display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="display: flex; background: #fff; border: 1px solid #DDE3EB; border-radius: 4px; overflow: hidden;">
+              <sc-for list="{{ horizontes }}" as="h" hint-placeholder-count="3">
+                <div onClick="{{ h.set }}" style="padding: 7px 16px; font-size: 12.5px; font-weight: 600; cursor: pointer; border-right: 1px solid #EEF2F7; background: {{ h.bg }}; color: {{ h.fg }};">{{ h.label }}</div>
+              </sc-for>
+            </div>
+            <div style="margin-left: auto; font-size: 12px; color: #7A8798;">Base: saldo actual + pagamentos aprovados + recorrências + receitas esperadas + histórico de 14 meses</div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 300px; gap: 16px; align-items: start;">
+            <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+              <div style="padding: 13px 16px; border-bottom: 1px solid #EEF2F7; display: flex; align-items: center; justify-content: space-between;">
+                <div style="font-size: 13px; font-weight: 600;">Projecção de tesouraria · {{ horizonteLabel }}</div>
+                <div style="display: flex; gap: 14px; font-size: 11px; color: #6B7A8D;">
+                  <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 9px; height: 9px; background: #1256B3; border-radius: 2px;"></span>Entradas</span>
+                  <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 9px; height: 9px; background: #C67A12; border-radius: 2px;"></span>Saídas</span>
+                  <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 9px; height: 2px; background: #0B1F33;"></span>Saldo</span>
+                </div>
+              </div>
+              <div style="padding: 16px;">
+                <div style="display: flex; align-items: flex-end; gap: 10px; height: 210px; border-bottom: 1px solid #E2E7EE; padding-bottom: 2px;">
+                  <sc-for list="{{ semanas }}" as="s" hint-placeholder-count="12">
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; gap: 3px; position: relative;">
+                      <div style="display: flex; align-items: flex-end; gap: 2px; width: 100%; justify-content: center; height: 100%;">
+                        <div style="width: 40%; background: #1256B3; border-radius: 2px 2px 0 0; height: {{ s.hIn }}px;"></div>
+                        <div style="width: 40%; background: {{ s.corOut }}; border-radius: 2px 2px 0 0; height: {{ s.hOut }}px;"></div>
+                      </div>
+                      <span style="font-size: 9.5px; color: #A6B2C1; font-family: 'IBM Plex Mono', monospace;">{{ s.label }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="margin: 0 16px 16px; border: 1px solid #F0DAD6; background: #FDF6F5; border-radius: 4px; padding: 11px 13px; font-size: 12px; color: #7A2E24; line-height: 1.55;">
+                <strong>Semana de 18 de Outubro:</strong> saldo projectado de <strong>612 000 MT</strong> contra um limite mínimo de <strong>800 000 MT</strong>. Três pagamentos de projecto (1 240 000 MT) concentram-se nessa semana — antecipar receita de doador ou reescalonar dois deles resolve a pressão.
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+                <div style="padding: 12px 14px; border-bottom: 1px solid #EEF2F7; font-size: 12.5px; font-weight: 600;">Composição da projecção</div>
+                <sc-for list="{{ drivers }}" as="d" hint-placeholder-count="6">
+                  <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #F4F7FA; font-size: 12px;">
+                    <span style="flex: 1; color: #45566B;">{{ d.nome }}</span>
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: {{ d.cor }};">{{ d.valor }}</span>
+                  </div>
+                </sc-for>
+                <div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: #F8FAFC;">
+                  <span style="flex: 1; font-size: 12px; font-weight: 600;">Saldo a 90 dias</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600;">3 964 000 MT</span>
+                </div>
+              </div>
+              <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; padding: 13px 14px;">
+                <div style="font-size: 12.5px; font-weight: 600; margin-bottom: 9px;">Cenários</div>
+                <sc-for list="{{ cenarios }}" as="c" hint-placeholder-count="3">
+                  <div style="display: flex; align-items: center; gap: 9px; padding: 7px 0; font-size: 12px; border-bottom: 1px solid #F4F7FA;">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background: {{ c.cor }};"></span>
+                    <span style="flex: 1; color: #45566B;">{{ c.nome }}</span>
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600;">{{ c.valor }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ PROJECTOS ============ -->
+      <sc-if value="{{ isProjectos }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .28s ease both; display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;">
+            <sc-for list="{{ projectosDet }}" as="p" hint-placeholder-count="4">
+              <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; padding: 16px 18px;">
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 14px;">
+                  <div>
+                    <div style="font-size: 14px; font-weight: 600;">{{ p.nome }}</div>
+                    <div style="font-size: 11.5px; color: #7A8798; margin-top: 4px;">{{ p.financiador }} · {{ p.periodo }} · gestor {{ p.gestor }}</div>
+                  </div>
+                  <span style="display: inline-block; padding: 3px 9px; border-radius: 3px; font-size: 10.5px; font-weight: 600; background: {{ p.estadoBg }}; color: {{ p.estadoFg }};">{{ p.estadoTexto }}</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px;">
+                  <div><div style="font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #8894A5; font-weight: 600;">Orçamento</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; margin-top: 4px;">{{ p.orcamento }}</div></div>
+                  <div><div style="font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #8894A5; font-weight: 600;">Executado</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; margin-top: 4px; color: #1256B3;">{{ p.executado }}</div></div>
+                  <div><div style="font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #8894A5; font-weight: 600;">Comprometido</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; margin-top: 4px; color: #C67A12;">{{ p.comprometido }}</div></div>
+                  <div><div style="font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #8894A5; font-weight: 600;">Disponível</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; margin-top: 4px; color: {{ p.corDisponivel }};">{{ p.disponivel }}</div></div>
+                </div>
+
+                <div style="height: 10px; border-radius: 5px; background: #EEF2F7; margin-top: 15px; position: relative; overflow: hidden;">
+                  <div style="position: absolute; left: 0; top: 0; height: 100%; width: {{ p.pctComprometido }}%; background: {{ p.corClara }};"></div>
+                  <div style="position: absolute; left: 0; top: 0; height: 100%; width: {{ p.pct }}%; background: {{ p.cor }};"></div>
+                  <div style="position: absolute; left: 80%; top: 0; height: 100%; width: 2px; background: #C0392B;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 10.5px; color: #93A0B0; margin-top: 6px; font-family: 'IBM Plex Mono', monospace;">
+                  <span>{{ p.pct }}% executado · {{ p.pctComprometido }}% com compromissos</span>
+                  <span>alerta a 80%</span>
+                </div>
+
+                <div style="margin-top: 14px; padding-top: 13px; border-top: 1px solid #F0F4F8; display: flex; gap: 18px; font-size: 11.5px; color: #7A8798;">
+                  <span>Elegibilidade: <strong style="color: #17714D;">{{ p.elegiveis }}</strong></span>
+                  <span>Por justificar: <strong style="color: #C67A12;">{{ p.porJustificar }}</strong></span>
+                  <span style="margin-left: auto; color: #1256B3; font-weight: 600; cursor: pointer;">Relatório do financiador →</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; overflow: hidden;">
+            <div style="padding: 13px 16px; border-bottom: 1px solid #E2E7EE; font-size: 13px; font-weight: 600;">Grant Control · cadeia rastreável financiamento → relatório</div>
+            <div style="display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr 1fr 1fr; gap: 12px; padding: 9px 16px; background: #F8FAFC; border-bottom: 1px solid #E2E7EE; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #6B7A8D; font-weight: 600;">
+              <span>Fonte de financiamento</span><span>Conta bancária associada</span><span style="text-align: right;">Recebido</span><span style="text-align: right;">Aplicado</span><span style="text-align: right;">Por justificar</span><span>Próximo relatório</span>
+            </div>
+            <sc-for list="{{ grants }}" as="g" hint-placeholder-count="4">
+              <div style="display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr 1fr 1fr; gap: 12px; align-items: center; padding: 11px 16px; border-bottom: 1px solid #F4F7FA; font-size: 12.5px;" style-hover="background: #F9FBFD;">
+                <span style="font-weight: 600;">{{ g.fonte }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #45566B;">{{ g.conta }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; text-align: right;">{{ g.recebido }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; text-align: right;">{{ g.aplicado }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; text-align: right; color: {{ g.cor }}; font-weight: 600;">{{ g.porJustificar }}</span>
+                <span style="font-size: 11.5px; color: #45566B;">{{ g.relatorio }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ FORNECEDORES ============ -->
+      <sc-if value="{{ isFornecedores }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .28s ease both; display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
+            <sc-for list="{{ insights }}" as="i" hint-placeholder-count="3">
+              <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; padding: 15px 16px; display: flex; gap: 13px;">
+                <span style="width: 30px; height: 30px; border-radius: 4px; background: {{ i.bg }}; color: {{ i.fg }}; display: flex; align-items: center; justify-content: center; font-size: 14px; flex: 0 0 30px;">{{ i.icone }}</span>
+                <div>
+                  <div style="font-size: 12.5px; font-weight: 600; line-height: 1.45;">{{ i.titulo }}</div>
+                  <div style="font-size: 11.5px; color: #7A8798; margin-top: 5px; line-height: 1.5;">{{ i.detalhe }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; overflow: hidden;">
+            <div style="padding: 13px 16px; border-bottom: 1px solid #E2E7EE; display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 13px; font-weight: 600;">Comportamento de fornecedores · 12 meses</span>
+              <span style="margin-left: auto; font-size: 11.5px; color: #7A8798;">Concentração: os 5 maiores representam 54% da despesa operacional</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.6fr 0.8fr 1fr 1fr 1fr 110px 1fr; gap: 12px; padding: 9px 16px; background: #F8FAFC; border-bottom: 1px solid #E2E7EE; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #6B7A8D; font-weight: 600;">
+              <span>Fornecedor</span><span style="text-align: right;">Transacções</span><span style="text-align: right;">Valor acumulado</span><span style="text-align: right;">Valor médio</span><span style="text-align: right;">Variação 3M</span><span>Tendência</span><span>% da despesa</span>
+            </div>
+            <sc-for list="{{ fornecedores }}" as="f" hint-placeholder-count="7">
+              <div style="display: grid; grid-template-columns: 1.6fr 0.8fr 1fr 1fr 1fr 110px 1fr; gap: 12px; align-items: center; padding: 11px 16px; border-bottom: 1px solid #F4F7FA; font-size: 12.5px;" style-hover="background: #F9FBFD;">
+                <span style="display: flex; align-items: center; gap: 9px;">
+                  <span style="width: 24px; height: 24px; border-radius: 3px; background: #EEF3F9; color: #45566B; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;">{{ f.sigla }}</span>
+                  <span style="font-weight: 600;">{{ f.nome }}</span>
+                </span>
+                <span style="font-family: 'IBM Plex Mono', monospace; text-align: right;">{{ f.transacoes }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; text-align: right; font-weight: 600;">{{ f.acumulado }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; text-align: right; color: #45566B;">{{ f.medio }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; text-align: right; font-weight: 600; color: {{ f.varCor }};">{{ f.variacao }}</span>
+                <span>
+                  <svg viewBox="0 0 100 26" style="width: 100%; height: 26px;">
+                    <polyline points="{{ f.spark }}" fill="none" stroke="{{ f.varCor }}" stroke-width="2" stroke-linejoin="round"></polyline>
+                  </svg>
+                </span>
+                <span style="display: flex; align-items: center; gap: 8px;">
+                  <span style="flex: 1; height: 6px; border-radius: 3px; background: #EEF2F7; overflow: hidden;"><span style="display: block; height: 100%; width: {{ f.pctBar }}%; background: #1256B3;"></span></span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #45566B; width: 32px; text-align: right;">{{ f.pct }}%</span>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ RELATÓRIOS ============ -->
+      <sc-if value="{{ isRelatorios }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .28s ease both; display: grid; grid-template-columns: 286px 1fr; gap: 16px; align-items: start;">
+          <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+            <div style="padding: 13px 16px; border-bottom: 1px solid #EEF2F7; font-size: 13px; font-weight: 600;">Selecção do relatório</div>
+            <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 15px;">
+              <sc-for list="{{ camposRelatorio }}" as="c" hint-placeholder-count="5">
+                <div>
+                  <div style="font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #6B7A8D; font-weight: 600; margin-bottom: 6px;">{{ c.label }}</div>
+                  <div style="height: 33px; border: 1px solid #DDE3EB; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; padding: 0 11px; font-size: 12.5px; cursor: pointer; background: #FCFDFE;" style-hover="border-color: #B9C4D2;">
+                    <span style="font-weight: 500;">{{ c.valor }}</span><span style="color: #97A3B4; font-size: 9px;">▼</span>
+                  </div>
+                </div>
+              </sc-for>
+              <div>
+                <div style="font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #6B7A8D; font-weight: 600; margin-bottom: 8px;">Incluir</div>
+                <sc-for list="{{ incluir }}" as="i" hint-placeholder-count="4">
+                  <div style="display: flex; align-items: center; gap: 9px; padding: 5px 0; font-size: 12.5px; cursor: pointer;">
+                    <span style="width: 16px; height: 16px; border-radius: 3px; border: 1.5px solid {{ i.borda }}; background: {{ i.fundo }}; color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center;">{{ i.marca }}</span>
+                    <span>{{ i.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 4px;">
+                <div onClick="{{ toast }}" style="height: 34px; display: flex; align-items: center; justify-content: center; background: #1256B3; color: #fff; border-radius: 4px; font-size: 12.5px; font-weight: 600; cursor: pointer;" style-hover="background: #0E4693;">Exportar PDF</div>
+                <div style="display: flex; gap: 8px;">
+                  <div onClick="{{ toast }}" style="flex: 1; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #DDE3EB; border-radius: 4px; font-size: 12px; cursor: pointer; background: #fff;" style-hover="border-color: #B9C4D2;">Excel</div>
+                  <div onClick="{{ toast }}" style="flex: 1; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #DDE3EB; border-radius: 4px; font-size: 12px; cursor: pointer; background: #fff;" style-hover="border-color: #B9C4D2;">CSV</div>
+                </div>
+                <div onClick="{{ toast }}" style="height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #1256B3; color: #1256B3; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; background: #fff;" style-hover="background: #F2F6FB;">Lote mensal para contabilidade</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+            <div style="padding: 14px 18px; border-bottom: 1px solid #E2E7EE; display: flex; align-items: flex-end; justify-content: space-between;">
+              <div>
+                <div style="font-size: 15px; font-weight: 600;">Despesa por rubrica orçamental</div>
+                <div style="font-size: 11.5px; color: #7A8798; margin-top: 4px;">01/08/2026 a 31/08/2026 · Todas as fontes · 214 despesas · gerado a 12/08/2026 08:41</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #6B7A8D; font-weight: 600;">Total do período</div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 21px; font-weight: 600;">1 932 400 MT</div>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.7fr 0.8fr 1fr 1fr 1fr 1fr; gap: 12px; padding: 9px 18px; background: #F8FAFC; border-bottom: 1px solid #E2E7EE; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #6B7A8D; font-weight: 600;">
+              <span>Rubrica</span><span style="text-align: right;">Nº</span><span style="text-align: right;">Aprovado</span><span style="text-align: right;">Pago</span><span style="text-align: right;">Por pagar</span><span style="text-align: right;">% do total</span>
+            </div>
+            <sc-for list="{{ linhasRelatorio }}" as="l" hint-placeholder-count="8">
+              <div style="display: grid; grid-template-columns: 1.7fr 0.8fr 1fr 1fr 1fr 1fr; gap: 12px; align-items: center; padding: 10px 18px; border-bottom: 1px solid #F4F7FA; font-size: 12.5px;" style-hover="background: #F9FBFD;">
+                <span style="font-weight: 500;">{{ l.rubrica }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; text-align: right; color: #7A8798;">{{ l.n }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; text-align: right;">{{ l.aprovado }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; text-align: right;">{{ l.pago }}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; text-align: right; color: {{ l.corPorPagar }};">{{ l.porPagar }}</span>
+                <span style="display: flex; align-items: center; gap: 8px; justify-content: flex-end;">
+                  <span style="width: 54px; height: 5px; border-radius: 3px; background: #EEF2F7; overflow: hidden;"><span style="display: block; height: 100%; width: {{ l.pct }}%; background: #1256B3;"></span></span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; width: 34px; text-align: right;">{{ l.pct }}%</span>
+                </span>
+              </div>
+            </sc-for>
+            <div style="display: grid; grid-template-columns: 1.7fr 0.8fr 1fr 1fr 1fr 1fr; gap: 12px; padding: 12px 18px; background: #F8FAFC; font-size: 12.5px; font-weight: 600;">
+              <span>Total</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; text-align: right;">214</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; text-align: right;">1 932 400</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; text-align: right;">1 145 500</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; text-align: right; color: #C67A12;">786 900</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; text-align: right;">100%</span>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ CONFIGURAÇÃO ============ -->
+      <sc-if value="{{ isConfig }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .28s ease both; display: grid; grid-template-columns: 224px 1fr; gap: 16px; align-items: start;">
+          <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px; padding: 8px;">
+            <sc-for list="{{ tabsConfig }}" as="t" hint-placeholder-count="6">
+              <div onClick="{{ t.set }}" style="padding: 9px 11px; border-radius: 4px; font-size: 12.5px; font-weight: 500; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }};" style-hover="background: #F2F6FB;">{{ t.label }}</div>
+            </sc-for>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+              <div style="padding: 14px 18px; border-bottom: 1px solid #EEF2F7;">
+                <div style="font-size: 13.5px; font-weight: 600;">Etapas activas do ciclo</div>
+                <div style="font-size: 11.5px; color: #7A8798; margin-top: 4px;">Nenhuma organização deve alterar o seu processo para caber no NEXORA. Active apenas as etapas que existem no seu percurso — o que é obrigatório é o rasto.</div>
+              </div>
+              <sc-for list="{{ etapas }}" as="e" hint-placeholder-count="8">
+                <div onClick="{{ e.toggle }}" style="display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-bottom: 1px solid #F4F7FA; cursor: pointer;" style-hover="background: #F9FBFD;">
+                  <span style="width: 34px; height: 19px; border-radius: 10px; background: {{ e.trackBg }}; position: relative; flex: 0 0 34px; transition: background .15s ease;">
+                    <span style="position: absolute; top: 2px; left: {{ e.knobLeft }}px; width: 15px; height: 15px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(11,31,51,.28); transition: left .15s ease;"></span>
+                  </span>
+                  <span style="flex: 1;">
+                    <span style="font-size: 12.5px; font-weight: 600; display: block; color: {{ e.corTitulo }};">{{ e.nome }}</span>
+                    <span style="font-size: 11.5px; color: #7A8798;">{{ e.descricao }}</span>
+                  </span>
+                  <span style="font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 3px; background: {{ e.tagBg }}; color: {{ e.tagFg }};">{{ e.tag }}</span>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+              <div style="padding: 14px 18px; border-bottom: 1px solid #E2E7EE; display: flex; align-items: center; gap: 12px;">
+                <div>
+                  <div style="font-size: 13.5px; font-weight: 600;">Matriz de aprovação · v4 vigente</div>
+                  <div style="font-size: 11.5px; color: #7A8798; margin-top: 4px;">Combine valor, tipo, projecto, fonte e centro de custo. Alterações ficam registadas com autor e data.</div>
+                </div>
+                <div onClick="{{ toast }}" style="margin-left: auto; height: 32px; padding: 0 14px; display: flex; align-items: center; background: #1256B3; color: #fff; border-radius: 4px; font-size: 12.5px; font-weight: 600; cursor: pointer;" style-hover="background: #0E4693;">Adicionar regra</div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1.2fr 1.4fr 1fr 1.5fr 0.7fr 90px; gap: 12px; padding: 9px 18px; background: #F8FAFC; border-bottom: 1px solid #E2E7EE; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #6B7A8D; font-weight: 600;">
+                <span>Dimensão</span><span>Condição</span><span>Verificação</span><span>Aprovadores</span><span style="text-align: center;">Níveis</span><span></span>
+              </div>
+              <sc-for list="{{ matriz }}" as="m" hint-placeholder-count="6">
+                <div style="display: grid; grid-template-columns: 1.2fr 1.4fr 1fr 1.5fr 0.7fr 90px; gap: 12px; align-items: center; padding: 11px 18px; border-bottom: 1px solid #F4F7FA; font-size: 12.5px;" style-hover="background: #F9FBFD;">
+                  <span><span style="display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 10.5px; font-weight: 600; background: #EEF3F9; color: #2B4A6F;">{{ m.dimensao }}</span></span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #16283C;">{{ m.condicao }}</span>
+                  <span style="font-size: 11.5px; color: {{ m.verifCor }}; font-weight: 500;">{{ m.verificacao }}</span>
+                  <span style="font-size: 11.5px; color: #45566B;">{{ m.aprovadores }}</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; text-align: center; font-weight: 600;">{{ m.niveis }}</span>
+                  <span style="display: flex; gap: 10px; justify-content: flex-end; font-size: 11.5px; font-weight: 600;">
+                    <span style="color: #1256B3; cursor: pointer;">Editar</span>
+                    <span style="color: #97A3B4; cursor: pointer;">⋯</span>
+                  </span>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+                <div style="padding: 13px 16px; border-bottom: 1px solid #EEF2F7;">
+                  <div style="font-size: 12.5px; font-weight: 600;">Fonte de financiamento → conta bancária</div>
+                  <div style="font-size: 11px; color: #7A8798; margin-top: 3px;">O sistema recusa combinações não previstas.</div>
+                </div>
+                <sc-for list="{{ ligacoes }}" as="l" hint-placeholder-count="4">
+                  <div style="display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-bottom: 1px solid #F4F7FA; font-size: 12px;">
+                    <span style="flex: 1; font-weight: 500;">{{ l.fonte }}</span>
+                    <span style="color: #C9D5E4;">→</span>
+                    <span style="flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #45566B;">{{ l.conta }}</span>
+                    <span style="font-size: 10.5px; font-weight: 600; padding: 2px 7px; border-radius: 3px; background: {{ l.bg }}; color: {{ l.fg }};">{{ l.regra }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background: #fff; border: 1px solid #E2E7EE; border-radius: 4px;">
+                <div style="padding: 13px 16px; border-bottom: 1px solid #EEF2F7;">
+                  <div style="font-size: 12.5px; font-weight: 600;">Documento de autorização</div>
+                  <div style="font-size: 11px; color: #7A8798; margin-top: 3px;">Gerado pelo sistema a partir da despesa registada.</div>
+                </div>
+                <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 12px;">
+                  <sc-for list="{{ docConfig }}" as="d" hint-placeholder-count="4">
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 12px;">
+                      <span style="color: #7A8798; width: 132px;">{{ d.label }}</span>
+                      <span style="flex: 1; font-weight: 600;">{{ d.valor }}</span>
+                    </div>
+                  </sc-for>
+                  <div style="margin-top: 4px; padding: 10px 12px; background: #F8FAFC; border: 1px solid #EEF2F7; border-radius: 3px; font-size: 11.5px; color: #6B7A8D; line-height: 1.55;">Assinaturas de verificação e autorização capturadas electronicamente, com autor, data e hora.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+    </main>
+  </div>
+
+  <!-- TOAST -->
+  <sc-if value="{{ toastMsg }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: #0B1F33; color: #fff; padding: 11px 18px; border-radius: 4px; font-size: 12.5px; font-weight: 500; box-shadow: 0 8px 24px rgba(11,31,51,.28); display: flex; align-items: center; gap: 10px; animation: nx-toast .2s ease both; z-index: 60;">
+      <span style="width: 6px; height: 6px; border-radius: 50%; background: #4FBE93;"></span>
+      {{ toastMsg }}
+    </div>
+  </sc-if>
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1600, &quot;height&quot;: 1000}, &quot;orgName&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;Grupo Zambeze&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Organização&quot;}}">
+class Component extends DCLogic {
+  state = {
+    route: 'dashboard',
+    filtro: 'todas',
+    horizonte: 90,
+    tabConfig: 'etapas',
+    selId: 'DSP-2026-0841',
+    aprovadas: [],
+    confirmadas: [],
+    resolvidos: [],
+    checked: [0, 1, 2],
+    etapasOff: ['requisicao'],
+    toastMsg: null
+  };
+
+  go(route) { this.setState({ route }); }
+
+  flash(msg) {
+    this.setState({ toastMsg: msg });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toastMsg: null }), 2600);
+  }
+
+  renderVals() {
+    const r = this.state.route;
+    const P = this.props;
+    const BLUE = '#1256B3', TEAL = '#17A3AE', AMBER = '#C67A12', RED = '#C0392B', GREEN = '#1E8A5F', VIOLET = '#6E62B6';
+
+    const titles = {
+      dashboard: ['Dashboard da Direcção', 'Posição consolidada · actualizada há 4 minutos'],
+      watch: ['NEXORA WATCH', 'Vigilância activa · resumo diário de 12 de Agosto'],
+      despesas: ['Controlo de Despesas', '214 despesas no período · ciclo completo rastreado'],
+      detalhe: ['Despesa DSP-2026-0841', 'Serviços · Fundo Doador UE · aguarda aprovação'],
+      aprovacoes: ['Aprovações', 'Caixa de entrada com rasto auditável'],
+      pagamentos: ['Controlo de Pagamentos', 'Estados explícitos entre aprovação e banco'],
+      reconciliacao: ['Reconciliação Bancária', 'Correspondência automática · confirmação em bloco'],
+      excepcoes: ['Centro de Excepções', 'O que não bate certo tem um lugar próprio'],
+      tesouraria: ['Previsão de Tesouraria', 'Posição de caixa projectada a 30, 60 e 90 dias'],
+      projectos: ['Projectos, Orçamentos e Grants', 'Execução orçamental permanente'],
+      fornecedores: ['Inteligência de Fornecedores', 'Comportamento acumulado e concentração de despesa'],
+      relatorios: ['Relatórios e Entrega à Contabilidade', 'O relatório não é produzido — é seleccionado'],
+      config: ['Configuração da Organização', 'Configurável, não prescritivo']
+    };
+    const [pageTitle, pageSub] = titles[r] || titles.dashboard;
+
+    const navDef = [
+      { g: 'Visão geral' },
+      { k: 'dashboard', label: 'Dashboard', icon: '▤' },
+      { k: 'watch', label: 'NEXORA WATCH', icon: '◔', badge: '6', badgeBg: RED },
+      { g: 'Ciclo da despesa' },
+      { k: 'despesas', label: 'Despesas', icon: '☰' },
+      { k: 'aprovacoes', label: 'Aprovações', icon: '✓', badge: String(4 - this.state.aprovadas.length), badgeBg: '#C67A12' },
+      { k: 'pagamentos', label: 'Pagamentos', icon: '⇄' },
+      { k: 'reconciliacao', label: 'Reconciliação', icon: '⇋' },
+      { k: 'excepcoes', label: 'Excepções', icon: '⚠', badge: '11', badgeBg: '#8894A5' },
+      { g: 'Inteligência' },
+      { k: 'tesouraria', label: 'Previsão de tesouraria', icon: '◈' },
+      { k: 'projectos', label: 'Projectos e grants', icon: '◫' },
+      { k: 'fornecedores', label: 'Fornecedores', icon: '◇' },
+      { k: 'relatorios', label: 'Relatórios', icon: '⎘' },
+      { g: 'Sistema' },
+      { k: 'config', label: 'Configuração', icon: '⚙' }
+    ];
+    const nav = navDef.map(n => n.g
+      ? { isGroup: true, isItem: false, label: n.g }
+      : {
+          isGroup: false, isItem: true, label: n.label, icon: n.icon,
+          badge: n.badge || null, badgeBg: n.badgeBg || RED,
+          bg: (r === n.k || (n.k === 'despesas' && r === 'detalhe')) ? 'rgba(23,163,174,.16)' : 'transparent',
+          fg: (r === n.k || (n.k === 'despesas' && r === 'detalhe')) ? '#FFFFFF' : '#B4C6D6',
+          shadow: (r === n.k || (n.k === 'despesas' && r === 'detalhe')) ? 'inset 2px 0 0 #17A3AE' : 'none',
+          go: () => this.go(n.k)
+        });
+
+    const kpis = [
+      { label: 'Caixa actual', value: '4,81 M', unit: 'MT', delta: '▲ 6,2% vs mês anterior', deltaColor: GREEN, pct: 72, bar: BLUE },
+      { label: 'Comprometido', value: '1,29 M', unit: 'MT', delta: '48 despesas aprovadas', deltaColor: AMBER, pct: 44, bar: AMBER },
+      { label: 'A receber', value: '2,15 M', unit: 'MT', delta: '3 tranches de doador', deltaColor: '#7A8798', pct: 58, bar: TEAL },
+      { label: 'Despesa do mês', value: '1,93 M', unit: 'MT', delta: '▼ 3,1% vs Julho', deltaColor: GREEN, pct: 63, bar: VIOLET },
+      { label: 'Aprovações pendentes', value: '12', unit: 'despesas', delta: '4 há mais de 3 dias', deltaColor: AMBER, pct: 33, bar: AMBER },
+      { label: 'Por reconciliar', value: '34', unit: 'movimentos', delta: '96% já correspondido', deltaColor: GREEN, pct: 96, bar: GREEN }
+    ];
+
+    const projBase = [
+      { nome: 'Projecto Zambeze · Saúde', pct: 84, pctComprometido: 92, executado: '4 200 000', orcamento: '5 000 000', financiador: 'UE' },
+      { nome: 'Programa Nampula', pct: 61, pctComprometido: 68, executado: '1 830 000', orcamento: '3 000 000', financiador: 'DANIDA' },
+      { nome: 'Operação corrente', pct: 47, pctComprometido: 52, executado: '1 128 000', orcamento: '2 400 000', financiador: 'Próprio' },
+      { nome: 'Fundo Emergência Sofala', pct: 22, pctComprometido: 30, executado: '264 000', orcamento: '1 200 000', financiador: 'USAID' }
+    ];
+    const projectos = projBase.map(p => ({
+      ...p,
+      cor: p.pct >= 80 ? RED : p.pct >= 60 ? AMBER : BLUE,
+      corClara: p.pct >= 80 ? '#F2C9C3' : p.pct >= 60 ? '#EFD9B8' : '#C3D6F0'
+    }));
+
+    const atencao = [
+      { cor: RED, texto: '2 pagamentos vencem hoje sem confirmação bancária', valor: '186 400 MT', acao: 'Marcar pago', dot: 1 },
+      { cor: RED, texto: 'Projecto Zambeze ultrapassou 80% do orçamento aprovado', valor: '4 200 000 MT', acao: 'Ver projecto' },
+      { cor: AMBER, texto: '4 despesas aguardam aprovação há mais de 3 dias', valor: '512 900 MT', acao: 'Aprovar' },
+      { cor: AMBER, texto: '3 despesas sem documento de suporte associado', valor: '94 200 MT', acao: 'Anexar' },
+      { cor: '#C8A21A', texto: 'Adiantamento a M. Chirindza por regularizar há 41 dias', valor: '48 000 MT', acao: 'Regularizar' }
+    ];
+
+    const naturezas = [
+      { nome: 'Serviços e consultoria', valor: '676 340', pct: 35, cor: BLUE },
+      { nome: 'Salários e encargos', valor: '482 100', pct: 25, cor: TEAL },
+      { nome: 'Compras e equipamento', valor: '348 200', pct: 18, cor: AMBER },
+      { nome: 'Viagens e logística', valor: '251 200', pct: 13, cor: VIOLET },
+      { nome: 'Outros', valor: '174 560', pct: 9, cor: '#B9C4D2' }
+    ];
+
+    const mk = (texto, acao, meta) => ({ texto, acao, meta, resolve: () => this.flash('Acção registada com autor, data e hora.') });
+    const watch = [
+      { nivel: 'Crítico', n: 2, cor: RED, itens: [mk('Pagamento a Sasol Moçambique vence hoje — 118 400 MT, sem confirmação bancária.', 'Marcar como pago', 'há 2h'), mk('Despesa duplicada provável: FAC-0839 e FAC-0841, mesmo valor e fornecedor.', 'Comparar', 'há 5h')] },
+      { nivel: 'Risco', n: 2, cor: AMBER, itens: [mk('Projecto Zambeze em 84% do orçamento com 4 meses de execução por cumprir.', 'Ver execução', 'hoje'), mk('Fornecedor Tecnhosat concentra 21% da despesa operacional do trimestre.', 'Analisar', 'hoje')] },
+      { nivel: 'Pendente', n: 4, cor: '#C8A21A', itens: [mk('4 despesas aguardam a sua aprovação há mais de 3 dias — 512 900 MT.', 'Abrir caixa de entrada', '3–6 dias'), mk('3 despesas sem documento de suporte antes do fecho do mês.', 'Anexar documentos', '2 dias')] },
+      { nivel: 'Saudável', n: 3, cor: GREEN, itens: [mk('96% das transacções bancárias de Agosto estão reconciliadas.', 'Ver extrato', 'hoje'), mk('Tempo médio de aprovação desceu para 1,4 dias (era 3,2).', 'Ver indicador', '30 dias')] }
+    ];
+
+    const scoreVals = [71, 68, 74, 76, 73, 79, 81, 80, 83, 85, 84, 87];
+    const scoreHist = scoreVals.map((v, i) => ({
+      v, sem: 'S' + (i + 1), h: Math.round((v / 100) * 62) + 6,
+      cor: i === scoreVals.length - 1 ? '#0B1F33' : v >= 80 ? '#8CC7AE' : '#C3D6F0'
+    }));
+
+    const estados = {
+      'Aguarda aprovação': ['#FDF3E3', AMBER],
+      'Aprovada': ['#EAF1FB', BLUE],
+      'Pronta a pagar': ['#EAF1FB', BLUE],
+      'Paga': ['#E8F5EE', '#17714D'],
+      'Reconciliada': ['#EDF7F2', '#17714D'],
+      'Em verificação': ['#F1EFFA', VIOLET],
+      'Sem documento': ['#FDF0EE', RED]
+    };
+    const despesasBase = [
+      ['DSP-2026-0841', 'Tecnhosat Serviços', 'Manutenção de rede e servidores · Agosto', '412 500', '18/08', 'Serviços · TI', 'Zambeze', 'Aguarda aprovação'],
+      ['DSP-2026-0840', 'Sasol Moçambique', 'Combustível frota — lote mensal', '118 400', 'hoje', 'Logística', 'Operação corrente', 'Pronta a pagar'],
+      ['DSP-2026-0839', 'Tecnhosat Serviços', 'Manutenção de rede e servidores · Julho', '412 500', '02/08', 'Serviços · TI', 'Zambeze', 'Paga'],
+      ['DSP-2026-0838', 'Cornelder Logística', 'Desembaraço aduaneiro contentor 2 un.', '286 900', '24/08', 'Logística', 'Nampula', 'Em verificação'],
+      ['DSP-2026-0837', 'Clínica Cruz Azul', 'Seguro de saúde — colaboradores', '164 200', '30/08', 'Salários e encargos', 'Operação corrente', 'Aprovada'],
+      ['DSP-2026-0836', 'Moza Consulting', 'Auditoria intermédia do projecto', '350 000', '05/09', 'Serviços', 'Zambeze', 'Aguarda aprovação'],
+      ['DSP-2026-0835', 'Papelaria Central', 'Consumíveis de escritório', '38 750', '11/08', 'Compras', 'Operação corrente', 'Sem documento'],
+      ['DSP-2026-0834', 'TDM Telecom', 'Internet dedicada — 3 delegações', '96 300', '20/08', 'Serviços', 'Operação corrente', 'Reconciliada'],
+      ['DSP-2026-0833', 'Hotel Cardoso', 'Alojamento missão Sofala (4 noites)', '74 600', '09/08', 'Viagens', 'Sofala', 'Paga'],
+      ['DSP-2026-0832', 'Electricidade de Moçambique', 'Energia — sede e armazém', '142 800', '15/08', 'Serviços', 'Operação corrente', 'Aprovada']
+    ];
+    let despesas = despesasBase.map(d => ({
+      ref: d[0], fornecedor: d[1], descricao: d[2], valor: d[3] + ' MT', vencimento: d[4],
+      vencCor: d[4] === 'hoje' ? RED : '#45566B',
+      rubrica: d[5], projecto: d[6], estado: d[7],
+      estadoBg: estados[d[7]][0], estadoFg: estados[d[7]][1],
+      open: () => this.setState({ route: 'detalhe', selId: d[0] })
+    }));
+    const f = this.state.filtro;
+    if (f === 'aprovar') despesas = despesas.filter(d => d.estado === 'Aguarda aprovação' || d.estado === 'Em verificação');
+    if (f === 'naopagas') despesas = despesas.filter(d => d.estado === 'Aprovada' || d.estado === 'Pronta a pagar');
+    if (f === 'semdoc') despesas = despesas.filter(d => d.estado === 'Sem documento');
+
+    const filtroDef = [['todas', 'Todas', 214], ['aprovar', 'Por aprovar', 12], ['naopagas', 'Aprovadas não pagas', 48], ['semdoc', 'Sem documento', 3]];
+    const filtros = filtroDef.map(([k, label, n]) => ({
+      label, n, set: () => this.setState({ filtro: k }),
+      bg: f === k ? '#EAF1FB' : '#fff', fg: f === k ? BLUE : '#45566B',
+      countFg: f === k ? BLUE : '#93A0B0'
+    }));
+
+    const resumoDespesas = [
+      { label: 'Total registado', valor: '1 932 400 MT' },
+      { label: 'Aprovado por pagar', valor: '786 900 MT' },
+      { label: 'Aguarda aprovação', valor: '512 900 MT' },
+      { label: 'Vence em 7 dias', valor: '742 300 MT' }
+    ];
+
+    const sel = despesas.find(d => d.ref === this.state.selId) || {
+      ref: 'DSP-2026-0841', fornecedor: 'Tecnhosat Serviços', descricao: 'Manutenção de rede e servidores · Agosto',
+      valor: '412 500 MT', vencimento: '18/08', estado: 'Aguarda aprovação', estadoBg: '#FDF3E3', estadoFg: AMBER
+    };
+
+    const campos = [
+      ['Fornecedor', 'Tecnhosat Serviços, Lda'], ['NUIT', '400 218 776'], ['Nº de factura', 'FAC-2026-0841'],
+      ['Data de emissão', '02/08/2026'], ['Data de vencimento', '18/08/2026'], ['Forma de pagamento', 'Transferência bancária'],
+      ['Tipo de despesa', 'Serviços'], ['Rubrica orçamental', '6.2.1 · Serviços de TI'], ['Fonte de financiamento', 'Fundo Doador UE'],
+      ['Projecto', 'Zambeze · Saúde'], ['Centro de custo', 'Sistemas de Informação'], ['Solicitante', 'Nélio Bila · Operações']
+    ].map(([label, valor]) => ({ label, valor }));
+
+    const extraidos = [
+      ['Fornecedor', 'Tecnhosat Serviços, Lda', '98%', '#E8F5EE', '#17714D'],
+      ['Nº de factura', 'FAC-2026-0841', '96%', '#E8F5EE', '#17714D'],
+      ['Valor total', '412 500,00 MT', '99%', '#E8F5EE', '#17714D'],
+      ['Data de emissão', '02/08/2026', '94%', '#E8F5EE', '#17714D'],
+      ['Data de vencimento', '18/08/2026', '76%', '#FDF3E3', AMBER]
+    ].map(([label, valor, conf, bg, fg]) => ({ label, valor, conf, bg, fg }));
+
+    const checklistDef = [
+      ['Existe saldo na rubrica 6.2.1 (disponível 1 240 000 MT)', 'H. Cossa · 11/08'],
+      ['Documentação de suporte completa (factura + contrato)', 'H. Cossa · 11/08'],
+      ['Retenção na fonte de 10% calculada e reportada', 'H. Cossa · 11/08'],
+      ['Despesa elegível face às regras do financiador UE', '—'],
+      ['Sem adiantamentos anteriores a abater', '—']
+    ];
+    const checklist = checklistDef.map(([texto, autor], i) => {
+      const on = this.state.checked.includes(i);
+      return {
+        texto, autor: on ? autor : '—', marca: on ? '✓' : '',
+        borda: on ? GREEN : '#C9D5E4', fundo: on ? GREEN : '#fff',
+        corTexto: on ? '#16283C' : '#66768A',
+        toggle: () => this.setState(s => ({ checked: on ? s.checked.filter(x => x !== i) : s.checked.concat(i) }))
+      };
+    });
+
+    const percursoDef = [
+      ['Registo da despesa', 'Nélio Bila · factura carregada e lida automaticamente', '02/08/2026 09:14', 'done'],
+      ['Verificação financeira', 'Helena Cossa · 3 de 5 confirmações registadas', '11/08/2026 15:02', 'done'],
+      ['Aprovação nível 1', 'Alcino Maido · Direcção Financeira', 'aguarda desde 11/08 15:02', 'active'],
+      ['Aprovação nível 2', 'Gestor do Projecto Zambeze (regra de fonte de financiamento)', 'por iniciar', 'todo'],
+      ['Pagamento e reconciliação', 'Fila de pagamento → extrato BCI 1234567', 'por iniciar', 'todo']
+    ];
+    const percurso = percursoDef.map(([etapa, detalhe, quando, st]) => ({
+      etapa, detalhe, quando,
+      marca: st === 'done' ? '✓' : '',
+      cor: st === 'done' ? GREEN : st === 'active' ? BLUE : '#C9D5E4',
+      fundo: st === 'done' ? GREEN : '#fff',
+      linha: st === 'done' ? '#BFE3D0' : '#EEF2F7',
+      corTitulo: st === 'todo' ? '#8894A5' : '#16283C'
+    }));
+
+    const auditoria = [
+      ['12/08 08:22', 'Consulta do processo', 'A. Maido'],
+      ['11/08 15:02', 'Verificação financeira submetida (3 confirmações)', 'H. Cossa'],
+      ['11/08 14:41', 'Rubrica alterada de 6.2.9 para 6.2.1', 'H. Cossa'],
+      ['02/08 09:14', 'Despesa criada por leitura automática de FAC-2026-0841.pdf', 'N. Bila']
+    ].map(([quando, acao, autor]) => ({ quando, acao, autor }));
+
+    const aprovDef = [
+      ['Tecnhosat Serviços', 'DSP-2026-0841', 'Manutenção de rede e servidores · Agosto', '412 500 MT', '18/08', '6.2.1 Serviços de TI', 'Zambeze · Saúde', 'Fundo Doador UE', '1 240 000 MT', 'valor acima de 250 000 MT em despesa de Serviços financiada por fundo de doador → 2 aprovadores, sendo um o gestor do projecto.', 'Vence em 6 dias', AMBER, '#FDF3E3'],
+      ['Moza Consulting', 'DSP-2026-0836', 'Auditoria intermédia do projecto', '350 000 MT', '05/09', '6.2.4 Auditoria', 'Zambeze · Saúde', 'Fundo Doador UE', '812 000 MT', 'despesa de projecto com financiamento externo → aprovação do gestor de projecto obrigatória.', 'Pendente há 4 dias', RED, '#FDF0EE'],
+      ['Cornelder Logística', 'DSP-2026-0838', 'Desembaraço aduaneiro contentor 2 un.', '286 900 MT', '24/08', '6.3.2 Logística', 'Programa Nampula', 'DANIDA', '498 300 MT', 'escalão 250 000 – 1 000 000 MT → verificação financeira + 2 aprovadores.', 'Normal', '#7A8798', '#F1F4F8'],
+      ['Electricidade de Moçambique', 'DSP-2026-0832', 'Energia — sede e armazém', '142 800 MT', '15/08', '6.1.3 Utilidades', 'Operação corrente', 'Fundos próprios', '2 100 000 MT', 'despesa recorrente abaixo de 250 000 MT → 1 aprovador.', 'Vence em 3 dias', AMBER, '#FDF3E3']
+    ];
+    const aprovacoes = aprovDef
+      .filter(a => !this.state.aprovadas.includes(a[1]))
+      .map(a => ({
+        fornecedor: a[0], ref: a[1], descricao: a[2], valor: a[3], vencimento: a[4], rubrica: a[5],
+        projecto: a[6], fonte: a[7], saldo: a[8], porque: a[9], urgencia: a[10], urgCor: a[11], urgBg: a[12],
+        aprovar: () => { this.setState(s => ({ aprovadas: s.aprovadas.concat(a[1]) })); this.flash('Despesa ' + a[1] + ' aprovada · registada com autor, data e hora.'); },
+        open: () => this.setState({ route: 'detalhe', selId: a[1] })
+      }));
+    const pendentesTexto = aprovacoes.length + ' à sua espera · ' + (this.state.aprovadas.length ? this.state.aprovadas.length + ' aprovadas nesta sessão' : 'nenhuma aprovada hoje');
+
+    const tempos = [
+      { nome: 'Direcção Financeira', valor: '1,4 dias', pct: 34, cor: GREEN },
+      { nome: 'Gestores de projecto', valor: '2,8 dias', pct: 62, cor: AMBER },
+      { nome: 'Administração', valor: '4,1 dias', pct: 88, cor: RED }
+    ];
+
+    const pipelineDef = [
+      ['Aprovada', 48, '786 900', BLUE], ['Pronta a pagar', 21, '512 400', BLUE],
+      ['Pagamento iniciado', 6, '186 400', AMBER], ['Paga', 112, '1 145 500', GREEN],
+      ['Correspondida', 108, '1 098 200', GREEN], ['Reconciliada', 104, '1 062 700', '#17714D']
+    ];
+    const pipeline = pipelineDef.map(([nome, n, valor, cor], i) => ({
+      nome, n, valor: valor + ' MT', cor,
+      seta: i < pipelineDef.length - 1,
+      borda: i === 1 ? '#C3D6F0' : '#EEF2F7',
+      fundo: i === 1 ? '#F7FAFE' : '#FCFDFE'
+    }));
+
+    const filaDef = [
+      ['Sasol Moçambique', 'DSP-2026-0840', '118 400 MT', 'hoje', 'BCI · 1234567 (operacional)', 'Fundos próprios', 'Pagamento iniciado', '#FDF3E3', AMBER],
+      ['Clínica Cruz Azul', 'DSP-2026-0837', '164 200 MT', '30/08', 'BCI · 1234567 (operacional)', 'Fundos próprios', 'Pronta a pagar', '#EAF1FB', BLUE],
+      ['Electricidade de Moçambique', 'DSP-2026-0832', '142 800 MT', '15/08', 'BCI · 1234567 (operacional)', 'Fundos próprios', 'Pronta a pagar', '#EAF1FB', BLUE],
+      ['Tecnhosat Serviços', 'DSP-2026-0839', '412 500 MT', '02/08', 'Standard · 9982211 (UE)', 'Fundo Doador UE', 'Paga', '#E8F5EE', '#17714D'],
+      ['Cornelder Logística', 'DSP-2026-0838', '286 900 MT', '24/08', 'Millennium · 7745120 (DANIDA)', 'DANIDA', 'Pronta a pagar', '#EAF1FB', BLUE],
+      ['Hotel Cardoso', 'DSP-2026-0833', '74 600 MT', '09/08', 'BCI · 1234567 (operacional)', 'Fundos próprios', 'Paga', '#E8F5EE', '#17714D']
+    ];
+    const fila = filaDef.map(x => ({
+      nome: x[0], ref: x[1], valor: x[2], vencimento: x[3], vencCor: x[3] === 'hoje' ? RED : '#45566B',
+      conta: x[4], fonte: x[5], estado: x[6], bg: x[7], fg: x[8]
+    }));
+    const filaTexto = '21 despesas · a conta de origem é determinada pela fonte de financiamento';
+
+    const propostasDef = [
+      ['TRF TECHNOSAT SERVICOS LDA', '02/08/2026', '-412 500,00', 'REF 88213004', 'Tecnhosat · manutenção Julho', 'DSP-2026-0839', '412 500,00 MT', 'Paga', 99],
+      ['DEB DIRECTO EDM SEDE', '07/08/2026', '-142 800,00', 'REF 77120448', 'Electricidade de Moçambique · Agosto', 'DSP-2026-0832', '142 800,00 MT', 'Aprovada', 96],
+      ['TRF HOTEL CARDOSO SA', '09/08/2026', '-74 600,00', 'REF 88214119', 'Hotel Cardoso · missão Sofala', 'DSP-2026-0833', '74 600,00 MT', 'Paga', 94],
+      ['TRF TDM TELECOMUNICACOES', '06/08/2026', '-96 300,00', 'REF 88213877', 'TDM · internet dedicada', 'DSP-2026-0834', '96 300,00 MT', 'Paga', 88],
+      ['TRF PAPELARIA CENTRAL', '11/08/2026', '-38 750,00', 'REF 88215002', 'Papelaria Central · consumíveis', 'DSP-2026-0835', '38 750,00 MT', 'Sem documento', 72]
+    ];
+    const propostas = propostasDef
+      .filter(p => !this.state.confirmadas.includes(p[5]))
+      .map(p => ({
+        descBanco: p[0], dataBanco: p[1], valorBanco: p[2], refBanco: p[3],
+        descNexora: p[4], refNexora: p[5], valorNexora: p[6], estadoNexora: p[7], conf: p[8],
+        confCor: p[8] >= 95 ? GREEN : p[8] >= 80 ? BLUE : AMBER,
+        confirmar: () => { this.setState(s => ({ confirmadas: s.confirmadas.concat(p[5]) })); this.flash('Correspondência confirmada · ' + p[5] + ' reconciliada.'); }
+      }));
+    const reconciliados = 104 + this.state.confirmadas.length;
+    const propostosN = propostas.length + 19;
+
+    const semPar = [
+      { desc: 'TRF RECEBIDA — DELEGACAO UE PAGAMENTO TRANCHE 3', data: '05/08/2026', valor: '+1 400 000,00' },
+      { desc: 'DEB COMISSOES E ENCARGOS BANCARIOS', data: '01/08/2026', valor: '-4 850,00' },
+      { desc: 'TRF ENVIADA — M CHIRINDZA ADIANTAMENTO', data: '03/08/2026', valor: '-48 000,00' }
+    ];
+
+    const categoriasExc = [
+      { nome: 'Movimento bancário sem despesa', n: 7, valor: '214 800 MT', antiguidade: '11 dias', cor: RED },
+      { nome: 'Aprovada sem pagamento identificado', n: 5, valor: '186 400 MT', antiguidade: '9 dias', cor: RED },
+      { nome: 'Despesa sem documento de suporte', n: 3, valor: '94 200 MT', antiguidade: '6 dias', cor: AMBER },
+      { nome: 'Pagamento vencido ou a vencer', n: 4, valor: '742 300 MT', antiguidade: 'hoje', cor: AMBER },
+      { nome: 'Despesa potencialmente duplicada', n: 1, valor: '412 500 MT', antiguidade: '3 dias', cor: VIOLET },
+      { nome: 'Adiantamento por regularizar', n: 2, valor: '86 000 MT', antiguidade: '41 dias', cor: '#C8A21A' }
+    ];
+
+    const excDef = [
+      ['Duplicação', 'FAC-0839 e FAC-0841 · Tecnhosat, mesmo valor e descrição', '412 500 MT', 3, 12, 'N. Bila', 'Comparar processos', '#F1EFFA', VIOLET],
+      ['Sem correspondência', 'Transferência recebida da Delegação UE sem receita registada', '1 400 000 MT', 7, 28, 'H. Cossa', 'Registar receita', '#FDF0EE', RED],
+      ['Aprovada não paga', 'Clínica Cruz Azul aprovada há 9 dias sem pagamento', '164 200 MT', 9, 36, 'Tesouraria', 'Colocar na fila', '#FDF0EE', RED],
+      ['Vencida', 'Sasol Moçambique · vence hoje, pagamento iniciado sem confirmação', '118 400 MT', 0, 6, 'Tesouraria', 'Confirmar pagamento', '#FDF3E3', AMBER],
+      ['Sem documento', 'Papelaria Central · consumíveis sem factura anexada', '38 750 MT', 6, 24, 'N. Bila', 'Anexar documento', '#FDF3E3', AMBER],
+      ['Adiantamento', 'M. Chirindza · saldo por regularizar há 41 dias', '48 000 MT', 41, 92, 'RH', 'Notificar', '#FBF6DF', '#8A6D10'],
+      ['Elegibilidade', 'Viagem Sofala sem justificação de elegibilidade UE', '74 600 MT', 5, 20, 'Gestor Zambeze', 'Justificar', '#F1EFFA', VIOLET]
+    ];
+    const excepcoes = excDef.map(e => ({
+      tipo: e[0], situacao: e[1], valor: e[2], dias: e[3], pct: e[4], responsavel: e[5], acao: e[6], bg: e[7], fg: e[8]
+    }));
+
+    const h = this.state.horizonte;
+    const horizontes = [30, 60, 90].map(v => ({
+      label: v + ' dias', set: () => this.setState({ horizonte: v }),
+      bg: h === v ? '#EAF1FB' : '#fff', fg: h === v ? BLUE : '#45566B'
+    }));
+    const horizonteLabel = h === 30 ? 'próximos 30 dias' : h === 60 ? 'próximos 60 dias' : 'próximos 90 dias';
+    const nSem = h === 30 ? 5 : h === 60 ? 9 : 13;
+    const inflows = [820, 240, 1400, 180, 260, 940, 210, 180, 1250, 240, 190, 880, 320];
+    const outflows = [610, 780, 520, 690, 1240, 580, 640, 1180, 610, 720, 560, 690, 640];
+    const semanas = Array.from({ length: nSem }, (_, i) => ({
+      label: i === 0 ? 'S0' : 'S' + i,
+      hIn: Math.round(inflows[i] / 8),
+      hOut: Math.round(outflows[i] / 8),
+      corOut: outflows[i] > 1000 ? RED : AMBER
+    }));
+
+    const drivers = [
+      { nome: 'Saldo actual consolidado', valor: '4 812 400 MT', cor: '#16283C' },
+      { nome: 'Pagamentos aprovados', valor: '−1 286 900 MT', cor: AMBER },
+      { nome: 'Despesa recorrente estimada', valor: '−2 410 000 MT', cor: AMBER },
+      { nome: 'Tranches de doador confirmadas', valor: '+2 145 000 MT', cor: BLUE },
+      { nome: 'Receita própria projectada', valor: '+840 000 MT', cor: BLUE },
+      { nome: 'Desvio histórico (14 meses)', valor: '±4,8%', cor: '#7A8798' }
+    ];
+    const cenarios = [
+      { nome: 'Base', valor: '3 964 000 MT', cor: BLUE },
+      { nome: 'Tranche UE atrasa 30 dias', valor: '2 564 000 MT', cor: AMBER },
+      { nome: 'Atraso + despesa +10%', valor: '1 890 000 MT', cor: RED }
+    ];
+
+    const projectosDet = projBase.map(p => {
+      const cor = p.pct >= 80 ? RED : p.pct >= 60 ? AMBER : BLUE;
+      return {
+        nome: p.nome, financiador: p.financiador === 'UE' ? 'Delegação da União Europeia' : p.financiador === 'DANIDA' ? 'DANIDA' : p.financiador === 'USAID' ? 'USAID' : 'Fundos próprios',
+        periodo: 'Jan 2026 – Dez 2026', gestor: p.pct >= 80 ? 'C. Mabjaia' : 'R. Sitoe',
+        orcamento: p.orcamento + ' MT', executado: p.executado + ' MT',
+        comprometido: p.pct >= 80 ? '412 500 MT' : '186 000 MT',
+        disponivel: p.pct >= 80 ? '387 500 MT' : '984 000 MT',
+        corDisponivel: p.pct >= 80 ? RED : GREEN,
+        pct: p.pct, pctComprometido: p.pctComprometido, cor,
+        corClara: p.pct >= 80 ? '#F2C9C3' : p.pct >= 60 ? '#EFD9B8' : '#C3D6F0',
+        estadoTexto: p.pct >= 80 ? 'Acima de 80% · alerta activo' : p.pct >= 60 ? 'Em execução normal' : 'Execução inicial',
+        estadoBg: p.pct >= 80 ? '#FDF0EE' : '#EEF3F9', estadoFg: p.pct >= 80 ? RED : '#2B4A6F',
+        elegiveis: p.pct >= 80 ? '96%' : '100%', porJustificar: p.pct >= 80 ? '164 200 MT' : '0 MT'
+      };
+    });
+
+    const grants = [
+      { fonte: 'Fundo Doador UE · FED/2026/041', conta: 'Standard 9982211', recebido: '4 200 000', aplicado: '3 812 500', porJustificar: '387 500', cor: AMBER, relatorio: '30/09/2026 · trimestral' },
+      { fonte: 'DANIDA · Programa Nampula', conta: 'Millennium 7745120', recebido: '3 000 000', aplicado: '1 830 000', porJustificar: '0', cor: GREEN, relatorio: '15/10/2026 · semestral' },
+      { fonte: 'USAID · Emergência Sofala', conta: 'BCI 5541203', recebido: '1 200 000', aplicado: '264 000', porJustificar: '0', cor: GREEN, relatorio: '31/12/2026 · final' },
+      { fonte: 'Fundos próprios', conta: 'BCI 1234567', recebido: '—', aplicado: '1 128 000', porJustificar: '—', cor: '#7A8798', relatorio: '—' }
+    ];
+
+    const insights = [
+      { icone: '▲', bg: '#FDF0EE', fg: RED, titulo: 'Tecnhosat subiu 38% em três meses', detalhe: 'De 298 000 para 412 500 MT por ciclo, sem alteração de contrato registada. Vale confirmar o âmbito facturado.' },
+      { icone: '◉', bg: '#FDF3E3', fg: AMBER, titulo: 'Concentração de 21% num único fornecedor', detalhe: 'Tecnhosat representa 21% da despesa operacional do trimestre — acima do limite interno de 15%.' },
+      { icone: '◇', bg: '#EAF1FB', fg: BLUE, titulo: '3 fornecedores com facturação irregular', detalhe: 'Intervalos entre facturas variam mais de 40% — indício de facturação retroactiva.' }
+    ];
+    const fornDef = [
+      ['TS', 'Tecnhosat Serviços', 14, '4 962 000', '354 428', '+38%', RED, '10,22 30,18 50,14 70,9 90,4', 21, 21],
+      ['SM', 'Sasol Moçambique', 12, '1 812 400', '151 033', '+4%', '#45566B', '10,16 30,15 50,17 70,14 90,13', 12, 12],
+      ['CL', 'Cornelder Logística', 9, '1 604 900', '178 322', '−7%', GREEN, '10,8 30,11 50,10 70,14 90,17', 9, 9],
+      ['MC', 'Moza Consulting', 4, '1 400 000', '350 000', '+12%', AMBER, '10,18 30,14 50,15 70,11 90,9', 8, 8],
+      ['EM', 'Electricidade de Moçambique', 12, '1 348 600', '112 383', '+2%', '#45566B', '10,15 30,14 50,15 70,13 90,14', 7, 7],
+      ['TD', 'TDM Telecom', 12, '984 300', '82 025', '0%', '#45566B', '10,14 30,14 50,14 70,14 90,14', 5, 5],
+      ['HC', 'Hotel Cardoso', 7, '512 800', '73 257', '−18%', GREEN, '10,6 30,9 50,12 70,15 90,19', 3, 3]
+    ];
+    const fornecedores = fornDef.map(x => ({
+      sigla: x[0], nome: x[1], transacoes: x[2], acumulado: x[3] + ' MT', medio: x[4] + ' MT',
+      variacao: x[5], varCor: x[6], spark: x[7], pct: x[8], pctBar: x[9] * 4
+    }));
+
+    const camposRelatorio = [
+      { label: 'Período', valor: '01/08/2026 – 31/08/2026' },
+      { label: 'Agrupar por', valor: 'Rubrica orçamental' },
+      { label: 'Fonte de financiamento', valor: 'Todas' },
+      { label: 'Projecto', valor: 'Todos' },
+      { label: 'Estado', valor: 'Aprovadas, pagas e reconciliadas' }
+    ];
+    const incluir = [
+      ['Documentos de suporte', true], ['Comprovativos bancários', true],
+      ['Percurso de aprovação', true], ['Movimentos por reconciliar', false]
+    ].map(([label, on]) => ({ label, marca: on ? '✓' : '', borda: on ? BLUE : '#C9D5E4', fundo: on ? BLUE : '#fff' }));
+
+    const linhasRelatorio = [
+      ['6.2.1 · Serviços de TI', 6, '824 900', '412 400', '412 500', 43],
+      ['6.1.1 · Salários e encargos', 41, '482 100', '482 100', '0', 25],
+      ['6.3.2 · Logística e transporte', 18, '286 900', '0', '286 900', 15],
+      ['6.1.3 · Utilidades', 9, '142 800', '0', '142 800', 7],
+      ['6.4.1 · Viagens e ajudas de custo', 12, '74 600', '74 600', '0', 4],
+      ['6.2.4 · Auditoria e consultoria', 3, '68 300', '68 300', '0', 3],
+      ['6.5.2 · Consumíveis de escritório', 22, '38 750', '38 750', '0', 2],
+      ['6.9.9 · Outros', 103, '14 050', '14 050', '0', 1]
+    ].map(l => ({
+      rubrica: l[0], n: l[1], aprovado: l[2], pago: l[3], porPagar: l[4], pct: l[5],
+      corPorPagar: l[4] === '0' ? '#93A0B0' : AMBER
+    }));
+
+    const tabsDef = [['etapas', 'Etapas do ciclo'], ['doc', 'Documento de autorização'], ['matriz', 'Matriz de aprovação'], ['check', 'Lista de verificação'], ['nomen', 'Nomenclatura'], ['contas', 'Fontes e contas'], ['papeis', 'Papéis e permissões']];
+    const tabsConfig = tabsDef.map(([k, label]) => ({
+      label, set: () => this.setState({ tabConfig: k }),
+      bg: this.state.tabConfig === k ? '#EAF1FB' : 'transparent',
+      fg: this.state.tabConfig === k ? BLUE : '#45566B'
+    }));
+
+    const etapasDef = [
+      ['requisicao', 'Requisição e aquisição', 'Necessidade, cotações e justificação da escolha do fornecedor', 'Opcional'],
+      ['despesa', 'Registo de despesa', 'Núcleo do sistema — sempre activo', 'Obrigatório'],
+      ['verificacao', 'Verificação financeira', 'Lista de confirmações antes da aprovação', 'Configurável'],
+      ['autorizacao', 'Documento de autorização', 'Memorando ou nota formal gerada pelo sistema', 'Configurável'],
+      ['aprovacao', 'Aprovação', 'Matriz multidimensional de aprovadores', 'Obrigatório'],
+      ['pagamento', 'Pagamento', 'Fila, lotes, estados e referências bancárias', 'Obrigatório'],
+      ['adiantamentos', 'Adiantamentos', 'Saldos próprios abatidos em despesas futuras', 'Opcional'],
+      ['reconciliacao', 'Reconciliação bancária', 'Importação de extrato e correspondência automática', 'Obrigatório']
+    ];
+    const etapas = etapasDef.map(([k, nome, descricao, tag]) => {
+      const forced = tag === 'Obrigatório';
+      const on = forced || !this.state.etapasOff.includes(k);
+      return {
+        nome, descricao, tag,
+        trackBg: on ? (forced ? '#8894A5' : BLUE) : '#D5DEE8',
+        knobLeft: on ? 17 : 2,
+        corTitulo: on ? '#16283C' : '#8894A5',
+        tagBg: tag === 'Obrigatório' ? '#F1F4F8' : tag === 'Configurável' ? '#EAF1FB' : '#F8FAFC',
+        tagFg: tag === 'Obrigatório' ? '#66768A' : tag === 'Configurável' ? BLUE : '#8894A5',
+        toggle: () => {
+          if (forced) { this.flash('Esta etapa é estrutural: o rasto é obrigatório no NEXORA.'); return; }
+          this.setState(s => ({ etapasOff: on ? s.etapasOff.concat(k) : s.etapasOff.filter(x => x !== k) }));
+        }
+      };
+    });
+
+    const matriz = [
+      ['Valor', '≤ 250 000 MT', 'Dispensada', '#8894A5', 'Responsável financeiro', 1],
+      ['Valor', '250 000 – 1 000 000 MT', 'Obrigatória', BLUE, 'Resp. financeiro → Direcção', 2],
+      ['Valor', '> 1 000 000 MT', 'Obrigatória', BLUE, 'Resp. financeiro → Direcção → Conselho', 3],
+      ['Fonte de financiamento', 'Fundo Doador UE (qualquer valor)', 'Obrigatória', BLUE, '+ Gestor do projecto', 2],
+      ['Tipo de despesa', 'Salários e encargos', 'Dispensada', '#8894A5', 'RH → Direcção', 2],
+      ['Excepção', 'Despesa fora de orçamento', 'Obrigatória', BLUE, 'Sobe um nível automaticamente', 3]
+    ].map(m => ({ dimensao: m[0], condicao: m[1], verificacao: m[2], verifCor: m[3], aprovadores: m[4], niveis: m[5] }));
+
+    const ligacoes = [
+      { fonte: 'Fundo Doador UE', conta: 'Standard 9982211', regra: 'Exclusiva', bg: '#EAF1FB', fg: BLUE },
+      { fonte: 'DANIDA · Nampula', conta: 'Millennium 7745120', regra: 'Exclusiva', bg: '#EAF1FB', fg: BLUE },
+      { fonte: 'USAID · Sofala', conta: 'BCI 5541203', regra: 'Exclusiva', bg: '#EAF1FB', fg: BLUE },
+      { fonte: 'Fundos próprios', conta: 'BCI 1234567', regra: 'Excepção autorizável', bg: '#FDF3E3', fg: AMBER }
+    ];
+    const docConfig = [
+      { label: 'Existe no processo', valor: 'Sim' },
+      { label: 'Designação', valor: 'Nota de Autorização de Pagamento' },
+      { label: 'Numeração', valor: 'NAP-{ano}-{sequencial}' },
+      { label: 'Gerado em', valor: 'Após verificação financeira' },
+      { label: 'Prepara / verifica / autoriza', valor: 'Contabilista · Resp. Financeiro · Direcção' }
+    ];
+
+    return {
+      orgName: P.orgName ?? 'Grupo Zambeze',
+      pageTitle, pageSub, nav,
+      isDashboard: r === 'dashboard', isWatch: r === 'watch', isDespesas: r === 'despesas',
+      isDetalhe: r === 'detalhe', isAprovacoes: r === 'aprovacoes', isPagamentos: r === 'pagamentos',
+      isReconciliacao: r === 'reconciliacao', isExcepcoes: r === 'excepcoes', isTesouraria: r === 'tesouraria',
+      isProjectos: r === 'projectos', isFornecedores: r === 'fornecedores', isRelatorios: r === 'relatorios',
+      isConfig: r === 'config',
+      goWatch: () => this.go('watch'), goDespesas: () => this.go('despesas'),
+      goTesouraria: () => this.go('tesouraria'), goProjectos: () => this.go('projectos'),
+      goExcepcoes: () => this.go('excepcoes'),
+      toast: () => this.flash('Acção registada · rasto de auditoria actualizado.'),
+      toastMsg: this.state.toastMsg,
+      kpis, projectos, atencao, naturezas, watch, scoreHist,
+      despesas, filtros, resumoDespesas,
+      sel, campos, extraidos, checklist, percurso, auditoria,
+      aprovacoes, pendentesTexto, tempos,
+      pipeline, fila, filaTexto,
+      propostas, semPar, reconciliados, propostosN,
+      confirmarTodas: () => { this.setState({ confirmadas: propostasDef.map(p => p[5]) }); this.flash('23 correspondências confirmadas em bloco · 7 excepções mantidas.'); },
+      criarLote: () => this.flash('Lote de pagamento criado · 3 despesas · 425 400 MT.'),
+      categoriasExc, excepcoes,
+      horizontes, horizonteLabel, semanas, drivers, cenarios,
+      projectosDet, grants, insights, fornecedores,
+      camposRelatorio, incluir, linhasRelatorio,
+      tabsConfig, etapas, matriz, ligacoes, docConfig
+    };
+  }
+}
+
+</script>
+</body>
+</html>

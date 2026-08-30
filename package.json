@@ -1,0 +1,30 @@
+{
+  "name": "nexora-projectos",
+  "private": true,
+  "version": "1.0.0",
+  "description": "NEXORA Projectos - sistema corporativo de gestao e acompanhamento de projectos",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./apps/*\" dev",
+    "build": "pnpm --filter shared build && pnpm --filter api build && pnpm --filter web build",
+    "test": "pnpm --recursive test",
+    "typecheck": "pnpm --recursive typecheck",
+    "lint": "pnpm --recursive lint",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "tables": "pnpm --filter api tables",
+    "seed": "pnpm --filter api seed",
+    "seed:admin": "pnpm --filter api seed:admin"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "bcrypt"
+    ]
+  }
+}

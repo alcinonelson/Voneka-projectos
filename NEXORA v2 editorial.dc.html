@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #F7F6F3; }
+  * { box-sizing: border-box; }
+  a { color: #0F4C4C; text-decoration: none; border-bottom: 1px solid rgba(15,76,76,.3); }
+  a:hover { color: #0A3634; border-bottom-color: #0A3634; }
+  input { font: inherit; }
+  ::-webkit-scrollbar { width: 11px; height: 11px; }
+  ::-webkit-scrollbar-thumb { background: #D8D6CE; border-radius: 6px; border: 3px solid #F7F6F3; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  @keyframes nx-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes nx-toast { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+</style>
+</helmet>
+
+<div style="width: 100%; height: 100vh; overflow-x: auto; overflow-y: hidden; background: #F7F6F3;">
+<div style="display: flex; height: 100vh; min-width: 1440px; overflow: hidden; font-family: 'Archivo', system-ui, sans-serif; font-size: 13px; color: #161D26; background: #F7F6F3; -webkit-font-smoothing: antialiased;">
+
+  <!-- ===================== RAIL ===================== -->
+  <aside style="width: 232px; flex: 0 0 232px; background: #FFFFFF; border-right: 1px solid #E5E3DC; display: flex; flex-direction: column;">
+    <div style="padding: 26px 24px 22px;">
+      <div style="font-family: 'Newsreader', serif; font-size: 23px; font-weight: 500; letter-spacing: .02em; line-height: 1;">NEXORA</div>
+      <div style="font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #8B8578; margin-top: 7px;">Financial Operations</div>
+    </div>
+
+    <div style="flex: 1; overflow-y: auto; padding: 0 12px 12px;">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="14">
+        <sc-if value="{{ n.isGroup }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 20px 12px 8px; font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: #A8A296;">{{ n.label }}</div>
+        </sc-if>
+        <sc-if value="{{ n.isItem }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ n.go }}" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 3px; cursor: pointer; font-size: 13.5px; transition: background .12s ease; background: {{ n.bg }}; color: {{ n.fg }}; font-weight: {{ n.weight }};" style-hover="background: #F3F2EE;">
+            <span style="flex: 1;">{{ n.label }}</span>
+            <sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size: 11px; font-variant-numeric: tabular-nums; color: {{ n.badgeFg }};">{{ n.badge }}</span>
+            </sc-if>
+          </div>
+        </sc-if>
+      </sc-for>
+    </div>
+
+    <div style="border-top: 1px solid #EDEBE4; padding: 18px 24px 22px;">
+      <div style="font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: #A8A296;">Saúde operacional</div>
+      <div style="display: flex; align-items: baseline; gap: 9px; margin-top: 8px;">
+        <span style="font-family: 'Newsreader', serif; font-size: 30px; font-weight: 500; line-height: 1;">87</span>
+        <span style="font-size: 11.5px; color: #2E6B4F;">+4 em 30 dias</span>
+      </div>
+      <div style="font-size: 11.5px; color: #7C766A; margin-top: 8px; line-height: 1.5;">Sem problemas críticos há 6 dias.</div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
+
+    <header style="height: 60px; flex: 0 0 60px; background: #FFFFFF; border-bottom: 1px solid #E5E3DC; display: flex; align-items: center; padding: 0 32px; gap: 20px;">
+      <div style="flex: 1; max-width: 340px; position: relative;">
+        <input placeholder="Procurar despesa, fornecedor ou referência" style="width: 100%; height: 34px; border: 1px solid #E1DFD8; border-radius: 3px; background: #FBFAF8; padding: 0 12px; font-size: 12.5px; color: #161D26; outline: none;" style-focus="border-color: #0F4C4C; background: #fff;" />
+      </div>
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 20px;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer; color: #4A5461;" style-hover="color: #161D26;">
+          <span style="color: #8B8578;">Entidade</span><span style="font-weight: 500; color: #161D26;">{{ orgName }}</span><span style="font-size: 8px; color: #A8A296;">▼</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer; color: #4A5461;" style-hover="color: #161D26;">
+          <span style="color: #8B8578;">Período</span><span style="font-weight: 500; color: #161D26;">Agosto 2026</span><span style="font-size: 8px; color: #A8A296;">▼</span>
+        </div>
+        <div style="width: 1px; height: 26px; background: #E5E3DC;"></div>
+        <div onClick="{{ goWatch }}" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 12.5px;">
+          <span style="width: 7px; height: 7px; border-radius: 50%; background: #A8321F;"></span>
+          <span style="font-weight: 500;">2 críticos</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+          <div style="width: 30px; height: 30px; border-radius: 50%; background: #16233A; color: #fff; font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center;">AM</div>
+          <div style="line-height: 1.25;">
+            <div style="font-size: 12.5px; font-weight: 500;">Alcino Maido</div>
+            <div style="font-size: 11px; color: #8B8578;">Direcção Financeira</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main style="flex: 1; overflow-y: auto; padding: 34px 40px 56px;">
+
+      <!-- Cabeçalho editorial comum a todos os ecrãs -->
+      <div style="max-width: 1180px; margin-bottom: 30px;">
+        <div style="font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: #A8A296;">{{ eyebrow }}</div>
+        <h1 style="font-family: 'Newsreader', serif; font-size: 31px; font-weight: 500; letter-spacing: -.01em; margin: 11px 0 0;">{{ pageTitle }}</h1>
+        <p style="font-size: 15px; line-height: 1.65; color: #4A5461; margin: 12px 0 0; max-width: 820px; text-wrap: pretty;">{{ pageLede }}</p>
+      </div>
+
+      <!-- ============ DASHBOARD ============ -->
+      <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+        <div style="animation: nx-in .3s ease both; display: flex; flex-direction: column; gap: 34px;">
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #E5E3DC; border: 1px solid #E5E3DC;">
+            <sc-for list="{{ headline }}" as="k" hint-placeholder-count="3">
+              <div style="background: #FFFFFF; padding: 24px 26px 22px;">
+                <div style="font-size: 10.5px; letter-spacing: .13em; text-transform: uppercase; color: #8B8578;">{{ k.label }}</div>
+                <div style="font-family: 'Newsreader', serif; font-size: 44px; font-weight: 500; line-height: 1.05; margin-top: 14px; white-space: nowrap; letter-spacing: -.015em;">{{ k.value }}<span style="font-family: 'Archivo', sans-serif; font-size: 15px; font-weight: 400; color: #8B8578; margin-left: 8px;">{{ k.unit }}</span></div>
+                <div style="font-size: 13px; color: #4A5461; margin-top: 12px; line-height: 1.55;">{{ k.context }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div>
+            <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;">
+              <h2 style="font-family: 'Newsreader', serif; font-size: 21px; font-weight: 500; margin: 0;">Exige decisão hoje</h2>
+              <span style="font-size: 12.5px; color: #8B8578;">Três assuntos. Cada um com a acção que o resolve.</span>
+              <span onClick="{{ goWatch }}" style="margin-left: auto; font-size: 12.5px; color: #0F4C4C; cursor: pointer; font-weight: 500;">Ver tudo no WATCH →</span>
+            </div>
+            <div style="background: #fff; border: 1px solid #E5E3DC;">
+              <sc-for list="{{ decisoes }}" as="d" hint-placeholder-count="3">
+                <div style="display: flex; align-items: center; gap: 20px; padding: 18px 24px; border-bottom: 1px solid #EDEBE4;" style-hover="background: #FBFAF8;">
+                  <span style="width: 6px; height: 34px; background: {{ d.cor }}; flex: 0 0 6px;"></span>
+                  <div style="flex: 1;">
+                    <div style="font-size: 14.5px; font-weight: 500;">{{ d.titulo }}</div>
+                    <div style="font-size: 12.5px; color: #7C766A; margin-top: 5px;">{{ d.detalhe }}</div>
+                  </div>
+                  <div style="font-family: 'Newsreader', serif; font-size: 21px; white-space: nowrap;">{{ d.valor }}</div>
+                  <div onClick="{{ d.acaoFn }}" style="height: 34px; padding: 0 16px; display: flex; align-items: center; background: #0F4C4C; color: #fff; font-size: 12.5px; font-weight: 500; cursor: pointer; border-radius: 2px; white-space: nowrap;" style-hover="background: #0A3634;">{{ d.acao }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; align-items: start;">
+            <div>
+              <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;">
+                <h2 style="font-family: 'Newsreader', serif; font-size: 21px; font-weight: 500; margin: 0;">Se nada mudar</h2>
+                <span style="font-size: 12.5px; color: #8B8578;">Saldo projectado, 90 dias</span>
+              </div>
+              <div style="background: #fff; border: 1px solid #E5E3DC; padding: 22px 24px 18px;">
+                <svg viewBox="0 0 720 190" style="width: 100%; height: 190px; display: block;">
+                  <line x1="0" y1="30" x2="720" y2="30" stroke="#F0EEE8" stroke-width="1"></line>
+                  <line x1="0" y1="80" x2="720" y2="80" stroke="#F0EEE8" stroke-width="1"></line>
+                  <line x1="0" y1="130" x2="720" y2="130" stroke="#F0EEE8" stroke-width="1"></line>
+                  <line x1="0" y1="165" x2="720" y2="165" stroke="#E5E3DC" stroke-width="1"></line>
+                  <line x1="0" y1="146" x2="720" y2="146" stroke="#C9C4B8" stroke-width="1" stroke-dasharray="4 5"></line>
+                  <text x="4" y="141" font-family="Archivo" font-size="10" fill="#8B8578">limite mínimo · 800 000 MT</text>
+                  <polyline points="0,88 60,82 120,96 180,78 240,92 300,70 360,88 420,110 480,126 540,150 600,132 660,112 720,100" fill="none" stroke="#16233A" stroke-width="2"></polyline>
+                  <circle cx="540" cy="150" r="4.5" fill="#A8321F"></circle>
+                  <text x="500" y="172" font-family="Archivo" font-size="10.5" fill="#A8321F">18 Out · 612 000 MT</text>
+                </svg>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: #A8A296; font-variant-numeric: tabular-nums; margin-top: 6px;">
+                  <span>Hoje</span><span>Setembro</span><span>Outubro</span><span>Novembro</span>
+                </div>
+                <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid #EDEBE4; font-size: 13.5px; line-height: 1.65; color: #4A5461;">
+                  A pressão está numa única semana: <strong style="color: #161D26; font-weight: 500;">18 a 24 de Outubro</strong>, quando três pagamentos de projecto (1 240 000 MT) coincidem. Reescalonar dois deles devolve o saldo acima do limite.
+                  <span onClick="{{ goTesouraria }}" style="color: #0F4C4C; cursor: pointer; font-weight: 500; margin-left: 6px;">Ver previsão →</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;">
+                <h2 style="font-family: 'Newsreader', serif; font-size: 21px; font-weight: 500; margin: 0;">Onde foi o dinheiro</h2>
+                <span style="font-size: 12.5px; color: #8B8578;">Agosto</span>
+              </div>
+              <div style="background: #fff; border: 1px solid #E5E3DC; padding: 8px 24px 20px;">
+                <sc-for list="{{ naturezas }}" as="n" hint-placeholder-count="5">
+                  <div style="padding: 15px 0; border-bottom: 1px solid #EDEBE4;">
+                    <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px;">
+                      <span style="font-size: 13.5px;">{{ n.nome }}</span>
+                      <span style="font-variant-numeric: tabular-nums; font-size: 13.5px; font-weight: 500; white-space: nowrap;">{{ n.valor }}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                      <span style="flex: 1; height: 3px; background: #EDEBE4;"><span style="display: block; height: 100%; width: {{ n.pct }}%; background: #16233A;"></span></span>
+                      <span style="font-size: 11.5px; color: #8B8578; font-variant-numeric: tabular-nums; width: 30px; text-align: right;">{{ n.pct }}%</span>
+                    </div>
+                  </div>
+                </sc-for>
+                <div style="padding-top: 16px; font-size: 12.5px; color: #7C766A; line-height: 1.6;">Serviços e consultoria pesam mais um terço que em Julho — quase todo o aumento vem de um único fornecedor.
+                  <span onClick="{{ goFornecedores }}" style="color: #0F4C4C; cursor: pointer; font-weight: 500;">Ver fornecedores →</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ WATCH ============ -->
+      <sc-if value="{{ isWatch }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .3s ease both; display: flex; flex-direction: column; gap: 30px;">
+          <sc-for list="{{ watch }}" as="w" hint-placeholder-count="4">
+            <div>
+              <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px;">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ w.cor }};"></span>
+                <h2 style="font-family: 'Newsreader', serif; font-size: 20px; font-weight: 500; margin: 0;">{{ w.nivel }}</h2>
+                <span style="font-size: 12.5px; color: #8B8578;">{{ w.resumo }}</span>
+              </div>
+              <div style="background: #fff; border: 1px solid #E5E3DC;">
+                <sc-for list="{{ w.itens }}" as="i" hint-placeholder-count="2">
+                  <div style="display: flex; align-items: center; gap: 22px; padding: 17px 24px; border-bottom: 1px solid #EDEBE4;" style-hover="background: #FBFAF8;">
+                    <div style="flex: 1;">
+                      <div style="font-size: 14px; font-weight: 500;">{{ i.texto }}</div>
+                      <div style="font-size: 12.5px; color: #7C766A; margin-top: 5px;">{{ i.detalhe }}</div>
+                    </div>
+                    <span style="font-size: 11.5px; color: #A8A296; white-space: nowrap;">detectado {{ i.meta }}</span>
+                    <div onClick="{{ i.resolve }}" style="height: 32px; padding: 0 15px; display: flex; align-items: center; border: 1px solid #16233A; color: #16233A; font-size: 12.5px; font-weight: 500; cursor: pointer; border-radius: 2px; white-space: nowrap; background: #fff;" style-hover="background: #16233A; color: #fff;">{{ i.acao }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+
+          <div style="background: #fff; border: 1px solid #E5E3DC; padding: 24px 26px;">
+            <div style="display: flex; align-items: baseline; gap: 14px;">
+              <h2 style="font-family: 'Newsreader', serif; font-size: 20px; font-weight: 500; margin: 0;">Saúde operacional ao longo do tempo</h2>
+              <span style="font-size: 12.5px; color: #8B8578;">O sistema sabe quando cada problema apareceu e quando deixou de existir.</span>
+            </div>
+            <div style="display: flex; align-items: flex-end; gap: 14px; height: 96px; margin-top: 24px;">
+              <sc-for list="{{ scoreHist }}" as="s" hint-placeholder-count="12">
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; justify-content: flex-end; height: 100%;">
+                  <span style="font-size: 11px; color: #8B8578; font-variant-numeric: tabular-nums;">{{ s.v }}</span>
+                  <div style="width: 100%; background: {{ s.cor }}; height: {{ s.h }}px;"></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 11px; color: #A8A296; margin-top: 10px;">
+              <span>12 semanas atrás</span><span>Esta semana</span>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ DESPESAS ============ -->
+      <sc-if value="{{ isDespesas }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .3s ease both; display: flex; flex-direction: column; gap: 18px;">
+          <div style="display: flex; align-items: flex-end; gap: 26px; border-bottom: 1px solid #E5E3DC;">
+            <sc-for list="{{ filtros }}" as="f" hint-placeholder-count="4">
+              <div onClick="{{ f.set }}" style="padding: 0 0 12px; cursor: pointer; font-size: 13.5px; color: {{ f.fg }}; font-weight: {{ f.weight }}; box-shadow: {{ f.underline }};">
+                {{ f.label }} <span style="color: #A8A296; font-variant-numeric: tabular-nums; font-weight: 400;">{{ f.n }}</span>
+              </div>
+            </sc-for>
+            <div style="margin-left: auto; display: flex; gap: 10px; padding-bottom: 9px;">
+              <div onClick="{{ toast }}" style="height: 34px; padding: 0 15px; display: flex; align-items: center; border: 1px solid #D8D6CE; background: #fff; font-size: 12.5px; cursor: pointer; border-radius: 2px;" style-hover="border-color: #16233A;">Carregar factura</div>
+              <div onClick="{{ toast }}" style="height: 34px; padding: 0 16px; display: flex; align-items: center; background: #0F4C4C; color: #fff; font-size: 12.5px; font-weight: 500; cursor: pointer; border-radius: 2px;" style-hover="background: #0A3634;">Nova despesa</div>
+            </div>
+          </div>
+
+          <div style="font-size: 13.5px; color: #4A5461;">{{ resumoFrase }}</div>
+
+          <div style="background: #fff; border: 1px solid #E5E3DC;">
+            <div style="display: grid; grid-template-columns: 2.1fr 1.1fr 1fr 1.3fr 1.2fr; gap: 20px; padding: 13px 24px; border-bottom: 1px solid #E5E3DC; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">
+              <span>Fornecedor</span><span style="text-align: right;">Valor</span><span>Vencimento</span><span>Destino</span><span>Estado</span>
+            </div>
+            <sc-for list="{{ despesas }}" as="d" hint-placeholder-count="10">
+              <div onClick="{{ d.open }}" style="display: grid; grid-template-columns: 2.1fr 1.1fr 1fr 1.3fr 1.2fr; gap: 20px; align-items: center; padding: 16px 24px; border-bottom: 1px solid #EDEBE4; cursor: pointer;" style-hover="background: #FBFAF8;">
+                <span>
+                  <span style="display: block; font-size: 14px; font-weight: 500;">{{ d.fornecedor }}</span>
+                  <span style="display: block; font-size: 12px; color: #8B8578; margin-top: 4px;">{{ d.descricao }}</span>
+                </span>
+                <span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 500; white-space: nowrap;">{{ d.valor }}</span>
+                <span style="font-size: 13px; color: {{ d.vencCor }}; font-variant-numeric: tabular-nums;">{{ d.vencimento }}</span>
+                <span style="font-size: 12.5px; color: #4A5461;">{{ d.projecto }}</span>
+                <span style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: {{ d.estadoFg }};">
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background: {{ d.estadoFg }};"></span>{{ d.estado }}
+                </span>
+              </div>
+            </sc-for>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; font-size: 12.5px; color: #8B8578;">
+              <span>10 de 214 despesas</span>
+              <div style="display: flex; gap: 18px;">
+                <span style="cursor: pointer; color: #C9C4B8;">Anterior</span>
+                <span style="cursor: pointer; color: #0F4C4C; font-weight: 500;">Seguinte</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ DETALHE ============ -->
+      <sc-if value="{{ isDetalhe }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .3s ease both; display: flex; flex-direction: column; gap: 26px;">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <span onClick="{{ goDespesas }}" style="font-size: 12.5px; color: #0F4C4C; cursor: pointer; font-weight: 500;">← Despesas</span>
+            <span style="margin-left: auto; display: flex; gap: 10px;">
+              <span onClick="{{ toast }}" style="height: 36px; padding: 0 16px; display: flex; align-items: center; border: 1px solid #D8D6CE; background: #fff; font-size: 12.5px; cursor: pointer; border-radius: 2px;" style-hover="border-color: #16233A;">Devolver ao solicitante</span>
+              <span onClick="{{ toast }}" style="height: 36px; padding: 0 16px; display: flex; align-items: center; border: 1px solid #D8D6CE; background: #fff; font-size: 12.5px; cursor: pointer; border-radius: 2px;" style-hover="border-color: #16233A;">Gerar nota de autorização</span>
+              <span onClick="{{ toast }}" style="height: 36px; padding: 0 20px; display: flex; align-items: center; background: #0F4C4C; color: #fff; font-size: 12.5px; font-weight: 500; cursor: pointer; border-radius: 2px;" style-hover="background: #0A3634;">Aprovar</span>
+            </span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1px; background: #E5E3DC; border: 1px solid #E5E3DC;">
+            <div style="background: #fff; padding: 20px 22px;">
+              <div style="font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">Valor a pagar</div>
+              <div style="font-family: 'Newsreader', serif; font-size: 32px; font-weight: 500; margin-top: 10px; white-space: nowrap;">412 500 <span style="font-family: 'Archivo'; font-size: 14px; color: #8B8578;">MT</span></div>
+            </div>
+            <div style="background: #fff; padding: 20px 22px;">
+              <div style="font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">Vence</div>
+              <div style="font-family: 'Newsreader', serif; font-size: 32px; font-weight: 500; margin-top: 10px;">18 Ago</div>
+              <div style="font-size: 12px; color: #A9761F; margin-top: 6px;">daqui a 6 dias</div>
+            </div>
+            <div style="background: #fff; padding: 20px 22px;">
+              <div style="font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">Saldo da rubrica</div>
+              <div style="font-family: 'Newsreader', serif; font-size: 32px; font-weight: 500; margin-top: 10px; white-space: nowrap;">1,24 M</div>
+              <div style="font-size: 12px; color: #2E6B4F; margin-top: 6px;">suficiente</div>
+            </div>
+            <div style="background: #fff; padding: 20px 22px;">
+              <div style="font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">Falta para avançar</div>
+              <div style="font-family: 'Newsreader', serif; font-size: 32px; font-weight: 500; margin-top: 10px;">{{ faltaN }}</div>
+              <div style="font-size: 12px; color: #7C766A; margin-top: 6px;">{{ faltaTexto }}</div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 380px; gap: 30px; align-items: start;">
+            <div style="display: flex; flex-direction: column; gap: 26px;">
+              <div>
+                <h2 style="font-family: 'Newsreader', serif; font-size: 20px; font-weight: 500; margin: 0 0 12px;">Antes de aprovar, confirme</h2>
+                <div style="background: #fff; border: 1px solid #E5E3DC;">
+                  <sc-for list="{{ checklist }}" as="c" hint-placeholder-count="5">
+                    <div onClick="{{ c.toggle }}" style="display: flex; align-items: center; gap: 14px; padding: 16px 22px; border-bottom: 1px solid #EDEBE4; cursor: pointer;" style-hover="background: #FBFAF8;">
+                      <span style="width: 18px; height: 18px; border-radius: 2px; border: 1px solid {{ c.borda }}; background: {{ c.fundo }}; color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; flex: 0 0 18px;">{{ c.marca }}</span>
+                      <span style="flex: 1; font-size: 13.5px; color: {{ c.corTexto }};">{{ c.texto }}</span>
+                      <span style="font-size: 11.5px; color: #A8A296;">{{ c.autor }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div>
+                <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px;">
+                  <h2 style="font-family: 'Newsreader', serif; font-size: 20px; font-weight: 500; margin: 0;">Dados lidos da factura</h2>
+                  <span style="font-size: 12.5px; color: #8B8578;">Confirme — não transcreva. Um campo pede revisão.</span>
+                </div>
+                <div style="background: #fff; border: 1px solid #E5E3DC; display: grid; grid-template-columns: 1fr 1fr;">
+                  <sc-for list="{{ campos }}" as="c" hint-placeholder-count="10">
+                    <div style="padding: 15px 22px; border-bottom: 1px solid #EDEBE4; display: flex; align-items: baseline; gap: 14px;">
+                      <span style="font-size: 12px; color: #8B8578; width: 132px; flex: 0 0 132px;">{{ c.label }}</span>
+                      <span style="font-size: 13.5px; font-weight: 500; flex: 1;">{{ c.valor }}</span>
+                      <sc-if value="{{ c.rever }}" hint-placeholder-val="{{ false }}">
+                        <span style="font-size: 11.5px; color: #A9761F; cursor: pointer; white-space: nowrap;">rever</span>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 26px;">
+              <div>
+                <h2 style="font-family: 'Newsreader', serif; font-size: 20px; font-weight: 500; margin: 0 0 12px;">Percurso</h2>
+                <div style="background: #fff; border: 1px solid #E5E3DC; padding: 20px 22px;">
+                  <sc-for list="{{ percurso }}" as="p" hint-placeholder-count="5">
+                    <div style="display: flex; gap: 14px;">
+                      <div style="display: flex; flex-direction: column; align-items: center; flex: 0 0 14px;">
+                        <span style="width: 11px; height: 11px; border-radius: 50%; border: 1px solid {{ p.cor }}; background: {{ p.fundo }};"></span>
+                        <span style="width: 1px; flex: 1; background: #E5E3DC; min-height: 22px;"></span>
+                      </div>
+                      <div style="padding-bottom: 20px; flex: 1;">
+                        <div style="font-size: 13.5px; font-weight: 500; color: {{ p.corTitulo }};">{{ p.etapa }}</div>
+                        <div style="font-size: 12.5px; color: #7C766A; margin-top: 4px; line-height: 1.5;">{{ p.detalhe }}</div>
+                        <div style="font-size: 11.5px; color: #A8A296; margin-top: 4px;">{{ p.quando }}</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="background: #FFFDF7; border: 1px solid #E8E0CB; padding: 20px 22px;">
+                <div style="font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #A9761F;">Porque precisa de dois aprovadores</div>
+                <div style="font-size: 13.5px; line-height: 1.65; color: #4A5461; margin-top: 11px;">Acima de 250 000 MT, em despesa de Serviços financiada pelo <strong style="font-weight: 500; color: #161D26;">Fundo Doador UE</strong> — o gestor do projecto tem de aprovar também.</div>
+                <div style="font-size: 11.5px; color: #8B8578; margin-top: 12px;">Matriz v4, vigente desde 01/07/2026</div>
+              </div>
+
+              <div>
+                <h2 style="font-family: 'Newsreader', serif; font-size: 20px; font-weight: 500; margin: 0 0 12px;">Registo de auditoria</h2>
+                <div style="background: #fff; border: 1px solid #E5E3DC;">
+                  <sc-for list="{{ auditoria }}" as="a" hint-placeholder-count="4">
+                    <div style="padding: 13px 22px; border-bottom: 1px solid #EDEBE4;">
+                      <div style="font-size: 12.5px; color: #161D26;">{{ a.acao }}</div>
+                      <div style="font-size: 11.5px; color: #A8A296; margin-top: 4px;">{{ a.autor }} · {{ a.quando }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ APROVAÇÕES ============ -->
+      <sc-if value="{{ isAprovacoes }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .3s ease both; display: grid; grid-template-columns: 1fr 320px; gap: 30px; align-items: start;">
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <sc-for list="{{ aprovacoes }}" as="a" hint-placeholder-count="4">
+              <div style="background: #fff; border: 1px solid #E5E3DC; padding: 22px 26px;">
+                <div style="display: flex; align-items: flex-start; gap: 26px;">
+                  <div style="flex: 1;">
+                    <div style="font-size: 16px; font-weight: 500;">{{ a.fornecedor }}</div>
+                    <div style="font-size: 13.5px; color: #4A5461; margin-top: 6px;">{{ a.descricao }}</div>
+                  </div>
+                  <div style="text-align: right;">
+                    <div style="font-family: 'Newsreader', serif; font-size: 28px; font-weight: 500; white-space: nowrap;">{{ a.valor }}</div>
+                    <div style="font-size: 12px; color: {{ a.urgCor }}; margin-top: 4px;">{{ a.urgencia }}</div>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 34px; margin-top: 18px; padding-top: 16px; border-top: 1px solid #EDEBE4;">
+                  <div><div style="font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #A8A296;">Destino</div><div style="font-size: 13px; margin-top: 5px;">{{ a.projecto }}</div></div>
+                  <div><div style="font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #A8A296;">Fonte</div><div style="font-size: 13px; margin-top: 5px;">{{ a.fonte }}</div></div>
+                  <div><div style="font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #A8A296;">Saldo da rubrica</div><div style="font-size: 13px; margin-top: 5px; color: #2E6B4F;">{{ a.saldo }}</div></div>
+                  <div><div style="font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #A8A296;">Verificação</div><div style="font-size: 13px; margin-top: 5px;">{{ a.verificacao }}</div></div>
+                  <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+                    <span onClick="{{ a.open }}" style="font-size: 12.5px; color: #0F4C4C; cursor: pointer; font-weight: 500;">Abrir</span>
+                    <span onClick="{{ a.aprovar }}" style="height: 34px; padding: 0 18px; display: flex; align-items: center; background: #0F4C4C; color: #fff; font-size: 12.5px; font-weight: 500; cursor: pointer; border-radius: 2px;" style-hover="background: #0A3634;">Aprovar</span>
+                  </div>
+                </div>
+                <div style="font-size: 12.5px; color: #7C766A; margin-top: 14px;">Chegou a você porque {{ a.porque }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 22px;">
+            <div style="background: #fff; border: 1px solid #E5E3DC; padding: 20px 22px;">
+              <div style="font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">Quanto tempo demoram</div>
+              <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 13px;">
+                <sc-for list="{{ tempos }}" as="t" hint-placeholder-count="3">
+                  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px;">
+                    <span style="font-size: 13px; color: #4A5461;">{{ t.nome }}</span>
+                    <span style="font-family: 'Newsreader', serif; font-size: 17px; color: {{ t.cor }}; white-space: nowrap;">{{ t.valor }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font-size: 12px; color: #8B8578; margin-top: 16px; line-height: 1.55;">Meta interna: 2 dias. A Administração é o passo que atrasa o ciclo.</div>
+            </div>
+            <div style="background: #fff; border: 1px solid #E5E3DC; padding: 20px 22px;">
+              <div style="font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">Substituição activa</div>
+              <div style="font-size: 13.5px; line-height: 1.65; color: #4A5461; margin-top: 11px;">De 24 a 31 de Agosto, aprovações até 500 000 MT seguem para <strong style="font-weight: 500; color: #161D26;">Helena Cossa</strong>. O processo não para em período de férias.</div>
+            </div>
+            <div style="font-size: 12.5px; color: #7C766A; line-height: 1.65;">Ninguém pode criar, aprovar e pagar a mesma despesa. O sistema recusa e registta a tentativa.</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ PAGAMENTOS ============ -->
+      <sc-if value="{{ isPagamentos }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .3s ease both; display: flex; flex-direction: column; gap: 30px;">
+          <div style="background: #fff; border: 1px solid #E5E3DC; display: grid; grid-template-columns: repeat(6, 1fr);">
+            <sc-for list="{{ pipeline }}" as="p" hint-placeholder-count="6">
+              <div style="padding: 20px 22px; border-right: 1px solid #EDEBE4;">
+                <div style="font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #8B8578;">{{ p.nome }}</div>
+                <div style="font-family: 'Newsreader', serif; font-size: 27px; font-weight: 500; margin-top: 10px; color: {{ p.cor }};">{{ p.n }}</div>
+                <div style="font-size: 12px; color: #8B8578; margin-top: 5px; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ p.valor }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div>
+            <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;">
+              <h2 style="font-family: 'Newsreader', serif; font-size: 21px; font-weight: 500; margin: 0;">Prontos a pagar</h2>
+              <span style="font-size: 12.5px; color: #8B8578;">A conta de origem é determinada pela fonte de financiamento — não é escolhida à mão.</span>
+              <span onClick="{{ criarLote }}" style="margin-left: auto; height: 34px; padding: 0 16px; display: flex; align-items: center; background: #0F4C4C; color: #fff; font-size: 12.5px; font-weight: 500; cursor: pointer; border-radius: 2px;" style-hover="background: #0A3634;">Criar lote</span>
+            </div>
+            <div style="background: #fff; border: 1px solid #E5E3DC;">
+              <div style="display: grid; grid-template-columns: 2fr 1fr 0.9fr 1.6fr 1.1fr; gap: 20px; padding: 13px 24px; border-bottom: 1px solid #E5E3DC; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">
+                <span>Beneficiário</span><span style="text-align: right;">Valor</span><span>Vence</span><span>Sai da conta</span><span>Estado</span>
+              </div>
+              <sc-for list="{{ fila }}" as="f" hint-placeholder-count="6">
+                <div style="display: grid; grid-template-columns: 2fr 1fr 0.9fr 1.6fr 1.1fr; gap: 20px; align-items: center; padding: 16px 24px; border-bottom: 1px solid #EDEBE4;" style-hover="background: #FBFAF8;">
+                  <span style="font-size: 14px; font-weight: 500;">{{ f.nome }}</span>
+                  <span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 500; white-space: nowrap;">{{ f.valor }}</span>
+                  <span style="font-size: 13px; color: {{ f.vencCor }};">{{ f.vencimento }}</span>
+                  <span style="font-size: 12.5px; color: #4A5461;">{{ f.conta }}</span>
+                  <span style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: {{ f.fg }};"><span style="width: 6px; height: 6px; border-radius: 50%; background: {{ f.fg }};"></span>{{ f.estado }}</span>
+                </div>
+              </sc-for>
+              <div style="display: flex; align-items: baseline; gap: 40px; padding: 18px 24px;">
+                <span style="font-size: 12.5px; color: #8B8578;">Total da fila <strong style="font-family: 'Newsreader', serif; font-size: 19px; font-weight: 500; color: #161D26; margin-left: 8px;">1 286 900 MT</strong></span>
+                <span style="font-size: 12.5px; color: #8B8578;">Vence em 7 dias <strong style="font-family: 'Newsreader', serif; font-size: 19px; font-weight: 500; color: #A9761F; margin-left: 8px;">742 300 MT</strong></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ RECONCILIAÇÃO ============ -->
+      <sc-if value="{{ isReconciliacao }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .3s ease both; display: flex; flex-direction: column; gap: 26px;">
+          <div style="display: flex; align-items: center; gap: 40px; background: #fff; border: 1px solid #E5E3DC; padding: 22px 26px;">
+            <div>
+              <div style="font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">Já correspondido</div>
+              <div style="font-family: 'Newsreader', serif; font-size: 34px; font-weight: 500; margin-top: 9px;">{{ reconciliados }} <span style="font-family: 'Archivo'; font-size: 14px; color: #8B8578;">de 128</span></div>
+            </div>
+            <div style="flex: 1; max-width: 420px;">
+              <div style="height: 6px; background: #EDEBE4;"><div style="height: 100%; width: 96%; background: #2E6B4F;"></div></div>
+              <div style="font-size: 12.5px; color: #4A5461; margin-top: 12px; line-height: 1.6;">Restam <strong style="font-weight: 500;">{{ propostosN }} propostas</strong> para confirmar e <strong style="font-weight: 500; color: #A8321F;">7 movimentos</strong> sem despesa correspondente.</div>
+            </div>
+            <div onClick="{{ confirmarTodas }}" style="margin-left: auto; height: 38px; padding: 0 20px; display: flex; align-items: center; background: #0F4C4C; color: #fff; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 2px; white-space: nowrap;" style-hover="background: #0A3634;">Confirmar todas as propostas</div>
+          </div>
+
+          <div>
+            <h2 style="font-family: 'Newsreader', serif; font-size: 21px; font-weight: 500; margin: 0 0 12px;">Correspondências propostas</h2>
+            <div style="background: #fff; border: 1px solid #E5E3DC;">
+              <sc-for list="{{ propostas }}" as="m" hint-placeholder-count="5">
+                <div style="display: grid; grid-template-columns: 1fr 90px 1fr 110px; gap: 24px; align-items: center; padding: 18px 24px; border-bottom: 1px solid #EDEBE4;" style-hover="background: #FBFAF8;">
+                  <div>
+                    <div style="font-size: 13.5px; font-weight: 500;">{{ m.descBanco }}</div>
+                    <div style="font-size: 12px; color: #8B8578; margin-top: 4px; font-variant-numeric: tabular-nums;">{{ m.dataBanco }} · {{ m.valorBanco }} · extrato BCI</div>
+                  </div>
+                  <div style="text-align: center;">
+                    <div style="font-size: 12.5px; color: {{ m.confCor }}; font-weight: 500;">{{ m.confTexto }}</div>
+                    <div style="font-size: 11px; color: #A8A296; margin-top: 3px;">{{ m.conf }}%</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 13.5px; font-weight: 500;">{{ m.descNexora }}</div>
+                    <div style="font-size: 12px; color: #8B8578; margin-top: 4px; font-variant-numeric: tabular-nums;">{{ m.refNexora }} · {{ m.valorNexora }}</div>
+                  </div>
+                  <div style="display: flex; justify-content: flex-end;">
+                    <span onClick="{{ m.confirmar }}" style="height: 32px; padding: 0 15px; display: flex; align-items: center; border: 1px solid #16233A; color: #16233A; font-size: 12.5px; font-weight: 500; cursor: pointer; border-radius: 2px; background: #fff;" style-hover="background: #16233A; color: #fff;">Confirmar</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div>
+            <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px;">
+              <h2 style="font-family: 'Newsreader', serif; font-size: 21px; font-weight: 500; margin: 0;">Sem despesa correspondente</h2>
+              <span style="font-size: 12.5px; color: #8B8578;">Exigem decisão de uma pessoa — não desaparecem sozinhos.</span>
+            </div>
+            <div style="background: #fff; border: 1px solid #E5E3DC;">
+              <sc-for list="{{ semPar }}" as="s" hint-placeholder-count="3">
+                <div style="display: flex; align-items: center; gap: 22px; padding: 16px 24px; border-bottom: 1px solid #EDEBE4;" style-hover="background: #FBFAF8;">
+                  <span style="flex: 1; font-size: 13.5px;">{{ s.desc }}</span>
+                  <span style="font-size: 12px; color: #8B8578;">{{ s.data }}</span>
+                  <span style="font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 500; white-space: nowrap;">{{ s.valor }}</span>
+                  <span onClick="{{ toast }}" style="font-size: 12.5px; color: #0F4C4C; cursor: pointer; font-weight: 500; white-space: nowrap;">{{ s.acao }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ EXCEPÇÕES ============ -->
+      <sc-if value="{{ isExcepcoes }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .3s ease both; display: flex; flex-direction: column; gap: 26px;">
+          <div style="background: #fff; border: 1px solid #E5E3DC;">
+            <sc-for list="{{ excepcoes }}" as="e" hint-placeholder-count="6">
+              <div style="display: flex; align-items: center; gap: 24px; padding: 20px 26px; border-bottom: 1px solid #EDEBE4;" style-hover="background: #FBFAF8;">
+                <span style="width: 6px; height: 40px; background: {{ e.cor }}; flex: 0 0 6px;"></span>
+                <div style="flex: 1;">
+                  <div style="font-size: 14.5px; font-weight: 500;">{{ e.titulo }}</div>
+                  <div style="font-size: 12.5px; color: #7C766A; margin-top: 5px;">{{ e.detalhe }}</div>
+                </div>
+                <div style="text-align: right; width: 130px;">
+                  <div style="font-family: 'Newsreader', serif; font-size: 20px; white-space: nowrap;">{{ e.valor }}</div>
+                  <div style="font-size: 11.5px; color: #A8A296; margin-top: 3px;">em risco</div>
+                </div>
+                <div style="width: 120px;">
+                  <div style="font-size: 12.5px; color: {{ e.cor }};">{{ e.antiguidade }}</div>
+                  <div style="font-size: 11.5px; color: #A8A296; margin-top: 3px;">{{ e.responsavel }}</div>
+                </div>
+                <div onClick="{{ toast }}" style="height: 34px; padding: 0 16px; display: flex; align-items: center; border: 1px solid #D8D6CE; background: #fff; font-size: 12.5px; font-weight: 500; cursor: pointer; border-radius: 2px; white-space: nowrap;" style-hover="border-color: #16233A;">{{ e.acao }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size: 13.5px; color: #7C766A; line-height: 1.7; max-width: 780px;">Nada aqui foi encontrado por alguém a procurar. O sistema compara continuamente o registado com o banco, o orçamento e as regras da organização — e só traz para esta lista o que não fecha.</div>
+        </div>
+      </sc-if>
+
+      <!-- ============ TESOURARIA ============ -->
+      <sc-if value="{{ isTesouraria }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .3s ease both; display: flex; flex-direction: column; gap: 26px;">
+          <div style="display: flex; align-items: flex-end; gap: 26px; border-bottom: 1px solid #E5E3DC;">
+            <sc-for list="{{ horizontes }}" as="h" hint-placeholder-count="3">
+              <div onClick="{{ h.set }}" style="padding: 0 0 12px; cursor: pointer; font-size: 13.5px; color: {{ h.fg }}; font-weight: {{ h.weight }}; box-shadow: {{ h.underline }};">{{ h.label }}</div>
+            </sc-for>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 340px; gap: 30px; align-items: start;">
+            <div style="background: #fff; border: 1px solid #E5E3DC; padding: 24px 26px;">
+              <div style="display: flex; align-items: baseline; gap: 22px;">
+                <div>
+                  <div style="font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">Saldo no fim do período</div>
+                  <div style="font-family: 'Newsreader', serif; font-size: 38px; font-weight: 500; margin-top: 8px; white-space: nowrap;">{{ saldoFim }}</div>
+                </div>
+                <div style="margin-left: auto; display: flex; gap: 20px; font-size: 12px; color: #7C766A;">
+                  <span style="display: flex; align-items: center; gap: 7px;"><span style="width: 10px; height: 10px; background: #16233A;"></span>Entradas</span>
+                  <span style="display: flex; align-items: center; gap: 7px;"><span style="width: 10px; height: 10px; background: #C9C4B8;"></span>Saídas</span>
+                  <span style="display: flex; align-items: center; gap: 7px;"><span style="width: 10px; height: 10px; background: #A8321F;"></span>Semana sob pressão</span>
+                </div>
+              </div>
+              <div style="display: flex; align-items: flex-end; gap: 12px; height: 190px; margin-top: 26px; border-bottom: 1px solid #E5E3DC;">
+                <sc-for list="{{ semanas }}" as="s" hint-placeholder-count="13">
+                  <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; gap: 7px;">
+                    <div style="display: flex; align-items: flex-end; gap: 3px; width: 100%; justify-content: center; height: 100%;">
+                      <div style="width: 42%; background: #16233A; height: {{ s.hIn }}px;"></div>
+                      <div style="width: 42%; background: {{ s.corOut }}; height: {{ s.hOut }}px;"></div>
+                    </div>
+                    <span style="font-size: 10.5px; color: #A8A296;">{{ s.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font-size: 13.5px; color: #4A5461; line-height: 1.7; margin-top: 20px;">{{ tesourariaFrase }}</div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 22px;">
+              <div style="background: #fff; border: 1px solid #E5E3DC;">
+                <div style="padding: 18px 22px 12px; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">Como se chega a este número</div>
+                <sc-for list="{{ drivers }}" as="d" hint-placeholder-count="5">
+                  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 12px 22px; border-top: 1px solid #EDEBE4;">
+                    <span style="font-size: 13px; color: #4A5461;">{{ d.nome }}</span>
+                    <span style="font-variant-numeric: tabular-nums; font-size: 13.5px; font-weight: 500; color: {{ d.cor }}; white-space: nowrap;">{{ d.valor }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background: #fff; border: 1px solid #E5E3DC;">
+                <div style="padding: 18px 22px 12px; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">E se…</div>
+                <sc-for list="{{ cenarios }}" as="c" hint-placeholder-count="3">
+                  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 13px 22px; border-top: 1px solid #EDEBE4;">
+                    <span style="font-size: 13px; color: #4A5461;">{{ c.nome }}</span>
+                    <span style="font-family: 'Newsreader', serif; font-size: 17px; color: {{ c.cor }}; white-space: nowrap;">{{ c.valor }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ PROJECTOS ============ -->
+      <sc-if value="{{ isProjectos }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .3s ease both; display: flex; flex-direction: column; gap: 26px;">
+          <sc-for list="{{ projectosDet }}" as="p" hint-placeholder-count="4">
+            <div style="background: #fff; border: 1px solid #E5E3DC; padding: 24px 26px;">
+              <div style="display: flex; align-items: flex-start; gap: 26px;">
+                <div style="flex: 1;">
+                  <div style="font-family: 'Newsreader', serif; font-size: 22px; font-weight: 500;">{{ p.nome }}</div>
+                  <div style="font-size: 12.5px; color: #8B8578; margin-top: 6px;">{{ p.financiador }} · {{ p.periodo }} · gestor {{ p.gestor }}</div>
+                </div>
+                <div style="font-size: 12.5px; color: {{ p.estadoFg }}; text-align: right; max-width: 260px; line-height: 1.55;">{{ p.estadoTexto }}</div>
+              </div>
+
+              <div style="display: flex; gap: 48px; margin-top: 22px;">
+                <sc-for list="{{ p.numeros }}" as="n" hint-placeholder-count="4">
+                  <div>
+                    <div style="font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #A8A296;">{{ n.label }}</div>
+                    <div style="font-family: 'Newsreader', serif; font-size: 24px; font-weight: 500; margin-top: 7px; color: {{ n.cor }}; white-space: nowrap;">{{ n.valor }}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="margin-top: 22px;">
+                <div style="height: 8px; background: #EDEBE4; position: relative;">
+                  <div style="position: absolute; left: 0; top: 0; height: 100%; width: {{ p.pctComprometido }}%; background: #C9C4B8;"></div>
+                  <div style="position: absolute; left: 0; top: 0; height: 100%; width: {{ p.pct }}%; background: {{ p.cor }};"></div>
+                  <div style="position: absolute; left: 80%; top: -3px; height: 14px; width: 1px; background: #A8321F;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: #8B8578; margin-top: 8px;">
+                  <span>{{ p.pct }}% executado · {{ p.pctComprometido }}% já comprometido</span>
+                  <span>alerta aos 80%</span>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+
+          <div>
+            <h2 style="font-family: 'Newsreader', serif; font-size: 21px; font-weight: 500; margin: 0 0 12px;">Fundos e justificação</h2>
+            <div style="background: #fff; border: 1px solid #E5E3DC;">
+              <div style="display: grid; grid-template-columns: 1.8fr 1.2fr 1fr 1fr 1.2fr; gap: 20px; padding: 13px 24px; border-bottom: 1px solid #E5E3DC; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">
+                <span>Fonte</span><span>Conta associada</span><span style="text-align: right;">Recebido</span><span style="text-align: right;">Aplicado</span><span>Próximo relatório</span>
+              </div>
+              <sc-for list="{{ grants }}" as="g" hint-placeholder-count="4">
+                <div style="display: grid; grid-template-columns: 1.8fr 1.2fr 1fr 1fr 1.2fr; gap: 20px; align-items: center; padding: 16px 24px; border-bottom: 1px solid #EDEBE4;" style-hover="background: #FBFAF8;">
+                  <span style="font-size: 13.5px; font-weight: 500;">{{ g.fonte }}</span>
+                  <span style="font-size: 12.5px; color: #4A5461; font-variant-numeric: tabular-nums;">{{ g.conta }}</span>
+                  <span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 13.5px; white-space: nowrap;">{{ g.recebido }}</span>
+                  <span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 13.5px; white-space: nowrap;">{{ g.aplicado }}</span>
+                  <span style="font-size: 12.5px; color: #4A5461;">{{ g.relatorio }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ FORNECEDORES ============ -->
+      <sc-if value="{{ isFornecedores }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .3s ease both; display: flex; flex-direction: column; gap: 26px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px;">
+            <sc-for list="{{ insights }}" as="i" hint-placeholder-count="2">
+              <div style="background: #fff; border: 1px solid #E5E3DC; border-left: 4px solid {{ i.cor }}; padding: 22px 26px;">
+                <div style="font-family: 'Newsreader', serif; font-size: 20px; font-weight: 500; line-height: 1.35;">{{ i.titulo }}</div>
+                <div style="font-size: 13.5px; color: #4A5461; margin-top: 10px; line-height: 1.65;">{{ i.detalhe }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #E5E3DC;">
+            <div style="display: grid; grid-template-columns: 2fr 0.9fr 1.2fr 1.1fr 1fr 1.2fr; gap: 20px; padding: 13px 24px; border-bottom: 1px solid #E5E3DC; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">
+              <span>Fornecedor</span><span style="text-align: right;">Facturas</span><span style="text-align: right;">Total 12 meses</span><span style="text-align: right;">Média</span><span style="text-align: right;">Variação</span><span>Peso na despesa</span>
+            </div>
+            <sc-for list="{{ fornecedores }}" as="f" hint-placeholder-count="7">
+              <div style="display: grid; grid-template-columns: 2fr 0.9fr 1.2fr 1.1fr 1fr 1.2fr; gap: 20px; align-items: center; padding: 16px 24px; border-bottom: 1px solid #EDEBE4;" style-hover="background: #FBFAF8;">
+                <span style="font-size: 14px; font-weight: 500;">{{ f.nome }}</span>
+                <span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 13px; color: #4A5461;">{{ f.transacoes }}</span>
+                <span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 500; white-space: nowrap;">{{ f.acumulado }}</span>
+                <span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 13px; color: #4A5461; white-space: nowrap;">{{ f.medio }}</span>
+                <span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 13.5px; color: {{ f.varCor }}; font-weight: 500;">{{ f.variacao }}</span>
+                <span style="display: flex; align-items: center; gap: 10px;">
+                  <span style="flex: 1; height: 4px; background: #EDEBE4;"><span style="display: block; height: 100%; width: {{ f.pctBar }}%; background: {{ f.barCor }};"></span></span>
+                  <span style="font-size: 12px; color: #4A5461; font-variant-numeric: tabular-nums; width: 30px; text-align: right;">{{ f.pct }}%</span>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ RELATÓRIOS ============ -->
+      <sc-if value="{{ isRelatorios }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .3s ease both; display: grid; grid-template-columns: 300px 1fr; gap: 30px; align-items: start;">
+          <div style="background: #fff; border: 1px solid #E5E3DC; padding: 22px 24px;">
+            <div style="font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">Selecção</div>
+            <div style="display: flex; flex-direction: column; gap: 18px; margin-top: 18px;">
+              <sc-for list="{{ camposRelatorio }}" as="c" hint-placeholder-count="4">
+                <div>
+                  <div style="font-size: 12px; color: #8B8578;">{{ c.label }}</div>
+                  <div style="height: 36px; border-bottom: 1px solid #D8D6CE; display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; font-weight: 500; cursor: pointer;" style-hover="border-color: #0F4C4C;">
+                    <span>{{ c.valor }}</span><span style="font-size: 8px; color: #A8A296;">▼</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 26px;">
+              <div onClick="{{ toast }}" style="height: 38px; display: flex; align-items: center; justify-content: center; background: #0F4C4C; color: #fff; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 2px;" style-hover="background: #0A3634;">Exportar PDF</div>
+              <div style="display: flex; gap: 10px;">
+                <div onClick="{{ toast }}" style="flex: 1; height: 34px; display: flex; align-items: center; justify-content: center; border: 1px solid #D8D6CE; font-size: 12.5px; cursor: pointer; border-radius: 2px;" style-hover="border-color: #16233A;">Excel</div>
+                <div onClick="{{ toast }}" style="flex: 1; height: 34px; display: flex; align-items: center; justify-content: center; border: 1px solid #D8D6CE; font-size: 12.5px; cursor: pointer; border-radius: 2px;" style-hover="border-color: #16233A;">CSV</div>
+              </div>
+              <div onClick="{{ toast }}" style="height: 34px; display: flex; align-items: center; justify-content: center; border: 1px solid #0F4C4C; color: #0F4C4C; font-size: 12.5px; font-weight: 500; cursor: pointer; border-radius: 2px;" style-hover="background: #F1F5F3;">Lote para a contabilidade</div>
+            </div>
+            <div style="font-size: 12px; color: #8B8578; margin-top: 20px; line-height: 1.6;">O lote sai classificado por rubrica, com factura e comprovativo bancário anexos a cada movimento.</div>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #E5E3DC;">
+            <div style="padding: 26px 28px 22px; border-bottom: 1px solid #E5E3DC; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;">
+              <div>
+                <div style="font-family: 'Newsreader', serif; font-size: 24px; font-weight: 500;">Despesa por rubrica</div>
+                <div style="font-size: 12.5px; color: #8B8578; margin-top: 7px;">1 a 31 de Agosto de 2026 · todas as fontes · 214 despesas</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">Total</div>
+                <div style="font-family: 'Newsreader', serif; font-size: 30px; font-weight: 500; white-space: nowrap;">1 932 400 MT</div>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 2.2fr 0.7fr 1fr 1fr 1.1fr; gap: 20px; padding: 13px 28px; border-bottom: 1px solid #E5E3DC; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8B8578;">
+              <span>Rubrica</span><span style="text-align: right;">Nº</span><span style="text-align: right;">Pago</span><span style="text-align: right;">Por pagar</span><span>Peso</span>
+            </div>
+            <sc-for list="{{ linhasRelatorio }}" as="l" hint-placeholder-count="8">
+              <div style="display: grid; grid-template-columns: 2.2fr 0.7fr 1fr 1fr 1.1fr; gap: 20px; align-items: center; padding: 14px 28px; border-bottom: 1px solid #EDEBE4;" style-hover="background: #FBFAF8;">
+                <span style="font-size: 13.5px;">{{ l.rubrica }}</span>
+                <span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 13px; color: #8B8578;">{{ l.n }}</span>
+                <span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 13.5px; white-space: nowrap;">{{ l.pago }}</span>
+                <span style="text-align: right; font-variant-numeric: tabular-nums; font-size: 13.5px; color: {{ l.corPorPagar }}; white-space: nowrap;">{{ l.porPagar }}</span>
+                <span style="display: flex; align-items: center; gap: 10px;">
+                  <span style="flex: 1; height: 4px; background: #EDEBE4;"><span style="display: block; height: 100%; width: {{ l.pct }}%; background: #16233A;"></span></span>
+                  <span style="font-size: 12px; color: #4A5461; font-variant-numeric: tabular-nums; width: 30px; text-align: right;">{{ l.pct }}%</span>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ CONFIGURAÇÃO ============ -->
+      <sc-if value="{{ isConfig }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .3s ease both; display: grid; grid-template-columns: 220px 1fr; gap: 34px; align-items: start;">
+          <div>
+            <sc-for list="{{ tabsConfig }}" as="t" hint-placeholder-count="6">
+              <div onClick="{{ t.set }}" style="padding: 10px 0; cursor: pointer; font-size: 13.5px; color: {{ t.fg }}; font-weight: {{ t.weight }}; border-bottom: 1px solid #EDEBE4;" style-hover="color: #161D26;">{{ t.label }}</div>
+            </sc-for>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 34px;">
+            <div>
+              <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 12px;">
+                <h2 style="font-family: 'Newsreader', serif; font-size: 21px; font-weight: 500; margin: 0;">Etapas do seu ciclo</h2>
+                <span style="font-size: 12.5px; color: #8B8578;">Active só o que existe na sua organização. O rasto é o que não se desliga.</span>
+              </div>
+              <div style="background: #fff; border: 1px solid #E5E3DC;">
+                <sc-for list="{{ etapas }}" as="e" hint-placeholder-count="8">
+                  <div onClick="{{ e.toggle }}" style="display: flex; align-items: center; gap: 18px; padding: 18px 24px; border-bottom: 1px solid #EDEBE4; cursor: pointer;" style-hover="background: #FBFAF8;">
+                    <span style="width: 36px; height: 20px; border-radius: 10px; background: {{ e.trackBg }}; position: relative; flex: 0 0 36px; transition: background .15s ease;">
+                      <span style="position: absolute; top: 2px; left: {{ e.knobLeft }}px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left .15s ease;"></span>
+                    </span>
+                    <span style="flex: 1;">
+                      <span style="display: block; font-size: 14px; font-weight: 500; color: {{ e.corTitulo }};">{{ e.nome }}</span>
+                      <span style="display: block; font-size: 12.5px; color: #7C766A; margin-top: 4px;">{{ e.descricao }}</span>
+                    </span>
+                    <span style="font-size: 11.5px; color: #A8A296;">{{ e.tag }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 12px;">
+                <h2 style="font-family: 'Newsreader', serif; font-size: 21px; font-weight: 500; margin: 0;">Quem aprova o quê</h2>
+                <span style="font-size: 12.5px; color: #8B8578;">Escrito como uma frase, não como uma tabela de código.</span>
+                <span onClick="{{ toast }}" style="margin-left: auto; height: 34px; padding: 0 16px; display: flex; align-items: center; border: 1px solid #0F4C4C; color: #0F4C4C; font-size: 12.5px; font-weight: 500; cursor: pointer; border-radius: 2px;" style-hover="background: #F1F5F3;">Adicionar regra</span>
+              </div>
+              <div style="background: #fff; border: 1px solid #E5E3DC;">
+                <sc-for list="{{ matriz }}" as="m" hint-placeholder-count="6">
+                  <div style="display: flex; align-items: center; gap: 22px; padding: 18px 24px; border-bottom: 1px solid #EDEBE4;" style-hover="background: #FBFAF8;">
+                    <span style="flex: 1; font-size: 14px; line-height: 1.6;">{{ m.frase }}</span>
+                    <span style="font-size: 12.5px; color: #8B8578; white-space: nowrap;">{{ m.niveis }}</span>
+                    <span onClick="{{ toast }}" style="font-size: 12.5px; color: #0F4C4C; cursor: pointer; font-weight: 500;">Editar</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 26px;">
+              <div>
+                <h2 style="font-family: 'Newsreader', serif; font-size: 20px; font-weight: 500; margin: 0 0 12px;">Cada fonte, a sua conta</h2>
+                <div style="background: #fff; border: 1px solid #E5E3DC;">
+                  <sc-for list="{{ ligacoes }}" as="l" hint-placeholder-count="4">
+                    <div style="display: flex; align-items: center; gap: 14px; padding: 15px 22px; border-bottom: 1px solid #EDEBE4; font-size: 13px;">
+                      <span style="flex: 1; font-weight: 500;">{{ l.fonte }}</span>
+                      <span style="color: #C9C4B8;">→</span>
+                      <span style="flex: 1; color: #4A5461; font-variant-numeric: tabular-nums;">{{ l.conta }}</span>
+                      <span style="font-size: 11.5px; color: {{ l.fg }}; white-space: nowrap;">{{ l.regra }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div>
+                <h2 style="font-family: 'Newsreader', serif; font-size: 20px; font-weight: 500; margin: 0 0 12px;">O seu documento de autorização</h2>
+                <div style="background: #fff; border: 1px solid #E5E3DC; padding: 20px 22px;">
+                  <sc-for list="{{ docConfig }}" as="d" hint-placeholder-count="5">
+                    <div style="display: flex; gap: 16px; padding: 9px 0; font-size: 13px;">
+                      <span style="color: #8B8578; width: 150px; flex: 0 0 150px;">{{ d.label }}</span>
+                      <span style="font-weight: 500;">{{ d.valor }}</span>
+                    </div>
+                  </sc-for>
+                  <div style="font-size: 12.5px; color: #7C766A; margin-top: 14px; padding-top: 14px; border-top: 1px solid #EDEBE4; line-height: 1.6;">Gerado a partir da despesa registada — nunca escrito à parte e depois anexado.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+    </main>
+  </div>
+
+  <sc-if value="{{ toastMsg }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; bottom: 26px; left: 50%; background: #16233A; color: #fff; padding: 13px 22px; font-size: 13px; border-radius: 2px; animation: nx-toast .2s ease both; z-index: 60;">{{ toastMsg }}</div>
+  </sc-if>
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1600, &quot;height&quot;: 1000}, &quot;orgName&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;Grupo Zambeze&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Organização&quot;}}">
+class Component extends DCLogic {
+  state = {
+    route: 'dashboard', filtro: 'todas', horizonte: 90, tabConfig: 'etapas',
+    selId: 'DSP-2026-0841', aprovadas: [], confirmadas: [], checked: [0, 1, 2],
+    etapasOff: ['requisicao'], toastMsg: null
+  };
+
+  go(route) { this.setState({ route }); }
+
+  flash(msg) {
+    this.setState({ toastMsg: msg });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toastMsg: null }), 2800);
+  }
+
+  renderVals() {
+    const r = this.state.route;
+    const INK = '#16233A', ACC = '#0F4C4C', RED = '#A8321F', AMB = '#A9761F', GRN = '#2E6B4F', MUT = '#8B8578';
+    const und = on => on ? 'inset 0 -2px 0 #0F4C4C' : 'none';
+
+    const head = {
+      dashboard: ['Direcção · 12 de Agosto de 2026', 'Bom dia, Alcino.', 'Tem 4,81 milhões em caixa e 1,29 milhões já comprometidos. Três assuntos precisam de decisão hoje — o resto está sob controlo.'],
+      watch: ['NEXORA WATCH · vigilância activa', 'O que exige a sua atenção', 'Não procurou nada: o sistema comparou a operação com o banco, o orçamento e as suas regras, e trouxe apenas o que não fecha.'],
+      despesas: ['Ciclo da despesa', 'Despesas', 'Cada despesa é registada uma vez e segue um percurso visível até ao extrato bancário.'],
+      detalhe: ['Despesa DSP-2026-0841 · Tecnhosat Serviços', 'Manutenção de rede e servidores', 'Aguarda a sua aprovação desde 11 de Agosto. Falta uma confirmação da lista de verificação.'],
+      aprovacoes: ['Ciclo da despesa', 'A sua caixa de aprovações', 'Quatro despesas à sua espera. Cada uma diz porque lhe chegou e se há saldo para a pagar.'],
+      pagamentos: ['Ciclo da despesa', 'Pagamentos', 'O que está aprovado, o que está pronto a sair e o que já saiu — sem folha de cálculo paralela.'],
+      reconciliacao: ['Ciclo da despesa', 'Reconciliação bancária', 'O extrato de Agosto já foi comparado com o que está registado. Confirme em bloco; trate apenas do que não bateu certo.'],
+      excepcoes: ['Ciclo da despesa', 'O que não bate certo', 'Onze situações abertas, com valor e antiguidade. Nenhuma desaparece sem uma decisão registada.'],
+      tesouraria: ['Inteligência', 'Previsão de tesouraria', 'A partir do saldo, dos pagamentos aprovados e do histórico de 14 meses — com a semana de pressão assinalada antes de acontecer.'],
+      projectos: ['Inteligência', 'Projectos e financiamentos', 'Orçamento, executado, comprometido e disponível — em permanência, não no fecho.'],
+      fornecedores: ['Inteligência', 'Fornecedores', 'O que o histórico já sabe e ninguém tinha tempo de calcular.'],
+      relatorios: ['Inteligência', 'Relatórios', 'O relatório do período não é produzido — é seleccionado.'],
+      config: ['Sistema', 'Como a sua organização trabalha', 'O NEXORA adapta-se ao seu processo. Configure as etapas, as regras e os nomes que já usa.']
+    };
+    const [eyebrow, pageTitle, pageLede] = head[r] || head.dashboard;
+
+    const navDef = [
+      { g: 'Hoje' },
+      { k: 'dashboard', label: 'Visão da direcção' },
+      { k: 'watch', label: 'WATCH', badge: '6', badgeFg: RED },
+      { g: 'Ciclo da despesa' },
+      { k: 'despesas', label: 'Despesas' },
+      { k: 'aprovacoes', label: 'Aprovações', badge: String(4 - this.state.aprovadas.length), badgeFg: AMB },
+      { k: 'pagamentos', label: 'Pagamentos' },
+      { k: 'reconciliacao', label: 'Reconciliação' },
+      { k: 'excepcoes', label: 'Excepções', badge: '11', badgeFg: MUT },
+      { g: 'Inteligência' },
+      { k: 'tesouraria', label: 'Tesouraria' },
+      { k: 'projectos', label: 'Projectos e fundos' },
+      { k: 'fornecedores', label: 'Fornecedores' },
+      { k: 'relatorios', label: 'Relatórios' },
+      { g: 'Sistema' },
+      { k: 'config', label: 'Configuração' }
+    ];
+    const active = k => r === k || (k === 'despesas' && r === 'detalhe');
+    const nav = navDef.map(n => n.g
+      ? { isGroup: true, isItem: false, label: n.g }
+      : {
+          isGroup: false, isItem: true, label: n.label, badge: n.badge || null, badgeFg: n.badgeFg || MUT,
+          bg: active(n.k) ? '#EEF1EF' : 'transparent',
+          fg: active(n.k) ? '#0F4C4C' : '#4A5461',
+          weight: active(n.k) ? '600' : '400',
+          go: () => this.go(n.k)
+        });
+
+    const headline = [
+      { label: 'Em caixa', value: '4,81 M', unit: 'MT', context: 'Somando as quatro contas. Subiu 6% desde Julho.' },
+      { label: 'Já comprometido', value: '1,29 M', unit: 'MT', context: '48 despesas aprovadas e ainda não pagas — 742 300 MT vencem nesta semana.' },
+      { label: 'A entrar', value: '2,15 M', unit: 'MT', context: 'Três tranches de doador confirmadas, a primeira a 5 de Setembro.' }
+    ];
+
+    const decisoes = [
+      { cor: RED, titulo: 'Dois pagamentos vencem hoje sem confirmação no banco', detalhe: 'Sasol Moçambique e EDM · pagamento iniciado há 2 dias', valor: '186 400 MT', acao: 'Confirmar', acaoFn: () => this.go('pagamentos') },
+      { cor: RED, titulo: 'O Projecto Zambeze passou os 80% do orçamento', detalhe: 'Faltam quatro meses de execução e 387 500 MT disponíveis', valor: '4,20 M MT', acao: 'Ver projecto', acaoFn: () => this.go('projectos') },
+      { cor: AMB, titulo: 'Quatro despesas esperam a sua aprovação há mais de 3 dias', detalhe: 'A mais antiga é a auditoria do projecto, de 8 de Agosto', valor: '512 900 MT', acao: 'Aprovar', acaoFn: () => this.go('aprovacoes') }
+    ];
+
+    const naturezas = [
+      { nome: 'Serviços e consultoria', valor: '676 340 MT', pct: 35 },
+      { nome: 'Salários e encargos', valor: '482 100 MT', pct: 25 },
+      { nome: 'Compras e equipamento', valor: '348 200 MT', pct: 18 },
+      { nome: 'Viagens e logística', valor: '251 200 MT', pct: 13 },
+      { nome: 'Outros', valor: '174 560 MT', pct: 9 }
+    ];
+
+    const mk = (texto, detalhe, acao, meta) => ({ texto, detalhe, acao, meta, resolve: () => this.flash('Acção registada com autor, data e hora.') });
+    const watch = [
+      { nivel: 'Crítico', cor: RED, resumo: 'Dinheiro em risco hoje', itens: [
+        mk('Pagamento à Sasol vence hoje e o banco não o confirma', '118 400 MT · iniciado a 10 de Agosto, sem movimento correspondente no extrato', 'Confirmar pagamento', 'há 2 horas'),
+        mk('A mesma factura pode ter sido registada duas vezes', 'FAC-0839 e FAC-0841 · Tecnhosat · mesmo valor, mesma descrição, meses diferentes', 'Comparar as duas', 'há 5 horas')
+      ] },
+      { nivel: 'Risco', cor: AMB, resumo: 'Ainda há tempo de corrigir', itens: [
+        mk('O Projecto Zambeze gastou 84% do orçamento com um terço do prazo por cumprir', 'Ao ritmo actual, o orçamento esgota a 2 de Novembro', 'Ver execução', 'hoje'),
+        mk('Um fornecedor concentra 21% da despesa operacional', 'Tecnhosat · o limite interno é de 15%', 'Analisar fornecedor', 'hoje')
+      ] },
+      { nivel: 'Pendente', cor: '#7C766A', resumo: 'Só depende de alguém decidir', itens: [
+        mk('Quatro despesas esperam aprovação há mais de três dias', '512 900 MT retidos no ciclo', 'Abrir aprovações', 'há 3 dias'),
+        mk('Três despesas de Agosto não têm factura anexada', 'O fecho do mês é a 31 — depois disso, custa o dobro do tempo', 'Pedir documentos', 'há 6 dias')
+      ] },
+      { nivel: 'Saudável', cor: GRN, resumo: 'Nada a fazer, apenas para saber', itens: [
+        mk('96% do extrato de Agosto já está reconciliado', 'A reconciliação deixou de ser tarefa de fim de mês', 'Ver extrato', 'hoje'),
+        mk('O tempo médio de aprovação caiu de 3,2 para 1,4 dias', 'Desde a entrada da matriz v4, em Julho', 'Ver indicador', 'esta semana')
+      ] }
+    ];
+
+    const scoreVals = [71, 68, 74, 76, 73, 79, 81, 80, 83, 85, 84, 87];
+    const scoreHist = scoreVals.map((v, i) => ({ v, h: Math.round(v * 0.68), cor: i === 11 ? INK : '#D5D2C8' }));
+
+    const est = { 'Aguarda aprovação': AMB, 'Pronta a pagar': ACC, 'Paga': GRN, 'Em verificação': '#4A5461', 'Sem factura': RED, 'Reconciliada': GRN, 'Aprovada': ACC };
+    const despesasBase = [
+      ['DSP-2026-0841', 'Tecnhosat Serviços', 'Manutenção de rede e servidores · Agosto', '412 500 MT', '18 Ago', 'Zambeze · Saúde', 'Aguarda aprovação'],
+      ['DSP-2026-0840', 'Sasol Moçambique', 'Combustível da frota · lote mensal', '118 400 MT', 'hoje', 'Operação corrente', 'Pronta a pagar'],
+      ['DSP-2026-0839', 'Tecnhosat Serviços', 'Manutenção de rede e servidores · Julho', '412 500 MT', 'pago', 'Zambeze · Saúde', 'Paga'],
+      ['DSP-2026-0838', 'Cornelder Logística', 'Desembaraço aduaneiro · 2 contentores', '286 900 MT', '24 Ago', 'Programa Nampula', 'Em verificação'],
+      ['DSP-2026-0837', 'Clínica Cruz Azul', 'Seguro de saúde dos colaboradores', '164 200 MT', '30 Ago', 'Operação corrente', 'Aprovada'],
+      ['DSP-2026-0836', 'Moza Consulting', 'Auditoria intermédia do projecto', '350 000 MT', '5 Set', 'Zambeze · Saúde', 'Aguarda aprovação'],
+      ['DSP-2026-0835', 'Papelaria Central', 'Consumíveis de escritório', '38 750 MT', '11 Ago', 'Operação corrente', 'Sem factura'],
+      ['DSP-2026-0834', 'TDM Telecom', 'Internet dedicada · 3 delegações', '96 300 MT', 'pago', 'Operação corrente', 'Reconciliada'],
+      ['DSP-2026-0833', 'Hotel Cardoso', 'Alojamento da missão a Sofala', '74 600 MT', 'pago', 'Emergência Sofala', 'Paga'],
+      ['DSP-2026-0832', 'Electricidade de Moçambique', 'Energia · sede e armazém', '142 800 MT', '15 Ago', 'Operação corrente', 'Aprovada']
+    ];
+    let despesas = despesasBase.map(d => ({
+      ref: d[0], fornecedor: d[1], descricao: d[2], valor: d[3], vencimento: d[4],
+      vencCor: d[4] === 'hoje' ? RED : d[4] === 'pago' ? MUT : '#4A5461',
+      projecto: d[5], estado: d[6], estadoFg: est[d[6]],
+      open: () => this.setState({ route: 'detalhe', selId: d[0] })
+    }));
+    const f = this.state.filtro;
+    if (f === 'aprovar') despesas = despesas.filter(d => d.estado === 'Aguarda aprovação' || d.estado === 'Em verificação');
+    if (f === 'naopagas') despesas = despesas.filter(d => d.estado === 'Aprovada' || d.estado === 'Pronta a pagar');
+    if (f === 'semdoc') despesas = despesas.filter(d => d.estado === 'Sem factura');
+
+    const filtros = [['todas', 'Todas', 214], ['aprovar', 'Por aprovar', 12], ['naopagas', 'Aprovadas, não pagas', 48], ['semdoc', 'Sem factura', 3]]
+      .map(([k, label, n]) => ({
+        label, n, set: () => this.setState({ filtro: k }),
+        fg: f === k ? '#161D26' : '#7C766A', weight: f === k ? '600' : '400', underline: und(f === k)
+      }));
+
+    const resumoFrase = f === 'todas'
+      ? '1 932 400 MT registados em Agosto. Destes, 786 900 MT estão aprovados mas ainda não pagos e 742 300 MT vencem nos próximos sete dias.'
+      : f === 'aprovar' ? '512 900 MT retidos à espera de decisão. A mais antiga espera há 4 dias.'
+      : f === 'naopagas' ? '786 900 MT aprovados e ainda não pagos, em 48 despesas.'
+      : '3 despesas sem factura anexada — 94 200 MT que a auditoria vai perguntar.';
+
+    const faltaFeito = this.state.checked.length;
+    const faltaN = (5 - faltaFeito) + ' de 5';
+    const faltaTexto = faltaFeito === 5 ? 'lista completa · pode aprovar' : 'confirmações da lista de verificação';
+
+    const campos = [
+      ['Fornecedor', 'Tecnhosat Serviços, Lda', false], ['NUIT', '400 218 776', false],
+      ['Nº de factura', 'FAC-2026-0841', false], ['Emitida a', '2 de Agosto de 2026', false],
+      ['Vencimento', '18 de Agosto de 2026', true], ['Rubrica', '6.2.1 · Serviços de TI', false],
+      ['Fonte de financiamento', 'Fundo Doador UE', false], ['Projecto', 'Zambeze · Saúde', false],
+      ['Centro de custo', 'Sistemas de Informação', false], ['Solicitado por', 'Nélio Bila · Operações', false]
+    ].map(([label, valor, rever]) => ({ label, valor, rever }));
+
+    const checklistDef = [
+      ['Há saldo na rubrica 6.2.1 — 1 240 000 MT disponíveis', 'Helena Cossa · 11 Ago'],
+      ['Factura e contrato estão anexados', 'Helena Cossa · 11 Ago'],
+      ['Retenção na fonte de 10% calculada', 'Helena Cossa · 11 Ago'],
+      ['A despesa é elegível face às regras do financiador', 'por confirmar'],
+      ['Não há adiantamentos anteriores a abater', 'por confirmar']
+    ];
+    const checklist = checklistDef.map(([texto, autor], i) => {
+      const on = this.state.checked.includes(i);
+      return {
+        texto, autor: on ? autor : 'por confirmar', marca: on ? '✓' : '',
+        borda: on ? GRN : '#C9C4B8', fundo: on ? GRN : '#fff', corTexto: on ? '#161D26' : '#7C766A',
+        toggle: () => this.setState(s => ({ checked: on ? s.checked.filter(x => x !== i) : s.checked.concat(i) }))
+      };
+    });
+
+    const percurso = [
+      ['Registada', 'Nélio Bila carregou a factura; o sistema leu os campos', '2 Ago, 09:14', 'done'],
+      ['Verificada', 'Helena Cossa · 3 de 5 confirmações', '11 Ago, 15:02', 'done'],
+      ['A sua aprovação', 'Direcção Financeira', 'à espera há 22 horas', 'active'],
+      ['Aprovação do projecto', 'Gestor do Zambeze · exigido pela fonte de financiamento', 'por iniciar', 'todo'],
+      ['Pagamento e banco', 'Fila de pagamento e extrato BCI', 'por iniciar', 'todo']
+    ].map(([etapa, detalhe, quando, st]) => ({
+      etapa, detalhe, quando,
+      cor: st === 'done' ? GRN : st === 'active' ? ACC : '#C9C4B8',
+      fundo: st === 'done' ? GRN : st === 'active' ? ACC : '#fff',
+      corTitulo: st === 'todo' ? '#A8A296' : '#161D26'
+    }));
+
+    const auditoria = [
+      ['Processo consultado', 'Alcino Maido', 'hoje, 08:22'],
+      ['Verificação submetida com 3 confirmações', 'Helena Cossa', '11 Ago, 15:02'],
+      ['Rubrica corrigida de 6.2.9 para 6.2.1', 'Helena Cossa', '11 Ago, 14:41'],
+      ['Despesa criada a partir da leitura de FAC-2026-0841.pdf', 'Nélio Bila', '2 Ago, 09:14']
+    ].map(([acao, autor, quando]) => ({ acao, autor, quando }));
+
+    const aprovDef = [
+      ['Tecnhosat Serviços', 'DSP-2026-0841', 'Manutenção de rede e servidores · Agosto', '412 500 MT', 'Zambeze · Saúde', 'Fundo Doador UE', '1,24 M MT', 'feita a 11 Ago', 'é acima de 250 000 MT e usa fundos de doador — precisa também do gestor do projecto.', 'vence em 6 dias', AMB],
+      ['Moza Consulting', 'DSP-2026-0836', 'Auditoria intermédia do projecto', '350 000 MT', 'Zambeze · Saúde', 'Fundo Doador UE', '812 000 MT', 'feita a 8 Ago', 'é despesa de projecto com financiamento externo.', 'espera há 4 dias', RED],
+      ['Cornelder Logística', 'DSP-2026-0838', 'Desembaraço aduaneiro · 2 contentores', '286 900 MT', 'Programa Nampula', 'DANIDA', '498 300 MT', 'em curso', 'está no escalão de 250 000 a 1 000 000 MT.', 'vence em 12 dias', '#7C766A'],
+      ['Electricidade de Moçambique', 'DSP-2026-0832', 'Energia · sede e armazém', '142 800 MT', 'Operação corrente', 'Fundos próprios', '2,10 M MT', 'dispensada', 'é despesa recorrente abaixo de 250 000 MT — basta a sua aprovação.', 'vence em 3 dias', AMB]
+    ];
+    const aprovacoes = aprovDef.filter(a => !this.state.aprovadas.includes(a[1])).map(a => ({
+      fornecedor: a[0], ref: a[1], descricao: a[2], valor: a[3], projecto: a[4], fonte: a[5],
+      saldo: a[6], verificacao: a[7], porque: a[8], urgencia: a[9], urgCor: a[10],
+      aprovar: () => { this.setState(s => ({ aprovadas: s.aprovadas.concat(a[1]) })); this.flash('Aprovada · ' + a[0] + ' segue para pagamento.'); },
+      open: () => this.setState({ route: 'detalhe', selId: a[1] })
+    }));
+
+    const tempos = [
+      { nome: 'Direcção Financeira', valor: '1,4 dias', cor: GRN },
+      { nome: 'Gestores de projecto', valor: '2,8 dias', cor: AMB },
+      { nome: 'Administração', valor: '4,1 dias', cor: RED }
+    ];
+
+    const pipeline = [
+      ['Aprovada', 48, '786 900 MT', INK], ['Pronta a pagar', 21, '512 400 MT', ACC],
+      ['A pagamento', 6, '186 400 MT', AMB], ['Paga', 112, '1 145 500 MT', GRN],
+      ['No extrato', 108, '1 098 200 MT', GRN], ['Reconciliada', 104, '1 062 700 MT', GRN]
+    ].map(([nome, n, valor, cor]) => ({ nome, n, valor, cor }));
+
+    const fila = [
+      ['Sasol Moçambique', '118 400 MT', 'hoje', 'BCI 1234567 · operacional', 'A pagamento', AMB],
+      ['Electricidade de Moçambique', '142 800 MT', '15 Ago', 'BCI 1234567 · operacional', 'Pronta a pagar', ACC],
+      ['Cornelder Logística', '286 900 MT', '24 Ago', 'Millennium 7745120 · DANIDA', 'Pronta a pagar', ACC],
+      ['Clínica Cruz Azul', '164 200 MT', '30 Ago', 'BCI 1234567 · operacional', 'Pronta a pagar', ACC],
+      ['Tecnhosat Serviços', '412 500 MT', 'pago', 'Standard 9982211 · UE', 'Paga', GRN],
+      ['Hotel Cardoso', '74 600 MT', 'pago', 'BCI 1234567 · operacional', 'Paga', GRN]
+    ].map(x => ({ nome: x[0], valor: x[1], vencimento: x[2], vencCor: x[2] === 'hoje' ? RED : x[2] === 'pago' ? MUT : '#4A5461', conta: x[3], estado: x[4], fg: x[5] }));
+
+    const propostasDef = [
+      ['TRF TECHNOSAT SERVICOS LDA', '2 Ago', '412 500,00 MT', 'Tecnhosat · manutenção de Julho', 'DSP-2026-0839', '412 500,00 MT', 99],
+      ['DEB DIRECTO EDM SEDE', '7 Ago', '142 800,00 MT', 'EDM · energia de Agosto', 'DSP-2026-0832', '142 800,00 MT', 96],
+      ['TRF HOTEL CARDOSO SA', '9 Ago', '74 600,00 MT', 'Hotel Cardoso · missão a Sofala', 'DSP-2026-0833', '74 600,00 MT', 94],
+      ['TRF TDM TELECOMUNICACOES', '6 Ago', '96 300,00 MT', 'TDM · internet dedicada', 'DSP-2026-0834', '96 300,00 MT', 88],
+      ['TRF PAPELARIA CENTRAL', '11 Ago', '38 750,00 MT', 'Papelaria Central · consumíveis', 'DSP-2026-0835', '38 750,00 MT', 72]
+    ];
+    const propostas = propostasDef.filter(p => !this.state.confirmadas.includes(p[4])).map(p => ({
+      descBanco: p[0], dataBanco: p[1], valorBanco: p[2], descNexora: p[3], refNexora: p[4], valorNexora: p[5],
+      conf: p[6], confCor: p[6] >= 95 ? GRN : p[6] >= 80 ? '#4A5461' : AMB,
+      confTexto: p[6] >= 95 ? 'Certo' : p[6] >= 80 ? 'Provável' : 'A confirmar',
+      confirmar: () => { this.setState(s => ({ confirmadas: s.confirmadas.concat(p[4]) })); this.flash('Reconciliada · ' + p[3] + '.'); }
+    }));
+
+    const semPar = [
+      { desc: 'Transferência recebida da Delegação da UE — tranche 3', data: '5 Ago', valor: '+1 400 000 MT', acao: 'Registar como receita' },
+      { desc: 'Adiantamento enviado a M. Chirindza', data: '3 Ago', valor: '−48 000 MT', acao: 'Ligar ao adiantamento' },
+      { desc: 'Comissões e encargos bancários', data: '1 Ago', valor: '−4 850 MT', acao: 'Criar despesa' }
+    ];
+
+    const excepcoes = [
+      { cor: RED, titulo: 'Uma transferência de 1,4 M MT entrou sem receita registada', detalhe: 'Tranche 3 da UE · sem contrapartida no NEXORA', valor: '1,40 M MT', antiguidade: 'há 7 dias', responsavel: 'Helena Cossa', acao: 'Registar receita' },
+      { cor: RED, titulo: 'Clínica Cruz Azul aprovada há 9 dias e ainda não paga', detalhe: 'Já dentro do prazo de vencimento', valor: '164 200 MT', antiguidade: 'há 9 dias', responsavel: 'Tesouraria', acao: 'Pôr na fila' },
+      { cor: RED, titulo: 'Pagamento à Sasol vence hoje sem confirmação bancária', detalhe: 'Iniciado a 10 de Agosto', valor: '118 400 MT', antiguidade: 'hoje', responsavel: 'Tesouraria', acao: 'Confirmar' },
+      { cor: '#6E62B6', titulo: 'Duas facturas da Tecnhosat com o mesmo valor e descrição', detalhe: 'FAC-0839 e FAC-0841 · possível duplicação', valor: '412 500 MT', antiguidade: 'há 3 dias', responsavel: 'Nélio Bila', acao: 'Comparar' },
+      { cor: AMB, titulo: 'Três despesas de Agosto sem factura anexada', detalhe: 'O fecho do mês é a 31 de Agosto', valor: '94 200 MT', antiguidade: 'há 6 dias', responsavel: 'Nélio Bila', acao: 'Pedir documento' },
+      { cor: AMB, titulo: 'Adiantamento a M. Chirindza por regularizar', detalhe: 'Sem despesa a abater desde 2 de Julho', valor: '48 000 MT', antiguidade: 'há 41 dias', responsavel: 'Recursos Humanos', acao: 'Notificar' }
+    ];
+
+    const h = this.state.horizonte;
+    const horizontes = [30, 60, 90].map(v => ({
+      label: v + ' dias', set: () => this.setState({ horizonte: v }),
+      fg: h === v ? '#161D26' : '#7C766A', weight: h === v ? '600' : '400', underline: und(h === v)
+    }));
+    const nSem = h === 30 ? 5 : h === 60 ? 9 : 13;
+    const inflows = [820, 240, 1400, 180, 260, 940, 210, 180, 1250, 240, 190, 880, 320];
+    const outflows = [610, 780, 520, 690, 1240, 580, 640, 1180, 610, 720, 560, 690, 640];
+    const semanas = Array.from({ length: nSem }, (_, i) => ({
+      label: i === 0 ? 'agora' : 'S' + i,
+      hIn: Math.round(inflows[i] / 8), hOut: Math.round(outflows[i] / 8),
+      corOut: outflows[i] > 1000 ? RED : '#C9C4B8'
+    }));
+    const saldoFim = h === 30 ? '4,42 M MT' : h === 60 ? '3,18 M MT' : '3,96 M MT';
+    const tesourariaFrase = h === 30
+      ? 'Nos próximos 30 dias não há pressão: as saídas mantêm-se abaixo das entradas em todas as semanas.'
+      : 'A única semana de risco é a de 18 de Outubro, quando três pagamentos de projecto somam 1 240 000 MT e o saldo desce a 612 000 MT — abaixo do limite mínimo de 800 000 MT que a organização definiu. Reescalonar dois deles resolve.';
+
+    const drivers = [
+      { nome: 'Saldo de hoje', valor: '4 812 400 MT', cor: '#161D26' },
+      { nome: 'Pagamentos já aprovados', valor: '−1 286 900 MT', cor: AMB },
+      { nome: 'Despesa recorrente estimada', valor: '−2 410 000 MT', cor: AMB },
+      { nome: 'Tranches de doador confirmadas', valor: '+2 145 000 MT', cor: ACC },
+      { nome: 'Receita própria projectada', valor: '+840 000 MT', cor: ACC }
+    ];
+    const cenarios = [
+      { nome: 'Como está previsto', valor: '3,96 M', cor: '#161D26' },
+      { nome: 'A tranche da UE atrasa 30 dias', valor: '2,56 M', cor: AMB },
+      { nome: 'Atrasa e a despesa sobe 10%', valor: '1,89 M', cor: RED }
+    ];
+
+    const projBase = [
+      ['Projecto Zambeze · Saúde', 'Delegação da União Europeia', 84, 92, '5,00 M MT', '4,20 M MT', '412 500 MT', '387 500 MT', 'C. Mabjaia', 'Passou os 80%: ao ritmo actual o orçamento esgota a 2 de Novembro, um mês antes do fim.'],
+      ['Programa Nampula', 'DANIDA', 61, 68, '3,00 M MT', '1,83 M MT', '186 000 MT', '984 000 MT', 'R. Sitoe', 'Execução alinhada com o calendário do financiador.'],
+      ['Operação corrente', 'Fundos próprios', 47, 52, '2,40 M MT', '1,13 M MT', '120 000 MT', '1,15 M MT', 'H. Cossa', 'Dentro do previsto para Agosto.'],
+      ['Fundo Emergência Sofala', 'USAID', 22, 30, '1,20 M MT', '264 000 MT', '96 000 MT', '840 000 MT', 'R. Sitoe', 'Arranque recente; primeiro relatório em Dezembro.']
+    ];
+    const projectosDet = projBase.map(p => {
+      const cor = p[2] >= 80 ? RED : p[2] >= 60 ? AMB : INK;
+      return {
+        nome: p[0], financiador: p[1], periodo: 'Jan – Dez 2026', gestor: p[8],
+        pct: p[2], pctComprometido: p[3], cor,
+        estadoTexto: p[9], estadoFg: p[2] >= 80 ? RED : '#7C766A',
+        numeros: [
+          { label: 'Orçamento', valor: p[4], cor: '#161D26' },
+          { label: 'Executado', valor: p[5], cor: cor },
+          { label: 'Comprometido', valor: p[6], cor: '#7C766A' },
+          { label: 'Disponível', valor: p[7], cor: p[2] >= 80 ? RED : GRN }
+        ]
+      };
+    });
+
+    const grants = [
+      { fonte: 'Fundo Doador UE · FED/2026/041', conta: 'Standard 9982211', recebido: '4,20 M MT', aplicado: '3,81 M MT', relatorio: '30 Set · trimestral' },
+      { fonte: 'DANIDA · Programa Nampula', conta: 'Millennium 7745120', recebido: '3,00 M MT', aplicado: '1,83 M MT', relatorio: '15 Out · semestral' },
+      { fonte: 'USAID · Emergência Sofala', conta: 'BCI 5541203', recebido: '1,20 M MT', aplicado: '264 000 MT', relatorio: '31 Dez · final' },
+      { fonte: 'Fundos próprios', conta: 'BCI 1234567', recebido: '—', aplicado: '1,13 M MT', relatorio: '—' }
+    ];
+
+    const insights = [
+      { cor: RED, titulo: 'A Tecnhosat cobra 38% mais do que há três meses', detalhe: 'Passou de 298 000 para 412 500 MT por ciclo, sem alteração de contrato registada no sistema. Vale confirmar o âmbito que está a ser facturado.' },
+      { cor: AMB, titulo: 'Um único fornecedor pesa 21% da despesa operacional', detalhe: 'Acima do limite interno de 15%. Os cinco maiores fornecedores somam 54% de tudo o que a organização gasta.' }
+    ];
+    const fornecedores = [
+      ['Tecnhosat Serviços', 14, '4,96 M MT', '354 428 MT', '+38%', RED, 21],
+      ['Sasol Moçambique', 12, '1,81 M MT', '151 033 MT', '+4%', '#4A5461', 12],
+      ['Cornelder Logística', 9, '1,60 M MT', '178 322 MT', '−7%', GRN, 9],
+      ['Moza Consulting', 4, '1,40 M MT', '350 000 MT', '+12%', AMB, 8],
+      ['Electricidade de Moçambique', 12, '1,35 M MT', '112 383 MT', '+2%', '#4A5461', 7],
+      ['TDM Telecom', 12, '984 300 MT', '82 025 MT', '0%', '#4A5461', 5],
+      ['Hotel Cardoso', 7, '512 800 MT', '73 257 MT', '−18%', GRN, 3]
+    ].map(x => ({
+      nome: x[0], transacoes: x[1], acumulado: x[2], medio: x[3], variacao: x[4], varCor: x[5],
+      pct: x[6], pctBar: x[6] * 4, barCor: x[6] >= 15 ? RED : INK
+    }));
+
+    const camposRelatorio = [
+      { label: 'Período', valor: 'Agosto de 2026' },
+      { label: 'Agrupar por', valor: 'Rubrica orçamental' },
+      { label: 'Fonte', valor: 'Todas' },
+      { label: 'Estado', valor: 'Aprovadas, pagas e reconciliadas' }
+    ];
+    const linhasRelatorio = [
+      ['6.2.1 · Serviços de TI', 6, '412 400 MT', '412 500 MT', 43],
+      ['6.1.1 · Salários e encargos', 41, '482 100 MT', '—', 25],
+      ['6.3.2 · Logística e transporte', 18, '—', '286 900 MT', 15],
+      ['6.1.3 · Utilidades', 9, '—', '142 800 MT', 7],
+      ['6.4.1 · Viagens e ajudas de custo', 12, '74 600 MT', '—', 4],
+      ['6.2.4 · Auditoria e consultoria', 3, '68 300 MT', '—', 3],
+      ['6.5.2 · Consumíveis', 22, '38 750 MT', '—', 2],
+      ['6.9.9 · Outros', 103, '14 050 MT', '—', 1]
+    ].map(l => ({ rubrica: l[0], n: l[1], pago: l[2], porPagar: l[3], pct: l[4], corPorPagar: l[3] === '—' ? '#C9C4B8' : AMB }));
+
+    const tabsConfig = [['etapas', 'Etapas do ciclo'], ['aprov', 'Quem aprova'], ['doc', 'Documento de autorização'], ['check', 'Lista de verificação'], ['nomes', 'Nomes e rubricas'], ['contas', 'Fontes e contas'], ['papeis', 'Pessoas e permissões']]
+      .map(([k, label]) => ({
+        label, set: () => this.setState({ tabConfig: k }),
+        fg: this.state.tabConfig === k ? '#0F4C4C' : '#7C766A',
+        weight: this.state.tabConfig === k ? '600' : '400'
+      }));
+
+    const etapasDef = [
+      ['requisicao', 'Requisição e cotações', 'Para quem começa antes da factura: necessidade, cotações e escolha do fornecedor', 'opcional'],
+      ['despesa', 'Registo da despesa', 'O núcleo do sistema', 'sempre activo'],
+      ['verificacao', 'Verificação financeira', 'A lista de confirmações que a sua equipa já usa', 'configurável'],
+      ['autorizacao', 'Documento de autorização', 'O memorando ou nota que a sua organização assina', 'configurável'],
+      ['aprovacao', 'Aprovação', 'Quem decide, segundo as suas regras', 'sempre activo'],
+      ['pagamento', 'Pagamento', 'Fila, lotes e estados até ao banco', 'sempre activo'],
+      ['adiantamentos', 'Adiantamentos', 'Saldos próprios abatidos em despesas seguintes', 'opcional'],
+      ['reconciliacao', 'Reconciliação bancária', 'Importação do extrato e correspondência automática', 'sempre activo']
+    ];
+    const etapas = etapasDef.map(([k, nome, descricao, tag]) => {
+      const fixed = tag === 'sempre activo';
+      const on = fixed || !this.state.etapasOff.includes(k);
+      return {
+        nome, descricao, tag,
+        trackBg: on ? (fixed ? '#C9C4B8' : ACC) : '#DEDBD2',
+        knobLeft: on ? 18 : 2,
+        corTitulo: on ? '#161D26' : '#A8A296',
+        toggle: () => {
+          if (fixed) { this.flash('Esta etapa é estrutural — o rasto é obrigatório.'); return; }
+          this.setState(s => ({ etapasOff: on ? s.etapasOff.concat(k) : s.etapasOff.filter(x => x !== k) }));
+        }
+      };
+    });
+
+    const matriz = [
+      ['Até 250 000 MT, aprova o responsável financeiro.', '1 nível'],
+      ['Entre 250 000 e 1 000 000 MT, aprova o responsável financeiro e depois a Direcção.', '2 níveis'],
+      ['Acima de 1 000 000 MT, sobe até ao Conselho de Administração.', '3 níveis'],
+      ['Se a despesa usar o Fundo Doador UE, o gestor do projecto aprova sempre, qualquer que seja o valor.', '+1 nível'],
+      ['Salários e encargos seguem por Recursos Humanos e Direcção, sem verificação financeira.', '2 níveis'],
+      ['Se a despesa estiver fora de orçamento, sobe automaticamente um nível.', '+1 nível']
+    ].map(([frase, niveis]) => ({ frase, niveis }));
+
+    const ligacoes = [
+      { fonte: 'Fundo Doador UE', conta: 'Standard 9982211', regra: 'só esta conta', fg: ACC },
+      { fonte: 'DANIDA · Nampula', conta: 'Millennium 7745120', regra: 'só esta conta', fg: ACC },
+      { fonte: 'USAID · Sofala', conta: 'BCI 5541203', regra: 'só esta conta', fg: ACC },
+      { fonte: 'Fundos próprios', conta: 'BCI 1234567', regra: 'excepção autorizável', fg: AMB }
+    ];
+    const docConfig = [
+      { label: 'Existe no seu processo', valor: 'Sim' },
+      { label: 'Como se chama', valor: 'Nota de Autorização de Pagamento' },
+      { label: 'Numeração', valor: 'NAP-2026-0148' },
+      { label: 'Gerado', valor: 'depois da verificação financeira' },
+      { label: 'Assinam', valor: 'Contabilista · Resp. Financeiro · Direcção' }
+    ];
+
+    return {
+      orgName: this.props.orgName ?? 'Grupo Zambeze',
+      eyebrow, pageTitle, pageLede, nav,
+      isDashboard: r === 'dashboard', isWatch: r === 'watch', isDespesas: r === 'despesas',
+      isDetalhe: r === 'detalhe', isAprovacoes: r === 'aprovacoes', isPagamentos: r === 'pagamentos',
+      isReconciliacao: r === 'reconciliacao', isExcepcoes: r === 'excepcoes', isTesouraria: r === 'tesouraria',
+      isProjectos: r === 'projectos', isFornecedores: r === 'fornecedores', isRelatorios: r === 'relatorios',
+      isConfig: r === 'config',
+      goWatch: () => this.go('watch'), goDespesas: () => this.go('despesas'),
+      goTesouraria: () => this.go('tesouraria'), goFornecedores: () => this.go('fornecedores'),
+      toast: () => this.flash('Acção registada · rasto de auditoria actualizado.'),
+      toastMsg: this.state.toastMsg,
+      headline, decisoes, naturezas, watch, scoreHist,
+      despesas, filtros, resumoFrase,
+      faltaN, faltaTexto, campos, checklist, percurso, auditoria,
+      aprovacoes, tempos, pipeline, fila,
+      propostas, semPar,
+      reconciliados: 104 + this.state.confirmadas.length,
+      propostosN: propostas.length + 19,
+      confirmarTodas: () => { this.setState({ confirmadas: propostasDef.map(p => p[4]) }); this.flash('24 correspondências confirmadas · 7 excepções mantidas.'); },
+      criarLote: () => this.flash('Lote criado · 3 pagamentos · 594 100 MT.'),
+      excepcoes, horizontes, saldoFim, semanas, tesourariaFrase, drivers, cenarios,
+      projectosDet, grants, insights, fornecedores,
+      camposRelatorio, linhasRelatorio,
+      tabsConfig, etapas, matriz, ligacoes, docConfig
+    };
+  }
+}
+
+</script>
+</body>
+</html>

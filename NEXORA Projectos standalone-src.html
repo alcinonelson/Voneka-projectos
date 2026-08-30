@@ -1,0 +1,1961 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="ext-resource-dependency" content="https://unpkg.com/react@18.3.1/umd/react.production.min.js" data-resource-id="https://unpkg.com/react@18.3.1/umd/react.production.min.js" />
+<meta name="ext-resource-dependency" content="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" data-resource-id="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" />
+<template id="__bundler_thumbnail" data-bg-color="#101828">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#101828"></rect>
+    <g transform="translate(480 240) scale(6)">
+      <path d="M8 32 H10.8 V8 H8 Z" fill="#FFFFFF"></path>
+      <path d="M8 8 H12.2 L32 32 H27.6 Z" fill="#FFFFFF"></path>
+      <path d="M27.4 32 H32 V11.5 H27.4 Z" fill="#FFFFFF"></path>
+      <path d="M27.4 11.5 H32 V5.6 H27.4 Z" fill="#7FA3FF"></path>
+    </g>
+  </svg>
+</template>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #F7F8FA; }
+  * { box-sizing: border-box; }
+  a { color: #2C5FF6; text-decoration: none; }
+  a:hover { color: #1E45C4; text-decoration: underline; }
+  input, textarea, select { font: inherit; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #D5D9E0; border-radius: 6px; border: 3px solid #F7F8FA; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  @keyframes nx-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+  @keyframes nx-drawer { from { transform: translateX(28px); opacity: .4; } to { transform: none; opacity: 1; } }
+  @keyframes nx-modal { from { opacity: 0; transform: translateY(8px) scale(.99); } to { opacity: 1; transform: none; } }
+  @keyframes nx-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes nx-toast { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+</style>
+</helmet>
+
+<div style="width: 100%; height: 100vh; overflow-x: auto; overflow-y: hidden; background: #F7F8FA;">
+<div style="display: flex; height: 100vh; min-width: 1440px; overflow: hidden; font-family: 'Instrument Sans', system-ui, sans-serif; font-size: 13px; color: #101828; background: #F7F8FA; -webkit-font-smoothing: antialiased;">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside style="width: 236px; flex: 0 0 236px; background: #FFFFFF; border-right: 1px solid #EAECF0; display: flex; flex-direction: column;">
+    <div style="padding: 14px 14px 10px;">
+      <div style="display: flex; align-items: center; gap: 9px; padding: 7px 9px; border: 1px solid #EAECF0; border-radius: 8px; cursor: pointer;" style-hover="background: #F9FAFB;">
+        <svg viewBox="0 0 40 40" style="width: 28px; height: 28px; display: block; flex: 0 0 28px;">
+          <path d="M8 32 H10.8 V8 H8 Z" fill="#101828"></path>
+          <path d="M8 8 H12.2 L32 32 H27.6 Z" fill="#101828"></path>
+          <path d="M27.4 32 H32 V11.5 H27.4 Z" fill="#101828"></path>
+          <path d="M27.4 11.5 H32 V5.6 H27.4 Z" fill="#2C5FF6"></path>
+        </svg>
+        <span style="flex: 1; min-width: 0;">
+          <span style="display: block; font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ orgName }}</span>
+          <span style="display: block; font-size: 11px; color: #98A2B3; letter-spacing: .06em; text-transform: uppercase;">Projectos</span>
+        </span>
+        <span style="font-size: 8px; color: #98A2B3;">▼</span>
+      </div>
+    </div>
+
+    <div style="padding: 4px 14px 12px;">
+      <div style="display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 9px; border: 1px solid #EAECF0; border-radius: 7px; cursor: pointer; color: #98A2B3;" style-hover="border-color: #D0D5DD;">
+        <span style="font-size: 12px;">⌕</span>
+        <span style="flex: 1; font-size: 12.5px;">Procurar</span>
+        <span style="font-size: 10.5px; border: 1px solid #EAECF0; border-radius: 4px; padding: 1px 4px; color: #98A2B3;">⌘K</span>
+      </div>
+    </div>
+
+    <div style="flex: 1; overflow-y: auto; padding: 0 8px 12px;">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="10">
+        <sc-if value="{{ n.isGroup }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 16px 10px 6px; font-size: 10.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #98A2B3;">{{ n.label }}</div>
+        </sc-if>
+        <sc-if value="{{ n.isItem }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ n.go }}" style="display: flex; align-items: center; gap: 10px; height: 33px; padding: 0 10px; border-radius: 7px; cursor: pointer; font-size: 13px; background: {{ n.bg }}; color: {{ n.fg }}; font-weight: {{ n.weight }};" style-hover="background: #F4F5F7;">
+            <span style="width: 15px; text-align: center; font-size: 12px; color: {{ n.iconFg }};">{{ n.icon }}</span>
+            <span style="flex: 1;">{{ n.label }}</span>
+            <sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}">
+              <span style="min-width: 18px; height: 17px; padding: 0 5px; border-radius: 5px; background: {{ n.badgeBg }}; color: {{ n.badgeFg }}; font-size: 10.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums;">{{ n.badge }}</span>
+            </sc-if>
+          </div>
+        </sc-if>
+      </sc-for>
+    </div>
+
+    <div style="border-top: 1px solid #EAECF0; padding: 12px 14px;">
+      <div style="font-size: 10.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #98A2B3; padding: 0 2px 8px;">Ver como</div>
+      <div style="display: flex; gap: 6px;">
+        <sc-for list="{{ perfis }}" as="p" hint-placeholder-count="2">
+          <div onClick="{{ p.fn }}" style="flex: 1; height: 29px; display: flex; align-items: center; justify-content: center; border-radius: 7px; font-size: 12px; cursor: pointer; border: 1px solid {{ p.bd }}; background: {{ p.bg }}; color: {{ p.fg }}; font-weight: {{ p.weight }};">{{ p.label }}</div>
+        </sc-for>
+      </div>
+      <div style="display: flex; align-items: center; gap: 9px; margin-top: 14px; padding: 5px 2px; cursor: pointer;">
+        <span style="width: 26px; height: 26px; border-radius: 50%; background: #101828; color: #fff; font-size: 10.5px; font-weight: 600; display: flex; align-items: center; justify-content: center;">{{ euIniciais }}</span>
+        <span style="flex: 1; min-width: 0;">
+          <span style="display: block; font-size: 12px; font-weight: 500;">{{ euNome }}</span>
+          <span style="display: block; font-size: 10.5px; color: #98A2B3;">{{ euFuncao }}</span>
+        </span>
+        <span style="font-size: 11px; color: #98A2B3;">⌄</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div style="flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative;">
+
+    <header style="height: 64px; flex: 0 0 64px; background: #fff; border-bottom: 1px solid #EAECF0; display: flex; align-items: center; padding: 0 28px; gap: 16px;">
+      <div style="min-width: 0;">
+        <div style="font-size: 16px; font-weight: 600; letter-spacing: -.01em;">{{ pageTitle }}</div>
+        <div style="font-size: 12px; color: #667085; margin-top: 3px;">{{ pageSub }}</div>
+      </div>
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+        <div onClick="{{ toast }}" style="height: 32px; padding: 0 12px; display: flex; align-items: center; border: 1px solid #EAECF0; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; background: #fff;" style-hover="border-color: #D0D5DD;">{{ acaoSec }}</div>
+        <div onClick="{{ acaoPrincipalFn }}" style="height: 32px; padding: 0 13px; display: flex; align-items: center; gap: 7px; background: #101828; color: #fff; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer;" style-hover="background: #1D2939;">
+          <span style="font-size: 13px;">+</span>{{ acaoPrincipal }}
+        </div>
+      </div>
+    </header>
+
+    <main style="flex: 1; overflow-y: auto; padding: 24px 28px 48px;">
+
+      <!-- =============== PAINEL (admin) =============== -->
+      <sc-if value="{{ isPainel }}" hint-placeholder-val="{{ true }}">
+        <div style="animation: nx-in .24s ease both; display: flex; flex-direction: column; gap: 22px; max-width: 1320px;">
+
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 12px; padding: 26px 28px; display: flex; align-items: flex-end; gap: 40px;">
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 11.5px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: #98A2B3;">{{ hoje }}</div>
+              <div style="font-size: 23px; font-weight: 600; letter-spacing: -.02em; line-height: 1.32; margin-top: 12px; max-width: 30ch; text-wrap: pretty;">{{ focoTitulo }}</div>
+              <div style="font-size: 13px; color: #667085; margin-top: 10px; line-height: 1.6; max-width: 62ch; text-wrap: pretty;">{{ focoNota }}</div>
+            </div>
+            <div style="display: flex; gap: 34px; flex: 0 0 auto;">
+              <sc-for list="{{ resumo }}" as="s" hint-placeholder-count="3">
+                <div>
+                  <div style="font-size: 11.5px; color: #98A2B3;">{{ s.label }}</div>
+                  <div style="font-size: 30px; font-weight: 600; letter-spacing: -.025em; margin-top: 8px; font-variant-numeric: tabular-nums; color: {{ s.fg }};">{{ s.value }}</div>
+                  <div style="font-size: 11.5px; color: #98A2B3; margin-top: 5px;">{{ s.sub }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div>
+            <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px;">
+              <span style="font-size: 14.5px; font-weight: 600;">Precisa da sua decisão</span>
+              <span style="font-size: 12px; color: #98A2B3;">três itens travam quatro projectos</span>
+            </div>
+            <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 12px; overflow: hidden;">
+              <sc-for list="{{ decisoes }}" as="a" hint-placeholder-count="3">
+                <div style="display: flex; align-items: center; gap: 18px; padding: 18px 20px; border-bottom: 1px solid #F2F4F7;" style-hover="background: #FCFCFD;">
+                  <span style="width: 3px; height: 34px; border-radius: 2px; flex: 0 0 3px; background: {{ a.cor }};"></span>
+                  <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 14px; font-weight: 500; letter-spacing: -.005em;">{{ a.titulo }}</div>
+                    <div style="font-size: 12px; color: #667085; margin-top: 5px;">{{ a.detalhe }}</div>
+                  </div>
+                  <span style="font-size: 11.5px; font-weight: 600; padding: 4px 9px; border-radius: 6px; white-space: nowrap; color: {{ a.alertaFg }}; background: {{ a.alertaBg }};">{{ a.alerta }}</span>
+                  <span onClick="{{ a.fn }}" style="height: 32px; padding: 0 14px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; background: #fff; white-space: nowrap;" style-hover="background: #101828; color: #fff; border-color: #101828;">{{ a.acao }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; align-items: start;">
+            <div>
+              <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px;">
+                <span style="font-size: 14.5px; font-weight: 600;">Avanço da carteira</span>
+                <span onClick="{{ goProjectos }}" style="margin-left: auto; font-size: 12.5px; color: #2C5FF6; cursor: pointer; font-weight: 500;">Abrir carteira</span>
+              </div>
+              <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 12px; overflow: hidden;">
+                <sc-for list="{{ avancos }}" as="p" hint-placeholder-count="5">
+                  <div onClick="{{ p.abrir }}" style="display: flex; align-items: center; gap: 16px; padding: 15px 20px; border-bottom: 1px solid #F2F4F7; cursor: pointer;" style-hover="background: #FCFCFD;">
+                    <div style="flex: 1; min-width: 0;">
+                      <div style="font-size: 13.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ p.nome }}</div>
+                      <div style="font-size: 11.5px; color: #98A2B3; margin-top: 4px;">{{ p.cliente }} · {{ p.estagio }}</div>
+                    </div>
+                    <div style="width: 132px; flex: 0 0 132px; height: 6px; border-radius: 3px; background: #F2F4F7; overflow: hidden;">
+                      <div style="height: 100%; border-radius: 3px; width: {{ p.barra }}; background: {{ p.barraFg }};"></div>
+                    </div>
+                    <span style="font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; width: 40px; text-align: right;">{{ p.pct }}</span>
+                    <span style="width: 8px; height: 8px; border-radius: 50%; flex: 0 0 8px; background: {{ p.saudeCor }};"></span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px;">
+                <span style="font-size: 14.5px; font-weight: 600;">Prazos a vencer</span>
+                <span onClick="{{ goTarefas }}" style="margin-left: auto; font-size: 12.5px; color: #2C5FF6; cursor: pointer; font-weight: 500;">Ver tarefas</span>
+              </div>
+              <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 12px; overflow: hidden;">
+                <sc-for list="{{ prazos }}" as="d" hint-placeholder-count="5">
+                  <div style="padding: 14px 18px; border-bottom: 1px solid #F2F4F7;" style-hover="background: #FCFCFD;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <span style="font-size: 12.5px; font-weight: 500; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ d.titulo }}</span>
+                      <span style="font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; white-space: nowrap; color: {{ d.alertaFg }}; background: {{ d.alertaBg }};">{{ d.alerta }}</span>
+                    </div>
+                    <div style="font-size: 11.5px; color: #98A2B3; margin-top: 6px;">{{ d.responsavel }} · {{ d.data }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div onClick="{{ goRelatorios }}" style="font-size: 12.5px; color: #2C5FF6; cursor: pointer; font-weight: 500; padding: 12px 2px;">Ler os relatórios desta semana →</div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== PROJECTOS =============== -->
+      <sc-if value="{{ isProjectos }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+            <sc-for list="{{ filtros }}" as="f" hint-placeholder-count="5">
+              <div onClick="{{ f.fn }}" style="height: 30px; padding: 0 12px; display: flex; align-items: center; gap: 7px; border-radius: 7px; font-size: 12.5px; cursor: pointer; border: 1px solid {{ f.bd }}; background: {{ f.bg }}; color: {{ f.fg }}; font-weight: {{ f.weight }};">
+                {{ f.label }}<span style="font-size: 11px; color: #98A2B3; font-variant-numeric: tabular-nums;">{{ f.n }}</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 14px; padding: 10px 20px; background: #FCFCFD; border-bottom: 1px solid #EAECF0; font-size: 11px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: #98A2B3;">
+              <span style="width: 270px; flex: 0 0 270px;">Projecto</span>
+              <span style="width: 120px; flex: 0 0 120px;">Estágio</span>
+              <span style="width: 160px; flex: 0 0 160px;">Responsável</span>
+              <span style="flex: 1;">Avanço</span>
+              <span style="width: 150px; flex: 0 0 150px; text-align: right;">Entrega</span>
+              <span style="width: 78px; flex: 0 0 78px; text-align: right;">Tarefas</span>
+            </div>
+            <sc-for list="{{ projectos }}" as="p" hint-placeholder-count="7">
+              <div onClick="{{ p.abrir }}" style="display: flex; align-items: center; gap: 14px; padding: 15px 20px; border-bottom: 1px solid #F2F4F7; cursor: pointer;" style-hover="background: #FCFCFD;">
+                <div style="width: 270px; flex: 0 0 270px; min-width: 0;">
+                  <div style="font-size: 13.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ p.nome }}</div>
+                  <div style="display: flex; align-items: center; gap: 7px; margin-top: 5px;">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; flex: 0 0 6px; background: {{ p.tipoDot }};"></span>
+                    <span style="font-size: 11.5px; font-weight: 500; color: {{ p.tipoFg }};">{{ p.tipo }}</span>
+                    <span style="font-size: 11.5px; color: #98A2B3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">· {{ p.cliente }}</span>
+                  </div>
+                </div>
+                <span style="width: 120px; flex: 0 0 120px;">
+                  <span style="font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 5px; white-space: nowrap; color: {{ p.estFg }}; background: {{ p.estBg }};">{{ p.estagio }}</span>
+                </span>
+                <div style="width: 160px; flex: 0 0 160px; display: flex; align-items: center; gap: 8px; min-width: 0;">
+                  <span style="width: 24px; height: 24px; border-radius: 50%; font-size: 9.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: 0 0 24px; background: #F2F4F7; color: #475467;">{{ p.iniciais }}</span>
+                  <span style="font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ p.responsavel }}</span>
+                </div>
+                <div style="flex: 1; display: flex; align-items: center; gap: 10px; min-width: 90px;">
+                  <div style="flex: 1; height: 6px; border-radius: 3px; background: #F2F4F7; overflow: hidden;">
+                    <div style="height: 100%; border-radius: 3px; width: {{ p.barra }}; background: {{ p.barraFg }};"></div>
+                  </div>
+                  <span style="font-size: 12.5px; font-weight: 600; font-variant-numeric: tabular-nums; width: 38px; text-align: right;">{{ p.pct }}</span>
+                </div>
+                <div style="width: 150px; flex: 0 0 150px; display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                  <span style="font-size: 12px; color: #475467; font-variant-numeric: tabular-nums;">{{ p.entrega }}</span>
+                  <span style="font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 5px; white-space: nowrap; color: {{ p.alertaFg }}; background: {{ p.alertaBg }};">{{ p.alerta }}</span>
+                </div>
+                <span style="width: 78px; flex: 0 0 78px; text-align: right; font-size: 12px; color: #667085; font-variant-numeric: tabular-nums;">{{ p.tarefasTxt }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== ROTEIRO =============== -->
+      <sc-if value="{{ isRoadmap }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+            <div style="display: flex; gap: 4px; padding: 3px; background: #F2F4F7; border-radius: 8px;">
+              <sc-for list="{{ escalas }}" as="e" hint-placeholder-count="3">
+                <div onClick="{{ e.fn }}" style="height: 27px; padding: 0 14px; display: flex; align-items: center; border-radius: 6px; font-size: 12.5px; cursor: pointer; background: {{ e.bg }}; color: {{ e.fg }}; font-weight: {{ e.weight }}; box-shadow: {{ e.shadow }};">{{ e.label }}</div>
+              </sc-for>
+            </div>
+            <div style="display: flex; gap: 6px; margin-left: 6px;">
+              <span onClick="{{ shiftBack }}" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border: 1px solid #EAECF0; border-radius: 7px; cursor: pointer; background: #fff; color: #475467; font-size: 13px;" style-hover="border-color: #D0D5DD;">‹</span>
+              <span onClick="{{ shiftFwd }}" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border: 1px solid #EAECF0; border-radius: 7px; cursor: pointer; background: #fff; color: #475467; font-size: 13px;" style-hover="border-color: #D0D5DD;">›</span>
+              <span onClick="{{ shiftHoje }}" style="height: 30px; padding: 0 12px; display: flex; align-items: center; border: 1px solid #EAECF0; border-radius: 7px; cursor: pointer; background: #fff; color: #475467; font-size: 12.5px; font-weight: 500;" style-hover="border-color: #D0D5DD;">Hoje</span>
+            </div>
+            <span style="font-size: 13px; font-weight: 500; margin-left: 8px;">{{ janelaLabel }}</span>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 16px; font-size: 11.5px; color: #667085;">
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 9px; height: 9px; border-radius: 2px; background: #101828;"></span>Concluída</span>
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 9px; height: 9px; border-radius: 2px; background: #2C5FF6;"></span>Em curso</span>
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 9px; height: 9px; border-radius: 2px; background: #EAECF0;"></span>Planeada</span>
+              <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 9px; height: 9px; border-radius: 2px; background: #F04438;"></span>Atrasada</span>
+            </div>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 12px 20px; border-bottom: 1px solid #EAECF0;">
+              <span style="font-size: 12px; color: #667085;">{{ dicaDrag }}</span>
+              <sc-if value="{{ temEdicoes }}" hint-placeholder-val="{{ false }}">
+                <span onClick="{{ reporRoteiro }}" style="margin-left: auto; font-size: 12.5px; color: #2C5FF6; cursor: pointer; font-weight: 500;">Repor plano original ({{ nEdicoes }})</span>
+              </sc-if>
+            </div>
+
+            <div style="display: flex; align-items: stretch; background: #FCFCFD; border-bottom: 1px solid #EAECF0; padding: 0 20px;">
+              <div style="width: 232px; flex: 0 0 232px;"></div>
+              <div style="flex: 1; position: relative; height: 38px;">
+                <sc-for list="{{ cols }}" as="c" hint-placeholder-count="6">
+                  <div style="position: absolute; top: 0; bottom: 0; border-left: 1px solid #EAECF0; padding: 8px 0 0 8px; left: {{ c.left }}; width: {{ c.width }}; background: {{ c.bg }};">
+                    <div style="font-size: 11px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; white-space: nowrap; overflow: hidden; color: {{ c.fg }};">{{ c.label }}</div>
+                    <div style="font-size: 10px; color: #98A2B3; margin-top: 2px; white-space: nowrap;">{{ c.sub }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <sc-for list="{{ gantt }}" as="g" hint-placeholder-count="7">
+              <div style="display: flex; align-items: stretch; border-bottom: 1px solid #F2F4F7; padding: 0 20px;">
+                <div style="width: 232px; flex: 0 0 232px; padding: 16px 14px 16px 0; min-width: 0; display: flex; align-items: center; gap: 8px;">
+                  <div onClick="{{ g.abrir }}" style="flex: 1; min-width: 0; cursor: pointer;">
+                    <div style="font-size: 12.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ g.nome }}</div>
+                    <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+                      <span style="width: 5px; height: 5px; border-radius: 50%; flex: 0 0 5px; background: {{ g.tipoDot }};"></span>
+                      <span style="font-size: 11px; color: #98A2B3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ g.tipo }} · {{ g.cliente }}</span>
+                    </div>
+                  </div>
+                  <span onClick="{{ g.editar }}" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; color: #98A2B3; font-size: 11px; flex: 0 0 24px;" style-hover="background: #F2F4F7; color: #101828;">✎</span>
+                </div>
+                <div style="flex: 1; position: relative; padding: 16px 0;">
+                  <div style="position: absolute; inset: 0; pointer-events: none;">
+                    <sc-for list="{{ cols }}" as="c" hint-placeholder-count="6">
+                      <div style="position: absolute; top: 0; bottom: 0; border-left: 1px solid #F2F4F7; left: {{ c.left }}; width: {{ c.width }}; background: {{ c.bg }};"></div>
+                    </sc-for>
+                  </div>
+                  <sc-if value="{{ mostraHoje }}" hint-placeholder-val="{{ false }}">
+                    <div style="position: absolute; top: 0; bottom: 0; width: 1px; background: #F04438; opacity: .5; pointer-events: none; left: {{ hojeLeft }};"></div>
+                  </sc-if>
+                  <div data-track="1" style="position: relative; height: 24px;">
+                    <sc-for list="{{ g.fases }}" as="f" hint-placeholder-count="3">
+                      <div onMouseDown="{{ f.mover }}" style="position: absolute; top: 0; height: 24px; border-radius: 6px; display: flex; align-items: center; padding: 0 9px; font-size: 11px; font-weight: 500; white-space: nowrap; overflow: hidden; cursor: grab; user-select: none; left: {{ f.left }}; width: {{ f.width }}; background: {{ f.bg }}; color: {{ f.fg }}; border: 1px solid {{ f.bd }}; box-shadow: {{ f.shadow }}; opacity: {{ f.opacity }};">
+                        <span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis;">{{ f.nome }}</span>
+                        <span onMouseDown="{{ f.redim }}" style="position: absolute; top: 0; right: 0; width: 8px; height: 24px; cursor: col-resize;"></span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== TAREFAS =============== -->
+      <sc-if value="{{ isTarefas }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+            <sc-for list="{{ filtrosT }}" as="f" hint-placeholder-count="4">
+              <div onClick="{{ f.fn }}" style="height: 30px; padding: 0 12px; display: flex; align-items: center; gap: 7px; border-radius: 7px; font-size: 12.5px; cursor: pointer; border: 1px solid {{ f.bd }}; background: {{ f.bg }}; color: {{ f.fg }}; font-weight: {{ f.weight }};">
+                {{ f.label }}<span style="font-size: 11px; color: #98A2B3; font-variant-numeric: tabular-nums;">{{ f.n }}</span>
+              </div>
+            </sc-for>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 12px; color: #667085;">Conclusão sujeita a mini relatório</span>
+              <span onClick="{{ abrirNovaTarefa }}" style="height: 30px; padding: 0 13px; display: flex; align-items: center; gap: 7px; background: #101828; color: #fff; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer;" style-hover="background: #1D2939;"><span style="font-size: 13px;">+</span>Atribuir tarefa</span>
+            </div>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 14px; padding: 10px 20px; background: #FCFCFD; border-bottom: 1px solid #EAECF0; font-size: 11px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: #98A2B3;">
+              <span style="width: 310px; flex: 0 0 310px;">Tarefa</span>
+              <span style="width: 170px; flex: 0 0 170px;">Responsável</span>
+              <span style="flex: 1;">Projecto</span>
+              <span style="width: 168px; flex: 0 0 168px; text-align: right;">Deadline</span>
+              <span style="width: 168px; flex: 0 0 168px; text-align: right;">Estado</span>
+            </div>
+            <sc-for list="{{ tarefas }}" as="t" hint-placeholder-count="9">
+              <div style="display: flex; align-items: center; gap: 14px; padding: 15px 20px; border-bottom: 1px solid #F2F4F7;" style-hover="background: #FCFCFD;">
+                <div style="width: 310px; flex: 0 0 310px; min-width: 0;">
+                  <div style="font-size: 13.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: {{ t.tituloFg }};">{{ t.titulo }}</div>
+                  <div style="font-size: 11.5px; color: #98A2B3; margin-top: 4px;">{{ t.fase }}</div>
+                </div>
+                <div style="width: 170px; flex: 0 0 170px; display: flex; align-items: center; gap: 8px; min-width: 0;">
+                  <span style="width: 24px; height: 24px; border-radius: 50%; font-size: 9.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: 0 0 24px; background: #F2F4F7; color: #475467;">{{ t.iniciais }}</span>
+                  <span style="font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ t.responsavel }}</span>
+                </div>
+                <span style="flex: 1; font-size: 12.5px; color: #475467; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ t.projecto }}</span>
+                <div style="width: 168px; flex: 0 0 168px; display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                  <span style="font-size: 12px; color: #475467; font-variant-numeric: tabular-nums;">{{ t.data }}</span>
+                  <span style="font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; white-space: nowrap; color: {{ t.alertaFg }}; background: {{ t.alertaBg }};">{{ t.alerta }}</span>
+                </div>
+                <div style="width: 168px; flex: 0 0 168px; display: flex; justify-content: flex-end;">
+                  <sc-if value="{{ t.podeConcluir }}" hint-placeholder-val="{{ true }}">
+                    <span onClick="{{ t.fn }}" style="height: 30px; padding: 0 12px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; background: #fff; white-space: nowrap;" style-hover="background: #101828; color: #fff; border-color: #101828;">Assinalar cumprida</span>
+                  </sc-if>
+                  <sc-if value="{{ t.concluida }}" hint-placeholder-val="{{ false }}">
+                    <span onClick="{{ t.verRelatorio }}" style="height: 30px; display: flex; align-items: center; font-size: 12.5px; color: #2C5FF6; cursor: pointer; font-weight: 500; white-space: nowrap;">Ver relatório</span>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== RELATÓRIOS =============== -->
+      <sc-if value="{{ isRelatorios }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; max-width: 1320px;">
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <sc-for list="{{ relatorios }}" as="r" hint-placeholder-count="6">
+              <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 12px; padding: 20px 22px;">
+                <div style="display: flex; align-items: center; gap: 11px;">
+                  <span style="width: 28px; height: 28px; border-radius: 50%; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; background: #F2F4F7; color: #475467;">{{ r.iniciais }}</span>
+                  <div style="min-width: 0;">
+                    <div style="font-size: 13px; font-weight: 500;">{{ r.autor }}</div>
+                    <div style="font-size: 11.5px; color: #98A2B3; margin-top: 3px;">{{ r.funcao }}</div>
+                  </div>
+                  <span style="margin-left: auto; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; color: {{ r.sitFg }}; background: {{ r.sitBg }};">{{ r.situacao }}</span>
+                  <span style="font-size: 11.5px; color: #98A2B3; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ r.quando }}</span>
+                </div>
+                <div style="font-size: 13.5px; color: #101828; margin-top: 15px; line-height: 1.66; max-width: 72ch; text-wrap: pretty;">{{ r.texto }}</div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid #F2F4F7;">
+                  <span style="font-size: 11.5px; color: #667085;">{{ r.tarefa }} · {{ r.projecto }}</span>
+                  <span onClick="{{ toast }}" style="margin-left: auto; font-size: 12.5px; font-weight: 500; color: #2C5FF6; cursor: pointer;">Comentar</span>
+                  <span onClick="{{ toast }}" style="height: 30px; padding: 0 12px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; background: #fff;" style-hover="background: #F9FAFB;">Validar entrega</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 12px; padding: 20px;">
+            <div style="font-size: 14px; font-weight: 600;">Leitura da semana</div>
+            <div style="font-size: 12.5px; color: #667085; margin-top: 10px; line-height: 1.62; text-wrap: pretty;">{{ leitura }}</div>
+            <div style="display: flex; flex-direction: column; gap: 13px; margin-top: 18px; padding-top: 16px; border-top: 1px solid #F2F4F7;">
+              <sc-for list="{{ obstaculos }}" as="o" hint-placeholder-count="3">
+                <div>
+                  <div style="display: flex; align-items: baseline; gap: 8px;">
+                    <span style="font-size: 12.5px; font-weight: 500;">{{ o.tipo }}</span>
+                    <span style="margin-left: auto; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums;">{{ o.n }}</span>
+                  </div>
+                  <div style="height: 4px; border-radius: 2px; background: #F2F4F7; margin-top: 8px; overflow: hidden;"><div style="height: 100%; width: {{ o.barra }}; background: {{ o.cor }};"></div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== EQUIPA / UTILIZADORES =============== -->
+      <sc-if value="{{ isEquipa }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+            <span style="font-size: 12.5px; color: #667085;">{{ equipaNota }}</span>
+            <span onClick="{{ abrirMembro }}" style="margin-left: auto; height: 30px; padding: 0 13px; display: flex; align-items: center; gap: 7px; background: #101828; color: #fff; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer;" style-hover="background: #1D2939;"><span style="font-size: 13px;">+</span>Registar membro</span>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 12px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 14px; padding: 10px 20px; background: #FCFCFD; border-bottom: 1px solid #EAECF0; font-size: 11px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: #98A2B3;">
+              <span style="width: 250px; flex: 0 0 250px;">Pessoa</span>
+              <span style="flex: 1;">Função e departamento</span>
+              <span style="width: 150px; flex: 0 0 150px;">Nível de acesso</span>
+              <span style="width: 74px; flex: 0 0 74px; text-align: right;">Tarefas</span>
+              <span style="width: 150px; flex: 0 0 150px;">Carga</span>
+              <span style="width: 78px; flex: 0 0 78px; text-align: right;">No prazo</span>
+              <span style="width: 140px; flex: 0 0 140px; text-align: right;">Conta</span>
+            </div>
+            <sc-for list="{{ equipa }}" as="e" hint-placeholder-count="7">
+              <div style="display: flex; align-items: center; gap: 14px; padding: 15px 20px; border-bottom: 1px solid #F2F4F7;" style-hover="background: #FCFCFD;">
+                <div style="width: 250px; flex: 0 0 250px; display: flex; align-items: center; gap: 10px; min-width: 0;">
+                  <span style="width: 30px; height: 30px; border-radius: 50%; font-size: 10.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: 0 0 30px; background: {{ e.avBg }}; color: {{ e.avFg }};">{{ e.iniciais }}</span>
+                  <div style="min-width: 0;">
+                    <div style="font-size: 13.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ e.nome }}</div>
+                    <div style="font-size: 11.5px; color: #98A2B3; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ e.email }}</div>
+                  </div>
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ e.funcao }}</div>
+                  <div style="font-size: 11.5px; color: #98A2B3; margin-top: 3px;">{{ e.departamento }} · desde {{ e.entrada }}</div>
+                </div>
+                <span style="width: 150px; flex: 0 0 150px;">
+                  <span style="font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 5px; white-space: nowrap; color: {{ e.acessoFg }}; background: {{ e.acessoBg }};">{{ e.acesso }}</span>
+                </span>
+                <span style="width: 74px; flex: 0 0 74px; text-align: right; font-size: 12.5px; font-variant-numeric: tabular-nums;">{{ e.abertas }}</span>
+                <div style="width: 150px; flex: 0 0 150px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="font-size: 11.5px; color: {{ e.cargaFg }}; font-weight: 500;">{{ e.carga }}</span>
+                    <span style="font-size: 11px; color: #98A2B3; font-variant-numeric: tabular-nums;">{{ e.alocacao }}</span>
+                  </div>
+                  <div style="height: 4px; border-radius: 2px; background: #F2F4F7; margin-top: 7px; overflow: hidden;"><div style="height: 100%; width: {{ e.cargaBar }}; background: {{ e.cargaCor }};"></div></div>
+                </div>
+                <span style="width: 78px; flex: 0 0 78px; text-align: right; font-size: 12.5px; font-weight: 600; font-variant-numeric: tabular-nums; color: {{ e.pctFg }};">{{ e.pct }}</span>
+                <div style="width: 140px; flex: 0 0 140px; display: flex; align-items: center; justify-content: flex-end; gap: 9px;">
+                  <span style="font-size: 11.5px; color: {{ e.estadoFg }};">{{ e.estado }}</span>
+                  <span onClick="{{ e.fn }}" style="font-size: 12.5px; color: #2C5FF6; cursor: pointer; font-weight: 500;">{{ e.acao }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== COLABORADOR: AS MINHAS TAREFAS =============== -->
+      <sc-if value="{{ isMinhas }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both; max-width: 900px; display: flex; flex-direction: column; gap: 22px;">
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 12px; padding: 24px 26px;">
+            <div style="font-size: 11.5px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: #98A2B3;">{{ hoje }}</div>
+            <div style="font-size: 21px; font-weight: 600; letter-spacing: -.02em; margin-top: 12px; line-height: 1.35; max-width: 34ch; text-wrap: pretty;">{{ meuFoco }}</div>
+            <div style="font-size: 13px; color: #667085; margin-top: 10px; line-height: 1.6; max-width: 60ch;">{{ meuFocoNota }}</div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <sc-for list="{{ minhasTarefas }}" as="t" hint-placeholder-count="3">
+              <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 12px; padding: 20px 22px; border-left: 3px solid {{ t.cor }};">
+                <div style="display: flex; align-items: flex-start; gap: 14px;">
+                  <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 15px; font-weight: 600; letter-spacing: -.01em; color: {{ t.tituloFg }};">{{ t.titulo }}</div>
+                    <div style="font-size: 12.5px; color: #667085; margin-top: 6px;">{{ t.projecto }} · {{ t.fase }}</div>
+                  </div>
+                  <span style="font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 6px; white-space: nowrap; color: {{ t.alertaFg }}; background: {{ t.alertaBg }};">{{ t.alerta }}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 22px; margin-top: 18px; padding-top: 15px; border-top: 1px solid #F2F4F7;">
+                  <div>
+                    <div style="font-size: 11px; color: #98A2B3;">Deadline</div>
+                    <div style="font-size: 12.5px; font-weight: 500; margin-top: 4px; font-variant-numeric: tabular-nums;">{{ t.dataLonga }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 11px; color: #98A2B3;">Esforço</div>
+                    <div style="font-size: 12.5px; font-weight: 500; margin-top: 4px; font-variant-numeric: tabular-nums;">{{ t.esforco }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 11px; color: #98A2B3;">Atribuída por</div>
+                    <div style="font-size: 12.5px; font-weight: 500; margin-top: 4px;">Alcino Maido</div>
+                  </div>
+                  <div style="margin-left: auto; display: flex; gap: 9px;">
+                    <sc-if value="{{ t.podeConcluir }}" hint-placeholder-val="{{ true }}">
+                      <span onClick="{{ t.pedir }}" style="height: 34px; padding: 0 13px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; background: #fff;" style-hover="background: #F9FAFB;">Pedir prorrogação</span>
+                      <span onClick="{{ t.fn }}" style="height: 34px; padding: 0 15px; display: flex; align-items: center; background: #101828; color: #fff; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer;" style-hover="background: #1D2939;">Assinalar cumprida</span>
+                    </sc-if>
+                    <sc-if value="{{ t.concluida }}" hint-placeholder-val="{{ false }}">
+                      <span style="height: 34px; padding: 0 13px; display: flex; align-items: center; font-size: 12.5px; font-weight: 500; color: #067647;">Cumprida · relatório entregue</span>
+                    </sc-if>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== COLABORADOR: OS MEUS PROJECTOS =============== -->
+      <sc-if value="{{ isMeusProjectos }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both; display: flex; flex-direction: column; gap: 12px; max-width: 900px;">
+          <sc-for list="{{ meusProjectos }}" as="p" hint-placeholder-count="3">
+            <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 12px; padding: 20px 22px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="min-width: 0;">
+                  <div style="font-size: 15px; font-weight: 600; letter-spacing: -.01em;">{{ p.nome }}</div>
+                  <div style="font-size: 12.5px; color: #667085; margin-top: 5px;">{{ p.cliente }} · gestão de {{ p.responsavel }}</div>
+                </div>
+                <span style="margin-left: auto; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 5px; color: {{ p.estFg }}; background: {{ p.estBg }};">{{ p.estagio }}</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; margin-top: 18px;">
+                <div style="flex: 1; height: 6px; border-radius: 3px; background: #F2F4F7; overflow: hidden;"><div style="height: 100%; border-radius: 3px; width: {{ p.barra }}; background: {{ p.barraFg }};"></div></div>
+                <span style="font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums;">{{ p.pct }}</span>
+                <span style="font-size: 12px; color: #667085; font-variant-numeric: tabular-nums;">entrega {{ p.entrega }}</span>
+              </div>
+              <div style="font-size: 12.5px; color: #667085; margin-top: 14px; padding-top: 13px; border-top: 1px solid #F2F4F7;">{{ p.minhaParte }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- =============== COLABORADOR: OS MEUS RELATÓRIOS =============== -->
+      <sc-if value="{{ isMeusRelatorios }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both; display: flex; flex-direction: column; gap: 12px; max-width: 860px;">
+          <sc-for list="{{ meusRelatorios }}" as="r" hint-placeholder-count="2">
+            <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 12px; padding: 20px 22px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 13px; font-weight: 500;">{{ r.tarefa }}</span>
+                <span style="margin-left: auto; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; color: {{ r.sitFg }}; background: {{ r.sitBg }};">{{ r.situacao }}</span>
+                <span style="font-size: 11.5px; color: #98A2B3;">{{ r.quando }}</span>
+              </div>
+              <div style="font-size: 13.5px; margin-top: 14px; line-height: 1.66; max-width: 70ch; text-wrap: pretty;">{{ r.texto }}</div>
+              <div style="font-size: 11.5px; color: #98A2B3; margin-top: 14px; padding-top: 13px; border-top: 1px solid #F2F4F7;">{{ r.projecto }} · {{ r.validacao }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+    </main>
+
+    <!-- =============== DRAWER PROJECTO =============== -->
+    <sc-if value="{{ det }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ fechar }}" style="position: absolute; inset: 0; background: rgba(16,24,40,.28); animation: nx-fade .18s ease both;"></div>
+      <aside style="position: absolute; top: 0; right: 0; bottom: 0; width: 640px; background: #fff; border-left: 1px solid #EAECF0; box-shadow: -18px 0 40px rgba(16,24,40,.10); display: flex; flex-direction: column; animation: nx-drawer .2s cubic-bezier(.2,.8,.2,1) both;">
+        <div style="padding: 22px 24px 18px; border-bottom: 1px solid #EAECF0;">
+          <div style="display: flex; align-items: flex-start; gap: 12px;">
+            <div style="min-width: 0;">
+              <div style="display: flex; align-items: center; gap: 9px;">
+                <span style="font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 5px; color: {{ det.estFg }}; background: {{ det.estBg }};">{{ det.estagio }}</span>
+                <span style="font-size: 11.5px; color: #98A2B3; font-variant-numeric: tabular-nums;">{{ det.codigo }}</span>
+                <span style="width: 6px; height: 6px; border-radius: 50%; flex: 0 0 6px; background: {{ det.tipoDot }};"></span>
+                <span style="font-size: 11.5px; font-weight: 500; color: {{ det.tipoFg }};">{{ det.tipo }}</span>
+              </div>
+              <div style="font-size: 20px; font-weight: 600; letter-spacing: -.018em; margin-top: 12px;">{{ det.nome }}</div>
+              <div style="font-size: 12.5px; color: #667085; margin-top: 5px;">{{ det.cliente }} · gestão de {{ det.responsavel }}</div>
+            </div>
+            <span onClick="{{ fechar }}" style="margin-left: auto; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 7px; cursor: pointer; color: #667085; font-size: 14px; flex: 0 0 28px;" style-hover="background: #F2F4F7;">✕</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; margin-top: 18px;">
+            <div style="flex: 1; height: 7px; border-radius: 4px; background: #F2F4F7; overflow: hidden;"><div style="height: 100%; border-radius: 4px; width: {{ det.barra }}; background: {{ det.barraFg }};"></div></div>
+            <span style="font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums;">{{ det.pct }}</span>
+            <span style="font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; color: {{ det.alertaFg }}; background: {{ det.alertaBg }};">{{ det.alerta }}</span>
+          </div>
+        </div>
+
+        <div style="flex: 1; overflow-y: auto; padding: 20px 24px 32px;">
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+            <sc-for list="{{ det.factos }}" as="f" hint-placeholder-count="3">
+              <div style="border: 1px solid #EAECF0; border-radius: 9px; padding: 13px 14px;">
+                <div style="font-size: 11px; color: #98A2B3;">{{ f.k }}</div>
+                <div style="font-size: 13.5px; font-weight: 600; margin-top: 7px; font-variant-numeric: tabular-nums;">{{ f.v }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display: flex; align-items: baseline; gap: 10px; margin: 26px 0 14px;">
+            <span style="font-size: 11.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #98A2B3;">Roteiro</span>
+            <span onClick="{{ det.editarFases }}" style="margin-left: auto; font-size: 12.5px; color: #2C5FF6; cursor: pointer; font-weight: 500;">Editar fases</span>
+          </div>
+          <div>
+            <sc-for list="{{ det.fases }}" as="f" hint-placeholder-count="4">
+              <div style="display: flex; gap: 13px;">
+                <div style="display: flex; flex-direction: column; align-items: center; flex: 0 0 16px; padding-top: 2px;">
+                  <span style="width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; background: {{ f.dotBg }}; color: {{ f.dotFg }}; border: 1px solid {{ f.dotBd }};">{{ f.marca }}</span>
+                  <span style="flex: 1; width: 1px; background: #EAECF0; margin: 4px 0;"></span>
+                </div>
+                <div style="flex: 1; min-width: 0; padding-bottom: 20px;">
+                  <div style="display: flex; align-items: baseline; gap: 10px;">
+                    <span style="font-size: 13px; font-weight: 500;">{{ f.nome }}</span>
+                    <span style="font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 5px; color: {{ f.estFg }}; background: {{ f.estBg }};">{{ f.estado }}</span>
+                    <span style="margin-left: auto; font-size: 11.5px; color: #98A2B3; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ f.periodo }}</span>
+                  </div>
+                  <div style="font-size: 12px; color: #667085; margin-top: 6px; line-height: 1.58; text-wrap: pretty;">{{ f.nota }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display: flex; align-items: baseline; gap: 10px; margin: 8px 0 14px;">
+            <span style="font-size: 11.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #98A2B3;">Tarefas atribuídas</span>
+            <span onClick="{{ det.atribuir }}" style="margin-left: auto; font-size: 12.5px; color: #2C5FF6; cursor: pointer; font-weight: 500;">+ Atribuir tarefa</span>
+          </div>
+          <div style="border: 1px solid #EAECF0; border-radius: 10px; overflow: hidden;">
+            <sc-for list="{{ det.atribuicoes }}" as="a" hint-placeholder-count="3">
+              <div style="display: flex; align-items: center; gap: 12px; padding: 13px 14px; border-bottom: 1px solid #F2F4F7;">
+                <span style="width: 26px; height: 26px; border-radius: 50%; font-size: 9.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: 0 0 26px; background: #F2F4F7; color: #475467;">{{ a.iniciais }}</span>
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-size: 12.5px; font-weight: 500;">{{ a.titulo }}</div>
+                  <div style="font-size: 11px; color: #98A2B3; margin-top: 4px;">{{ a.pessoa }} · {{ a.funcao }}</div>
+                </div>
+                <span style="font-size: 11.5px; color: #667085; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ a.data }}</span>
+                <span style="font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; white-space: nowrap; color: {{ a.alertaFg }}; background: {{ a.alertaBg }};">{{ a.alerta }}</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ det.semTarefas }}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 20px 14px; font-size: 12.5px; color: #98A2B3;">Nenhuma tarefa atribuída neste projecto. Crie a primeira com o botão acima.</div>
+            </sc-if>
+          </div>
+
+          <div style="display: flex; gap: 9px; margin-top: 22px;">
+            <span onClick="{{ det.atribuir }}" style="height: 34px; padding: 0 14px; display: flex; align-items: center; background: #101828; color: #fff; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer;" style-hover="background: #1D2939;">Atribuir tarefa</span>
+            <span onClick="{{ goRoadmap }}" style="height: 34px; padding: 0 14px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; background: #fff;" style-hover="background: #F9FAFB;">Editar roteiro</span>
+            <span onClick="{{ toast }}" style="height: 34px; padding: 0 14px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; background: #fff;" style-hover="background: #F9FAFB;">Pedir ponto de situação</span>
+          </div>
+        </div>
+      </aside>
+    </sc-if>
+
+    <!-- =============== MODAL CONCLUIR TAREFA =============== -->
+    <sc-if value="{{ mt }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ fecharModal }}" style="position: absolute; inset: 0; background: rgba(16,24,40,.32); display: flex; align-items: center; justify-content: center; padding: 40px; animation: nx-fade .18s ease both;">
+        <div onClick="{{ stop }}" style="width: 580px; max-height: 100%; overflow-y: auto; background: #fff; border-radius: 14px; box-shadow: 0 24px 60px rgba(16,24,40,.22); animation: nx-modal .2s cubic-bezier(.2,.8,.2,1) both;">
+          <div style="padding: 22px 24px 18px; border-bottom: 1px solid #EAECF0; display: flex; align-items: flex-start; gap: 12px;">
+            <div style="min-width: 0;">
+              <div style="font-size: 16.5px; font-weight: 600; letter-spacing: -.012em;">Assinalar como cumprida</div>
+              <div style="font-size: 12.5px; color: #667085; margin-top: 6px;">{{ mt.titulo }}</div>
+              <div style="font-size: 11.5px; color: #98A2B3; margin-top: 4px;">{{ mt.projecto }} · deadline {{ mt.data }}</div>
+            </div>
+            <span onClick="{{ fecharModal }}" style="margin-left: auto; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 7px; cursor: pointer; color: #667085; font-size: 14px; flex: 0 0 28px;" style-hover="background: #F2F4F7;">✕</span>
+          </div>
+          <div style="padding: 20px 24px 8px;">
+            <div style="font-size: 12px; font-weight: 500; color: #344054;">Situação</div>
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+              <sc-for list="{{ situacoes }}" as="s" hint-placeholder-count="3">
+                <div onClick="{{ s.fn }}" style="flex: 1; padding: 12px 13px; border-radius: 9px; cursor: pointer; border: 1px solid {{ s.bd }}; background: {{ s.bg }};">
+                  <div style="font-size: 12.5px; font-weight: 600; color: {{ s.fg }};">{{ s.label }}</div>
+                  <div style="font-size: 11px; color: #98A2B3; margin-top: 5px; line-height: 1.45;">{{ s.nota }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="font-size: 12px; font-weight: 500; color: #344054; margin-top: 22px;">Mini relatório</div>
+            <div style="font-size: 11.5px; color: #98A2B3; margin-top: 5px;">O que foi feito, o que ficou pendente e o que a gestão precisa de saber.</div>
+            <textarea onChange="{{ setTexto }}" value="{{ mtTexto }}" placeholder="Ex.: Levantamento concluído nas três unidades. Ficou pendente a validação do inventário de Nampula porque o responsável esteve ausente — proposta nova data 04 Set." rows="5" style="width: 100%; margin-top: 10px; padding: 12px 13px; border: 1px solid #D0D5DD; border-radius: 9px; font-size: 13px; line-height: 1.62; color: #101828; resize: vertical; outline: none; font-family: inherit;" style-focus="border-color: #2C5FF6; box-shadow: 0 0 0 3px rgba(44,95,246,.12);"></textarea>
+            <sc-if value="{{ mtErro }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size: 11.5px; color: #B42318; margin-top: 7px;">{{ mtErro }}</div>
+            </sc-if>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500; color: #344054;">Esforço real</div>
+                <div style="display: flex; align-items: center; gap: 8px; height: 38px; margin-top: 9px; padding: 0 12px; border: 1px solid #D0D5DD; border-radius: 9px;">
+                  <span style="font-size: 13px; font-variant-numeric: tabular-nums;">{{ mt.horas }}</span>
+                  <span style="font-size: 12px; color: #98A2B3;">horas</span>
+                  <span style="margin-left: auto; font-size: 11.5px; color: #98A2B3;">est. {{ mt.horasEst }}h</span>
+                </div>
+              </div>
+              <div>
+                <div style="font-size: 12px; font-weight: 500; color: #344054;">Prova de execução</div>
+                <div onClick="{{ toast }}" style="display: flex; align-items: center; gap: 8px; height: 38px; margin-top: 9px; padding: 0 12px; border: 1px dashed #D0D5DD; border-radius: 9px; cursor: pointer; color: #667085;" style-hover="border-color: #2C5FF6; color: #2C5FF6;">
+                  <span style="font-size: 13px;">⇪</span><span style="font-size: 12.5px;">Anexar ficheiro</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 9px; padding: 20px 24px 22px;">
+            <span style="font-size: 11.5px; color: #98A2B3;">{{ mtValid }}</span>
+            <span onClick="{{ fecharModal }}" style="margin-left: auto; height: 36px; padding: 0 14px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; background: #fff;" style-hover="background: #F9FAFB;">Cancelar</span>
+            <span onClick="{{ submeter }}" style="height: 36px; padding: 0 16px; display: flex; align-items: center; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; color: #fff; background: {{ submeterBg }};">Submeter relatório</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- =============== MODAL NOVO PROJECTO =============== -->
+    <sc-if value="{{ novoOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ fecharNovo }}" style="position: absolute; inset: 0; background: rgba(16,24,40,.32); display: flex; align-items: center; justify-content: center; padding: 40px; animation: nx-fade .18s ease both;">
+        <div onClick="{{ stop }}" style="width: 720px; max-height: 100%; overflow-y: auto; background: #fff; border-radius: 14px; box-shadow: 0 24px 60px rgba(16,24,40,.22); animation: nx-modal .2s cubic-bezier(.2,.8,.2,1) both;">
+          <div style="padding: 22px 26px 18px; border-bottom: 1px solid #EAECF0; display: flex; align-items: flex-start;">
+            <div>
+              <div style="font-size: 16.5px; font-weight: 600; letter-spacing: -.012em;">Registar projecto</div>
+              <div style="font-size: 12.5px; color: #667085; margin-top: 6px;">Estágio, datas, responsáveis e roteiro inicial.</div>
+            </div>
+            <span onClick="{{ fecharNovo }}" style="margin-left: auto; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 7px; cursor: pointer; color: #667085; font-size: 14px; flex: 0 0 28px;" style-hover="background: #F2F4F7;">✕</span>
+          </div>
+          <div style="padding: 20px 26px 6px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500; color: #344054;">Nome do projecto</div>
+                <input value="{{ npNome }}" onChange="{{ setNpNome }}" placeholder="Ex.: Migração do ERP — fase 2" style="width: 100%; height: 38px; margin-top: 9px; padding: 0 12px; border: 1px solid #D0D5DD; border-radius: 9px; font-size: 13px; color: #101828; outline: none;" style-focus="border-color: #2C5FF6; box-shadow: 0 0 0 3px rgba(44,95,246,.12);" />
+              </div>
+              <div>
+                <div style="font-size: 12px; font-weight: 500; color: #344054;">Empresa cliente</div>
+                <input value="{{ npCliente }}" onChange="{{ setNpCliente }}" placeholder="Ex.: Cimentos de Moçambique" style="width: 100%; height: 38px; margin-top: 9px; padding: 0 12px; border: 1px solid #D0D5DD; border-radius: 9px; font-size: 13px; color: #101828; outline: none;" style-focus="border-color: #2C5FF6; box-shadow: 0 0 0 3px rgba(44,95,246,.12);" />
+              </div>
+            </div>
+
+            <div style="font-size: 12px; font-weight: 500; color: #344054; margin-top: 20px;">Natureza do projecto</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px;">
+              <sc-for list="{{ tipoOpt }}" as="t" hint-placeholder-count="5">
+                <div onClick="{{ t.fn }}" style="height: 34px; padding: 0 13px; display: flex; align-items: center; gap: 8px; border-radius: 8px; font-size: 12.5px; cursor: pointer; border: 1px solid {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }}; font-weight: {{ t.weight }};">
+                  <span style="width: 7px; height: 7px; border-radius: 50%; background: {{ t.dot }};"></span>{{ t.label }}
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="font-size: 12px; font-weight: 500; color: #344054; margin-top: 20px;">Estágio actual</div>
+            <div style="display: flex; gap: 7px; margin-top: 10px;">
+              <sc-for list="{{ estagiosOpt }}" as="e" hint-placeholder-count="5">
+                <div onClick="{{ e.fn }}" style="flex: 1; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 12.5px; cursor: pointer; border: 1px solid {{ e.bd }}; background: {{ e.bg }}; color: {{ e.fg }}; font-weight: {{ e.weight }};">{{ e.label }}</div>
+              </sc-for>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 20px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500; color: #344054;">Início</div>
+                <input value="{{ npInicio }}" onChange="{{ setNpInicio }}" placeholder="dd/mm/aaaa" style="width: 100%; height: 38px; margin-top: 9px; padding: 0 12px; border: 1px solid #D0D5DD; border-radius: 9px; font-size: 13px; color: #101828; outline: none; font-variant-numeric: tabular-nums;" style-focus="border-color: #2C5FF6; box-shadow: 0 0 0 3px rgba(44,95,246,.12);" />
+              </div>
+              <div>
+                <div style="font-size: 12px; font-weight: 500; color: #344054;">Deadline de entrega</div>
+                <input value="{{ npFim }}" onChange="{{ setNpFim }}" placeholder="dd/mm/aaaa" style="width: 100%; height: 38px; margin-top: 9px; padding: 0 12px; border: 1px solid #D0D5DD; border-radius: 9px; font-size: 13px; color: #101828; outline: none; font-variant-numeric: tabular-nums; border-color: {{ npFimBd }};" style-focus="box-shadow: 0 0 0 3px rgba(44,95,246,.12);" />
+              </div>
+              <div>
+                <div style="font-size: 12px; font-weight: 500; color: #344054;">Orçamento (MT)</div>
+                <input value="{{ npOrc }}" onChange="{{ setNpOrc }}" placeholder="4 200 000" style="width: 100%; height: 38px; margin-top: 9px; padding: 0 12px; border: 1px solid #D0D5DD; border-radius: 9px; font-size: 13px; color: #101828; outline: none; font-variant-numeric: tabular-nums;" style-focus="border-color: #2C5FF6; box-shadow: 0 0 0 3px rgba(44,95,246,.12);" />
+              </div>
+            </div>
+            <sc-if value="{{ npErroData }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size: 11.5px; color: #B42318; margin-top: 8px;">{{ npErroData }}</div>
+            </sc-if>
+
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 20px;">
+              <div style="font-size: 12px; font-weight: 500; color: #344054;">Alertar responsáveis</div>
+              <span style="font-size: 11.5px; color: #98A2B3;">antes de cada deadline</span>
+              <div style="margin-left: auto; display: flex; gap: 6px;">
+                <sc-for list="{{ alertaOpt }}" as="a" hint-placeholder-count="4">
+                  <div onClick="{{ a.fn }}" style="height: 30px; padding: 0 12px; display: flex; align-items: center; border-radius: 7px; font-size: 12px; cursor: pointer; border: 1px solid {{ a.bd }}; background: {{ a.bg }}; color: {{ a.fg }}; font-weight: {{ a.weight }};">{{ a.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="font-size: 12px; font-weight: 500; color: #344054; margin-top: 22px;">Responsáveis</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+              <sc-for list="{{ pessoasOpt }}" as="p" hint-placeholder-count="6">
+                <div onClick="{{ p.fn }}" style="display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 12px 0 6px; border-radius: 18px; cursor: pointer; border: 1px solid {{ p.bd }}; background: {{ p.bg }};">
+                  <span style="width: 22px; height: 22px; border-radius: 50%; font-size: 9.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; background: {{ p.avBg }}; color: {{ p.avFg }};">{{ p.iniciais }}</span>
+                  <span style="font-size: 12.5px; color: {{ p.fg }}; font-weight: {{ p.weight }};">{{ p.nome }}</span>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 24px;">
+              <span style="font-size: 12px; font-weight: 500; color: #344054;">Fases do roteiro</span>
+              <span style="font-size: 11.5px; color: #98A2B3;">{{ npTipoNota }}</span>
+            </div>
+            <div style="border: 1px solid #EAECF0; border-radius: 10px; margin-top: 10px; overflow: hidden;">
+              <sc-for list="{{ npFasesRows }}" as="f" hint-placeholder-count="4">
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid #F2F4F7;">
+                  <span style="width: 19px; height: 19px; border-radius: 50%; background: #F2F4F7; color: #667085; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: 0 0 19px;">{{ f.i }}</span>
+                  <input value="{{ f.nome }}" onChange="{{ f.setNome }}" placeholder="Nome da fase" style="flex: 1; min-width: 0; height: 32px; padding: 0 10px; border: 1px solid transparent; border-radius: 7px; font-size: 12.5px; font-weight: 500; color: #101828; outline: none; background: transparent;" style-focus="border-color: #2C5FF6; background: #fff;" style-hover="border-color: #EAECF0;" />
+                  <span style="font-size: 11.5px; color: #98A2B3; font-variant-numeric: tabular-nums; width: 104px; text-align: right;">{{ f.periodo }}</span>
+                  <div style="display: flex; align-items: center; gap: 2px; border: 1px solid #EAECF0; border-radius: 7px; height: 30px; padding: 0 2px;">
+                    <span onClick="{{ f.menos }}" style="width: 22px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 5px; cursor: pointer; color: #667085; font-size: 13px;" style-hover="background: #F2F4F7;">−</span>
+                    <span style="font-size: 11.5px; width: 46px; text-align: center; font-variant-numeric: tabular-nums;">{{ f.semanas }}</span>
+                    <span onClick="{{ f.mais }}" style="width: 22px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 5px; cursor: pointer; color: #667085; font-size: 13px;" style-hover="background: #F2F4F7;">+</span>
+                  </div>
+                  <span onClick="{{ f.remover }}" style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; color: #98A2B3; font-size: 12px;" style-hover="background: #FEF3F2; color: #B42318;">✕</span>
+                </div>
+              </sc-for>
+              <div onClick="{{ npFaseAdd }}" style="padding: 12px 14px; font-size: 12.5px; color: #2C5FF6; cursor: pointer; font-weight: 500;">+ Adicionar fase</div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 9px; padding: 20px 26px 22px;">
+            <span style="font-size: 11.5px; color: {{ npValidFg }};">{{ npValid }}</span>
+            <span onClick="{{ fecharNovo }}" style="margin-left: auto; height: 36px; padding: 0 14px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; background: #fff;" style-hover="background: #F9FAFB;">Cancelar</span>
+            <span onClick="{{ gravarNovo }}" style="height: 36px; padding: 0 16px; display: flex; align-items: center; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; color: #fff; background: {{ gravarBg }};">Registar e abrir</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- =============== MODAL REGISTAR MEMBRO / UTILIZADOR =============== -->
+    <sc-if value="{{ membroOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ fecharMembro }}" style="position: absolute; inset: 0; background: rgba(16,24,40,.32); display: flex; align-items: center; justify-content: center; padding: 40px; animation: nx-fade .18s ease both;">
+        <div onClick="{{ stop }}" style="width: 700px; max-height: 100%; overflow-y: auto; background: #fff; border-radius: 14px; box-shadow: 0 24px 60px rgba(16,24,40,.22); animation: nx-modal .2s cubic-bezier(.2,.8,.2,1) both;">
+          <div style="padding: 22px 26px 18px; border-bottom: 1px solid #EAECF0; display: flex; align-items: flex-start;">
+            <div>
+              <div style="font-size: 16.5px; font-weight: 600; letter-spacing: -.012em;">Registar membro da equipa</div>
+              <div style="font-size: 12.5px; color: #667085; margin-top: 6px;">Cria a conta de utilizador e envia o convite de acesso.</div>
+            </div>
+            <span onClick="{{ fecharMembro }}" style="margin-left: auto; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 7px; cursor: pointer; color: #667085; font-size: 14px; flex: 0 0 28px;" style-hover="background: #F2F4F7;">✕</span>
+          </div>
+          <div style="padding: 20px 26px 6px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500; color: #344054;">Nome completo</div>
+                <input value="{{ mbNome }}" onChange="{{ setMbNome }}" placeholder="Ex.: Amélia Sitoe" style="width: 100%; height: 38px; margin-top: 9px; padding: 0 12px; border: 1px solid #D0D5DD; border-radius: 9px; font-size: 13px; color: #101828; outline: none; border-color: {{ mbNomeBd }};" style-focus="box-shadow: 0 0 0 3px rgba(44,95,246,.12);" />
+                <sc-if value="{{ mbNomeErro }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size: 11.5px; color: #B42318; margin-top: 6px;">{{ mbNomeErro }}</div>
+                </sc-if>
+              </div>
+              <div>
+                <div style="font-size: 12px; font-weight: 500; color: #344054;">Email profissional</div>
+                <input value="{{ mbEmail }}" onChange="{{ setMbEmail }}" placeholder="nome@empresa.co.mz" style="width: 100%; height: 38px; margin-top: 9px; padding: 0 12px; border: 1px solid #D0D5DD; border-radius: 9px; font-size: 13px; color: #101828; outline: none; border-color: {{ mbEmailBd }};" style-focus="box-shadow: 0 0 0 3px rgba(44,95,246,.12);" />
+                <sc-if value="{{ mbEmailErro }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size: 11.5px; color: #B42318; margin-top: 6px;">{{ mbEmailErro }}</div>
+                </sc-if>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 20px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500; color: #344054;">Função</div>
+                <input value="{{ mbFuncao }}" onChange="{{ setMbFuncao }}" placeholder="Ex.: Analista de Processos" style="width: 100%; height: 38px; margin-top: 9px; padding: 0 12px; border: 1px solid #D0D5DD; border-radius: 9px; font-size: 13px; color: #101828; outline: none; border-color: {{ mbFuncaoBd }};" style-focus="box-shadow: 0 0 0 3px rgba(44,95,246,.12);" />
+              </div>
+              <div>
+                <div style="font-size: 12px; font-weight: 500; color: #344054;">Telefone</div>
+                <input value="{{ mbTel }}" onChange="{{ setMbTel }}" placeholder="+258 84 000 0000" style="width: 100%; height: 38px; margin-top: 9px; padding: 0 12px; border: 1px solid #D0D5DD; border-radius: 9px; font-size: 13px; color: #101828; outline: none; font-variant-numeric: tabular-nums;" style-focus="border-color: #2C5FF6; box-shadow: 0 0 0 3px rgba(44,95,246,.12);" />
+              </div>
+              <div>
+                <div style="font-size: 12px; font-weight: 500; color: #344054;">Data de entrada</div>
+                <input value="{{ mbEntrada }}" onChange="{{ setMbEntrada }}" placeholder="dd/mm/aaaa" style="width: 100%; height: 38px; margin-top: 9px; padding: 0 12px; border: 1px solid #D0D5DD; border-radius: 9px; font-size: 13px; color: #101828; outline: none; font-variant-numeric: tabular-nums;" style-focus="border-color: #2C5FF6; box-shadow: 0 0 0 3px rgba(44,95,246,.12);" />
+              </div>
+            </div>
+
+            <div style="font-size: 12px; font-weight: 500; color: #344054; margin-top: 20px;">Departamento</div>
+            <div style="display: flex; gap: 7px; margin-top: 10px;">
+              <sc-for list="{{ deptOpt }}" as="d" hint-placeholder-count="5">
+                <div onClick="{{ d.fn }}" style="flex: 1; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 12.5px; cursor: pointer; border: 1px solid {{ d.bd }}; background: {{ d.bg }}; color: {{ d.fg }}; font-weight: {{ d.weight }};">{{ d.label }}</div>
+              </sc-for>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 22px;">
+              <div style="font-size: 12px; font-weight: 500; color: #344054;">Alocação</div>
+              <span style="font-size: 11.5px; color: #98A2B3;">do tempo disponível para projectos</span>
+              <div style="margin-left: auto; display: flex; gap: 6px;">
+                <sc-for list="{{ alocOpt }}" as="a" hint-placeholder-count="4">
+                  <div onClick="{{ a.fn }}" style="width: 54px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 7px; font-size: 12px; cursor: pointer; font-variant-numeric: tabular-nums; border: 1px solid {{ a.bd }}; background: {{ a.bg }}; color: {{ a.fg }}; font-weight: {{ a.weight }};">{{ a.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="font-size: 12px; font-weight: 500; color: #344054; margin-top: 24px;">Nível de acesso</div>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+              <sc-for list="{{ acessoOpt }}" as="a" hint-placeholder-count="3">
+                <div onClick="{{ a.fn }}" style="display: flex; align-items: flex-start; gap: 12px; padding: 13px 14px; border-radius: 10px; cursor: pointer; border: 1px solid {{ a.bd }}; background: {{ a.bg }};">
+                  <span style="width: 16px; height: 16px; border-radius: 50%; flex: 0 0 16px; margin-top: 1px; border: 5px solid {{ a.dot }}; background: #fff; box-sizing: border-box;"></span>
+                  <div style="min-width: 0;">
+                    <div style="font-size: 13px; font-weight: 500;">{{ a.label }}</div>
+                    <div style="font-size: 11.5px; color: #667085; margin-top: 4px; line-height: 1.5;">{{ a.nota }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="font-size: 12px; font-weight: 500; color: #344054; margin-top: 24px;">Projectos iniciais</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+              <sc-for list="{{ projOpt }}" as="p" hint-placeholder-count="4">
+                <div onClick="{{ p.fn }}" style="height: 32px; padding: 0 12px; display: flex; align-items: center; border-radius: 16px; font-size: 12.5px; cursor: pointer; border: 1px solid {{ p.bd }}; background: {{ p.bg }}; color: {{ p.fg }}; font-weight: {{ p.weight }};">{{ p.label }}</div>
+              </sc-for>
+            </div>
+
+            <div onClick="{{ toggleConvite }}" style="display: flex; align-items: center; gap: 11px; margin-top: 24px; padding: 13px 14px; background: #F9FAFB; border: 1px solid #EAECF0; border-radius: 10px; cursor: pointer;">
+              <span style="width: 17px; height: 17px; border-radius: 5px; flex: 0 0 17px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #fff; background: {{ conviteBg }}; border: 1px solid {{ conviteBd }};">{{ conviteMarca }}</span>
+              <span style="font-size: 12.5px; color: #344054;">Enviar convite de acesso por email agora</span>
+              <span style="margin-left: auto; font-size: 11.5px; color: #98A2B3;">{{ conviteNota }}</span>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 9px; padding: 20px 26px 22px;">
+            <span style="font-size: 11.5px; color: {{ mbValidFg }};">{{ mbValid }}</span>
+            <span onClick="{{ fecharMembro }}" style="margin-left: auto; height: 36px; padding: 0 14px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; background: #fff;" style-hover="background: #F9FAFB;">Cancelar</span>
+            <span onClick="{{ gravarMembro }}" style="height: 36px; padding: 0 16px; display: flex; align-items: center; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; color: #fff; background: {{ mbBtnBg }};">{{ mbBtnLabel }}</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- =============== MODAL EDITAR FASES =============== -->
+    <sc-if value="{{ fasesEdit }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ fecharFases }}" style="position: absolute; inset: 0; background: rgba(16,24,40,.32); display: flex; align-items: center; justify-content: center; padding: 40px; animation: nx-fade .18s ease both;">
+        <div onClick="{{ stop }}" style="width: 720px; max-height: 100%; overflow-y: auto; background: #fff; border-radius: 14px; box-shadow: 0 24px 60px rgba(16,24,40,.22); animation: nx-modal .2s cubic-bezier(.2,.8,.2,1) both;">
+          <div style="padding: 22px 26px 18px; border-bottom: 1px solid #EAECF0; display: flex; align-items: flex-start;">
+            <div style="min-width: 0;">
+              <div style="font-size: 16.5px; font-weight: 600; letter-spacing: -.012em;">Fases do roteiro</div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-top: 7px;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: {{ fasesEdit.tipoDot }};"></span>
+                <span style="font-size: 12px; font-weight: 500; color: {{ fasesEdit.tipoFg }};">{{ fasesEdit.tipo }}</span>
+                <span style="font-size: 12.5px; color: #667085;">· {{ fasesEdit.nome }}</span>
+              </div>
+            </div>
+            <span onClick="{{ fecharFases }}" style="margin-left: auto; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 7px; cursor: pointer; color: #667085; font-size: 14px; flex: 0 0 28px;" style-hover="background: #F2F4F7;">✕</span>
+          </div>
+          <div style="padding: 18px 26px 6px;">
+            <div style="border: 1px solid #EAECF0; border-radius: 10px; overflow: hidden;">
+              <sc-for list="{{ fasesRows }}" as="f" hint-placeholder-count="4">
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid #F2F4F7;">
+                  <span style="color: #D0D5DD; font-size: 13px; cursor: grab; flex: 0 0 10px;">≡</span>
+                  <input value="{{ f.nome }}" onChange="{{ f.setNome }}" placeholder="Nome da fase" style="flex: 1; min-width: 0; height: 32px; padding: 0 10px; border: 1px solid transparent; border-radius: 7px; font-size: 13px; font-weight: 500; color: #101828; outline: none; background: transparent;" style-focus="border-color: #2C5FF6; background: #fff;" style-hover="border-color: #EAECF0;" />
+                  <span onClick="{{ f.ciclo }}" style="width: 96px; flex: 0 0 96px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; color: {{ f.estFg }}; background: {{ f.estBg }};">{{ f.estado }}</span>
+                  <span style="font-size: 11.5px; color: #98A2B3; font-variant-numeric: tabular-nums; width: 104px; text-align: right;">{{ f.periodo }}</span>
+                  <div style="display: flex; align-items: center; gap: 2px; border: 1px solid #EAECF0; border-radius: 7px; height: 30px; padding: 0 2px;">
+                    <span onClick="{{ f.menos }}" style="width: 22px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 5px; cursor: pointer; color: #667085; font-size: 13px;" style-hover="background: #F2F4F7;">−</span>
+                    <span style="font-size: 11.5px; width: 46px; text-align: center; font-variant-numeric: tabular-nums;">{{ f.semanas }}</span>
+                    <span onClick="{{ f.mais }}" style="width: 22px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 5px; cursor: pointer; color: #667085; font-size: 13px;" style-hover="background: #F2F4F7;">+</span>
+                  </div>
+                  <span onClick="{{ f.remover }}" style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; color: #98A2B3; font-size: 12px;" style-hover="background: #FEF3F2; color: #B42318;">✕</span>
+                </div>
+              </sc-for>
+              <div onClick="{{ addFaseDraft }}" style="padding: 12px 14px; font-size: 12.5px; color: #2C5FF6; cursor: pointer; font-weight: 500;">+ Adicionar fase</div>
+            </div>
+            <div style="font-size: 11.5px; color: #98A2B3; margin-top: 12px; line-height: 1.55;">As fases encadeiam-se pela ordem, com dois dias entre elas. Depois de gravar pode acertar as datas exactas arrastando as barras no roteiro.</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 9px; padding: 18px 26px 22px;">
+            <span style="font-size: 11.5px; color: #98A2B3;">{{ fasesEdit.resumo }}</span>
+            <span onClick="{{ fecharFases }}" style="margin-left: auto; height: 36px; padding: 0 14px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; background: #fff;" style-hover="background: #F9FAFB;">Cancelar</span>
+            <span onClick="{{ gravarFases }}" style="height: 36px; padding: 0 16px; display: flex; align-items: center; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; color: #fff; background: #101828;" style-hover="background: #1D2939;">Gravar roteiro</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- =============== MODAL ATRIBUIR TAREFA =============== -->
+    <sc-if value="{{ novaOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ fecharNova }}" style="position: absolute; inset: 0; background: rgba(16,24,40,.32); display: flex; align-items: center; justify-content: center; padding: 40px; animation: nx-fade .18s ease both;">
+        <div onClick="{{ stop }}" style="width: 700px; max-height: 100%; overflow-y: auto; background: #fff; border-radius: 14px; box-shadow: 0 24px 60px rgba(16,24,40,.22); animation: nx-modal .2s cubic-bezier(.2,.8,.2,1) both;">
+          <div style="padding: 22px 26px 18px; border-bottom: 1px solid #EAECF0; display: flex; align-items: flex-start;">
+            <div>
+              <div style="font-size: 16.5px; font-weight: 600; letter-spacing: -.012em;">Atribuir tarefa</div>
+              <div style="font-size: 12.5px; color: #667085; margin-top: 6px;">Escreva a tarefa como ela existe no terreno e dê-lhe um dono e uma data.</div>
+            </div>
+            <span onClick="{{ fecharNova }}" style="margin-left: auto; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 7px; cursor: pointer; color: #667085; font-size: 14px; flex: 0 0 28px;" style-hover="background: #F2F4F7;">✕</span>
+          </div>
+          <div style="padding: 20px 26px 6px;">
+            <div style="font-size: 12px; font-weight: 500; color: #344054;">Tarefa</div>
+            <input value="{{ ntTitulo }}" onChange="{{ setNtTitulo }}" placeholder="Ex.: Conferir inventário de activos fixos da unidade de Nampula" style="width: 100%; height: 38px; margin-top: 9px; padding: 0 12px; border: 1px solid #D0D5DD; border-radius: 9px; font-size: 13px; color: #101828; outline: none; border-color: {{ ntTituloBd }};" style-focus="box-shadow: 0 0 0 3px rgba(44,95,246,.12);" />
+            <sc-if value="{{ ntTituloErro }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size: 11.5px; color: #B42318; margin-top: 6px;">{{ ntTituloErro }}</div>
+            </sc-if>
+
+            <div style="font-size: 12px; font-weight: 500; color: #344054; margin-top: 18px;">O que se espera como entrega</div>
+            <textarea onChange="{{ setNtDesc }}" value="{{ ntDesc }}" placeholder="Ex.: Lista assinada pelo responsável do armazém, com número de série e estado de cada activo." rows="3" style="width: 100%; margin-top: 9px; padding: 11px 12px; border: 1px solid #D0D5DD; border-radius: 9px; font-size: 13px; line-height: 1.6; color: #101828; resize: vertical; outline: none; font-family: inherit;" style-focus="border-color: #2C5FF6; box-shadow: 0 0 0 3px rgba(44,95,246,.12);"></textarea>
+
+            <div style="font-size: 12px; font-weight: 500; color: #344054; margin-top: 20px;">Projecto</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px;">
+              <sc-for list="{{ ntProjOpt }}" as="p" hint-placeholder-count="7">
+                <div onClick="{{ p.fn }}" style="height: 32px; padding: 0 12px; display: flex; align-items: center; border-radius: 16px; font-size: 12.5px; cursor: pointer; border: 1px solid {{ p.bd }}; background: {{ p.bg }}; color: {{ p.fg }}; font-weight: {{ p.weight }};">{{ p.label }}</div>
+              </sc-for>
+            </div>
+
+            <div style="font-size: 12px; font-weight: 500; color: #344054; margin-top: 20px;">Fase do roteiro</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px;">
+              <sc-for list="{{ ntFaseOpt }}" as="f" hint-placeholder-count="4">
+                <div onClick="{{ f.fn }}" style="height: 32px; padding: 0 12px; display: flex; align-items: center; gap: 8px; border-radius: 8px; font-size: 12.5px; cursor: pointer; border: 1px solid {{ f.bd }}; background: {{ f.bg }}; color: {{ f.fg }}; font-weight: {{ f.weight }};">
+                  {{ f.label }}<span style="font-size: 11px; color: #98A2B3; font-variant-numeric: tabular-nums;">{{ f.periodo }}</span>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="font-size: 12px; font-weight: 500; color: #344054; margin-top: 20px;">Responsável</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+              <sc-for list="{{ ntPessoaOpt }}" as="p" hint-placeholder-count="6">
+                <div onClick="{{ p.fn }}" style="display: flex; align-items: center; gap: 9px; height: 40px; padding: 0 13px 0 6px; border-radius: 20px; cursor: pointer; border: 1px solid {{ p.bd }}; background: {{ p.bg }};">
+                  <span style="width: 26px; height: 26px; border-radius: 50%; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; background: {{ p.avBg }}; color: {{ p.avFg }};">{{ p.iniciais }}</span>
+                  <span style="min-width: 0;">
+                    <span style="display: block; font-size: 12.5px; color: {{ p.fg }}; font-weight: {{ p.weight }};">{{ p.nome }}</span>
+                    <span style="display: block; font-size: 10.5px; color: {{ p.cargaFg }}; margin-top: 1px;">{{ p.carga }}</span>
+                  </span>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 22px;">
+              <div>
+                <div style="font-size: 12px; font-weight: 500; color: #344054;">Deadline</div>
+                <input value="{{ ntData }}" onChange="{{ setNtData }}" placeholder="dd/mm/aaaa" style="width: 100%; height: 38px; margin-top: 9px; padding: 0 12px; border: 1px solid #D0D5DD; border-radius: 9px; font-size: 13px; color: #101828; outline: none; font-variant-numeric: tabular-nums; border-color: {{ ntDataBd }};" style-focus="box-shadow: 0 0 0 3px rgba(44,95,246,.12);" />
+                <sc-if value="{{ ntDataNota }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size: 11.5px; margin-top: 6px; color: {{ ntDataNotaFg }};">{{ ntDataNota }}</div>
+                </sc-if>
+              </div>
+              <div>
+                <div style="font-size: 12px; font-weight: 500; color: #344054;">Esforço estimado</div>
+                <div style="display: flex; gap: 6px; margin-top: 9px;">
+                  <sc-for list="{{ ntHorasOpt }}" as="h" hint-placeholder-count="4">
+                    <div onClick="{{ h.fn }}" style="flex: 1; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 9px; font-size: 12.5px; cursor: pointer; font-variant-numeric: tabular-nums; border: 1px solid {{ h.bd }}; background: {{ h.bg }}; color: {{ h.fg }}; font-weight: {{ h.weight }};">{{ h.label }}</div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 22px;">
+              <div style="font-size: 12px; font-weight: 500; color: #344054;">Prioridade</div>
+              <div style="display: flex; gap: 6px;">
+                <sc-for list="{{ ntPrioOpt }}" as="p" hint-placeholder-count="3">
+                  <div onClick="{{ p.fn }}" style="height: 30px; padding: 0 13px; display: flex; align-items: center; border-radius: 7px; font-size: 12px; cursor: pointer; border: 1px solid {{ p.bd }}; background: {{ p.bg }}; color: {{ p.fg }}; font-weight: {{ p.weight }};">{{ p.label }}</div>
+                </sc-for>
+              </div>
+              <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 12px; color: #667085;">Alertar</span>
+                <sc-for list="{{ ntAlertaOpt }}" as="a" hint-placeholder-count="3">
+                  <div onClick="{{ a.fn }}" style="height: 30px; padding: 0 11px; display: flex; align-items: center; border-radius: 7px; font-size: 12px; cursor: pointer; border: 1px solid {{ a.bd }}; background: {{ a.bg }}; color: {{ a.fg }}; font-weight: {{ a.weight }};">{{ a.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div onClick="{{ toggleNtRelatorio }}" style="display: flex; align-items: center; gap: 11px; margin-top: 22px; padding: 13px 14px; background: #F9FAFB; border: 1px solid #EAECF0; border-radius: 10px; cursor: pointer;">
+              <span style="width: 17px; height: 17px; border-radius: 5px; flex: 0 0 17px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #fff; background: {{ ntRelBg }}; border: 1px solid {{ ntRelBd }};">{{ ntRelMarca }}</span>
+              <span style="font-size: 12.5px; color: #344054;">Exigir mini relatório ao assinalar como cumprida</span>
+              <span style="margin-left: auto; font-size: 11.5px; color: #98A2B3;">{{ ntRelNota }}</span>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 9px; padding: 20px 26px 22px;">
+            <span style="font-size: 11.5px; color: {{ ntValidFg }};">{{ ntValid }}</span>
+            <span onClick="{{ fecharNova }}" style="margin-left: auto; height: 36px; padding: 0 14px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; background: #fff;" style-hover="background: #F9FAFB;">Cancelar</span>
+            <span onClick="{{ criarTarefa }}" style="height: 36px; padding: 0 16px; display: flex; align-items: center; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; color: #fff; background: {{ criarBg }};">Atribuir e notificar</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ toastMsg }}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); background: #101828; color: #fff; padding: 11px 17px; border-radius: 9px; font-size: 12.5px; font-weight: 500; box-shadow: 0 10px 30px rgba(16,24,40,.24); animation: nx-toast .2s ease both; white-space: nowrap;">{{ toastMsg }}</div>
+    </sc-if>
+
+  </div>
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1600, &quot;height&quot;: 1000}, &quot;orgName&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;NEXORA&quot;, &quot;tsType&quot;: &quot;string&quot;}}">
+const BLUE = '#2C5FF6', RED = '#B42318', AMB = '#B54708', GRN = '#067647';
+const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+const MESES_L = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+const BASE = Date.UTC(2026, 6, 1);
+const HOJE = 59;
+
+const PESSOAS = [
+  { nome: 'Cláudia Bila', funcao: 'Analista de Processos', email: 'claudia.bila@nexora.co.mz', dept: 'Consultoria', acesso: 'Colaborador', estado: 'Activo', entrada: 'Mar 2024', alocacao: 100 },
+  { nome: 'Nuno Chirindza', funcao: 'Engenheiro de Dados', email: 'nuno.chirindza@nexora.co.mz', dept: 'Dados', acesso: 'Colaborador', estado: 'Activo', entrada: 'Set 2023', alocacao: 75 },
+  { nome: 'Ivete Macuácua', funcao: 'Consultora Sénior', email: 'ivete.macuacua@nexora.co.mz', dept: 'Consultoria', acesso: 'Gestor de projecto', estado: 'Activo', entrada: 'Jan 2022', alocacao: 100 },
+  { nome: 'Hélder Tembe', funcao: 'Especialista de Integrações', email: 'helder.tembe@nexora.co.mz', dept: 'Dados', acesso: 'Gestor de projecto', estado: 'Activo', entrada: 'Jun 2023', alocacao: 75 },
+  { nome: 'Sara Nhaca', funcao: 'Gestora de Mudança', email: 'sara.nhaca@nexora.co.mz', dept: 'Mudança', acesso: 'Colaborador', estado: 'Activo', entrada: 'Nov 2024', alocacao: 100 },
+  { nome: 'Jorge Alfane', funcao: 'Coordenador de Terreno', email: 'jorge.alfane@nexora.co.mz', dept: 'Terreno', acesso: 'Colaborador', estado: 'Convite pendente', entrada: 'Ago 2026', alocacao: 50 },
+];
+
+const PROJ = [
+  { id: 'p1', codigo: 'PRJ-114', nome: 'Migração do ERP — fase 2', cliente: 'Cimentos de Moçambique', estagio: 'Execução', pct: 62, responsavel: 'Ivete Macuácua', dl: 170, saude: 'No prazo', abertas: 7, total: 24, orcamento: '4 200 000 MT', consumido: '61%', equipa: 6,
+    fases: [
+      { nome: 'Descoberta', estado: 'Concluída', s: 0, d: 23, nota: 'Levantamento em quatro unidades. Relatório aceite pelo cliente a 24 Jul.' },
+      { nome: 'Desenho da solução', estado: 'Concluída', s: 25, d: 30, nota: 'Arquitectura de integração validada com a equipa de TI do cliente.' },
+      { nome: 'Configuração e migração', estado: 'Em curso', s: 57, d: 57, nota: 'Dois módulos migrados. Falta contabilidade analítica e activos fixos.' },
+      { nome: 'Testes de aceitação', estado: 'Planeada', s: 116, d: 28, nota: 'Depende do encerramento do mês de Outubro no sistema antigo.' },
+      { nome: 'Entrada em produção', estado: 'Planeada', s: 146, d: 32, nota: 'Janela de corte a 15 Dez, com duas semanas de apoio reforçado.' },
+    ],
+    atribuicoes: [
+      { titulo: 'Migrar contabilidade analítica', pessoa: 'Nuno Chirindza', funcao: 'Engenheiro de Dados', dl: 63, estado: 'Em curso' },
+      { titulo: 'Validar plano de contas com o cliente', pessoa: 'Ivete Macuácua', funcao: 'Consultora Sénior', dl: 51, estado: 'Atrasada' },
+      { titulo: 'Guião de formação para 40 utilizadores', pessoa: 'Sara Nhaca', funcao: 'Gestora de Mudança', dl: 72, estado: 'Pendente' },
+      { titulo: 'Mapear activos fixos por unidade', pessoa: 'Jorge Alfane', funcao: 'Coordenador de Terreno', dl: 62, estado: 'Em curso' },
+    ] },
+  { id: 'p2', codigo: 'PRJ-108', nome: 'Central de facturação electrónica', cliente: 'Grupo Madal', estagio: 'Validação', pct: 84, responsavel: 'Hélder Tembe', dl: 87, saude: 'Em risco', abertas: 4, total: 19, orcamento: '2 750 000 MT', consumido: '88%', equipa: 4,
+    fases: [
+      { nome: 'Descoberta', estado: 'Concluída', s: 0, d: 20, nota: 'Requisitos fiscais confirmados com a Autoridade Tributária.' },
+      { nome: 'Desenvolvimento', estado: 'Concluída', s: 22, d: 62, nota: 'Emissão, anulação e séries documentais entregues.' },
+      { nome: 'Validação fiscal', estado: 'Atrasada', s: 86, d: 28, nota: 'Parecer externo pendente há 11 dias. Risco directo na data de entrada.' },
+      { nome: 'Entrega', estado: 'Planeada', s: 116, d: 24, nota: 'Formação de facturação em duas sessões.' },
+    ],
+    atribuicoes: [
+      { titulo: 'Obter parecer fiscal externo', pessoa: 'Hélder Tembe', funcao: 'Integrações', dl: 48, estado: 'Atrasada' },
+      { titulo: 'Testar séries documentais em produção', pessoa: 'Cláudia Bila', funcao: 'Analista', dl: 64, estado: 'Em curso' },
+      { titulo: 'Manual de utilizador', pessoa: 'Sara Nhaca', funcao: 'Gestão de Mudança', dl: 70, estado: 'Pendente' },
+    ] },
+  { id: 'p3', codigo: 'PRJ-121', nome: 'Reestruturação do armazém central', cliente: 'Distribuidora Zambeze', estagio: 'Planeamento', pct: 28, responsavel: 'Jorge Alfane', dl: 152, saude: 'No prazo', abertas: 6, total: 17, orcamento: '1 900 000 MT', consumido: '24%', equipa: 5,
+    fases: [
+      { nome: 'Diagnóstico de fluxos', estado: 'Concluída', s: 28, d: 30, nota: 'Medição de tempos de picking em três turnos.' },
+      { nome: 'Plano de layout', estado: 'Em curso', s: 60, d: 30, nota: 'Proposta de duas plantas alternativas em avaliação.' },
+      { nome: 'Obra e reorganização', estado: 'Planeada', s: 92, d: 58, nota: 'Execução por sectores para não parar a expedição.' },
+    ],
+    atribuicoes: [
+      { titulo: 'Fechar planta definitiva', pessoa: 'Jorge Alfane', funcao: 'Coordenação', dl: 69, estado: 'Em curso' },
+      { titulo: 'Orçamentar obra civil', pessoa: 'Cláudia Bila', funcao: 'Analista', dl: 73, estado: 'Pendente' },
+    ] },
+  { id: 'p4', codigo: 'PRJ-096', nome: 'Painel de indicadores da Direcção', cliente: 'Banco Índico', estagio: 'Entrega', pct: 95, responsavel: 'Nuno Chirindza', dl: 66, saude: 'No prazo', abertas: 2, total: 22, orcamento: '3 100 000 MT', consumido: '92%', equipa: 4,
+    fases: [
+      { nome: 'Modelo de dados', estado: 'Concluída', s: 0, d: 30, nota: 'Camada semântica sobre o data warehouse existente.' },
+      { nome: 'Construção dos painéis', estado: 'Concluída', s: 32, d: 30, nota: 'Nove painéis, três perfis de acesso.' },
+      { nome: 'Aceitação e passagem', estado: 'Em curso', s: 64, d: 24, nota: 'Falta assinatura de aceitação da Direcção Financeira.' },
+    ],
+    atribuicoes: [
+      { titulo: 'Recolher aceitação formal', pessoa: 'Nuno Chirindza', funcao: 'Dados', dl: 63, estado: 'Em curso' },
+      { titulo: 'Documentar transferência de conhecimento', pessoa: 'Ivete Macuácua', funcao: 'Consultoria', dl: 65, estado: 'Pendente' },
+    ] },
+  { id: 'p5', codigo: 'PRJ-129', nome: 'Programa de conformidade fiscal', cliente: 'Petromoc Serviços', estagio: 'Descoberta', pct: 11, responsavel: 'Cláudia Bila', dl: 234, saude: 'No prazo', abertas: 3, total: 9, orcamento: '2 400 000 MT', consumido: '7%', equipa: 3,
+    fases: [
+      { nome: 'Enquadramento legal', estado: 'Em curso', s: 62, d: 30, nota: 'Inventário de obrigações por tipo de contrato.' },
+      { nome: 'Desenho do programa', estado: 'Planeada', s: 94, d: 58, nota: 'Políticas, matriz de responsabilidades e calendário fiscal.' },
+    ],
+    atribuicoes: [
+      { titulo: 'Inventariar obrigações declarativas', pessoa: 'Cláudia Bila', funcao: 'Analista', dl: 71, estado: 'Em curso' },
+    ] },
+  { id: 'p6', codigo: 'PRJ-117', nome: 'Digitalização de arquivo contratual', cliente: 'Seguradora Costa Sul', estagio: 'Execução', pct: 46, responsavel: 'Sara Nhaca', dl: 136, saude: 'Atrasado', abertas: 5, total: 20, orcamento: '1 350 000 MT', consumido: '58%', equipa: 5,
+    fases: [
+      { nome: 'Inventário físico', estado: 'Concluída', s: 0, d: 48, nota: '18 400 contratos catalogados em dois arquivos.' },
+      { nome: 'Digitalização', estado: 'Atrasada', s: 50, d: 68, nota: 'Ritmo 40% abaixo do plano por avaria de dois scanners.' },
+      { nome: 'Indexação e pesquisa', estado: 'Planeada', s: 120, d: 30, nota: 'Indexação por apólice, titular e data de renovação.' },
+    ],
+    atribuicoes: [
+      { titulo: 'Repor capacidade de digitalização', pessoa: 'Sara Nhaca', funcao: 'Gestão de Mudança', dl: 57, estado: 'Atrasada' },
+      { titulo: 'Revisão de qualidade por amostragem', pessoa: 'Cláudia Bila', funcao: 'Analista', dl: 57, estado: 'Atrasada' },
+    ] },
+  { id: 'p7', codigo: 'PRJ-132', nome: 'Integração da rede de agentes', cliente: 'Mozambique Fintech', estagio: 'Planeamento', pct: 19, responsavel: 'Hélder Tembe', dl: 214, saude: 'No prazo', abertas: 4, total: 14, orcamento: '5 600 000 MT', consumido: '12%', equipa: 6,
+    fases: [
+      { nome: 'Arquitectura de integração', estado: 'Em curso', s: 62, d: 48, nota: 'Escolha entre barramento próprio e plataforma gerida.' },
+      { nome: 'Piloto em 12 agentes', estado: 'Planeada', s: 112, d: 66, nota: 'Piloto em Maputo e Beira antes do alargamento nacional.' },
+    ],
+    atribuicoes: [
+      { titulo: 'Decidir plataforma de integração', pessoa: 'Hélder Tembe', funcao: 'Integrações', dl: 66, estado: 'Em curso' },
+      { titulo: 'Definir critérios do piloto', pessoa: 'Ivete Macuácua', funcao: 'Consultoria', dl: 77, estado: 'Pendente' },
+    ] },
+];
+
+const TIPOS = ['Implementação', 'Concurso', 'Marketing', 'Prospecção', 'Tarefa regular'];
+
+const MODELOS = {
+  'Implementação': [['Descoberta', 3], ['Desenho da solução', 4], ['Execução', 6], ['Validação e entrega', 3]],
+  'Concurso': [['Elegibilidade e caderno de encargos', 2], ['Proposta técnica e financeira', 3], ['Submissão e defesa', 2]],
+  'Marketing': [['Mensagem e provas', 3], ['Produção de conteúdos', 5], ['Activação e medição', 4]],
+  'Prospecção': [['Mapa de contas-alvo', 4], ['Abordagem e reuniões', 6], ['Qualificação e proposta', 4]],
+  'Tarefa regular': [['Recolha de dados', 1], ['Consolidação', 1], ['Reporte à Direcção', 1]],
+};
+
+PROJ.push(
+  { id: 'p8', codigo: 'CNC-041', tipo: 'Concurso', nome: 'Concurso público — gestão portuária', cliente: 'Portos e Caminhos de Ferro (CFM)', estagio: 'Planeamento', pct: 35, responsavel: 'Ivete Macuácua', dl: 74, saude: 'Em risco', abertas: 3, total: 8, orcamento: '—', consumido: '—', equipa: 3,
+    fases: [
+      { nome: 'Elegibilidade e caderno de encargos', estado: 'Concluída', s: 40, d: 16, nota: 'Requisitos de elegibilidade confirmados; garantia bancária em preparação.' },
+      { nome: 'Proposta técnica e financeira', estado: 'Em curso', s: 58, d: 14, nota: 'Preço em fecho. Falta a carta de referências de três clientes.' },
+      { nome: 'Submissão e defesa', estado: 'Planeada', s: 74, d: 10, nota: 'Entrega em mão até 12 Set, defesa oral prevista para a semana seguinte.' },
+    ], atribuicoes: [] },
+  { id: 'p9', codigo: 'MKT-012', tipo: 'Marketing', nome: 'Posicionamento no sector financeiro', cliente: 'NEXORA · interno', estagio: 'Execução', pct: 58, responsavel: 'Sara Nhaca', dl: 122, saude: 'No prazo', abertas: 4, total: 11, orcamento: '860 000 MT', consumido: '54%', equipa: 3,
+    fases: [
+      { nome: 'Mensagem e provas', estado: 'Concluída', s: 31, d: 24, nota: 'Três casos de cliente documentados com números autorizados.' },
+      { nome: 'Produção de conteúdos', estado: 'Em curso', s: 57, d: 40, nota: 'Dois estudos de caso e a série de artigos técnicos.' },
+      { nome: 'Activação e medição', estado: 'Planeada', s: 99, d: 30, nota: 'Evento com directores financeiros em Novembro.' },
+    ], atribuicoes: [] },
+  { id: 'p10', codigo: 'PRS-007', tipo: 'Prospecção', nome: 'Prospecção — agro-indústria da região centro', cliente: 'NEXORA · interno', estagio: 'Descoberta', pct: 22, responsavel: 'Jorge Alfane', dl: 153, saude: 'No prazo', abertas: 3, total: 7, orcamento: '320 000 MT', consumido: '18%', equipa: 2,
+    fases: [
+      { nome: 'Mapa de contas-alvo', estado: 'Em curso', s: 50, d: 35, nota: '28 empresas identificadas em Manica, Sofala e Zambézia.' },
+      { nome: 'Abordagem e reuniões', estado: 'Planeada', s: 88, d: 42, nota: 'Duas semanas de terreno por província.' },
+    ], atribuicoes: [] },
+  { id: 'p11', codigo: 'OPS-003', tipo: 'Tarefa regular', nome: 'Fecho mensal e reporte de carteira', cliente: 'NEXORA · interno', estagio: 'Execução', pct: 67, responsavel: 'Cláudia Bila', dl: 63, saude: 'No prazo', abertas: 2, total: 6, orcamento: '—', consumido: '—', equipa: 2,
+    fases: [
+      { nome: 'Recolha de dados', estado: 'Em curso', s: 57, d: 5, nota: 'Horas, custos e avanço declarado por cada gestor.' },
+      { nome: 'Consolidação', estado: 'Planeada', s: 62, d: 3, nota: 'Conferência com a contabilidade.' },
+      { nome: 'Reporte à Direcção', estado: 'Planeada', s: 65, d: 2, nota: 'Reunião de carteira na primeira segunda-feira.' },
+    ], atribuicoes: [] },
+);
+PROJ.forEach(p => { if (!p.tipo) p.tipo = 'Implementação'; });
+
+const TAREFAS = [
+  { id: 't1', titulo: 'Validar plano de contas com o cliente', fase: 'Configuração e migração', responsavel: 'Ivete Macuácua', projecto: 'Migração do ERP — fase 2', dl: 51, estado: 'Atrasada', horas: 14, horasEst: 10 },
+  { id: 't2', titulo: 'Obter parecer fiscal externo', fase: 'Validação fiscal', responsavel: 'Hélder Tembe', projecto: 'Central de facturação electrónica', dl: 48, estado: 'Atrasada', horas: 9, horasEst: 6 },
+  { id: 't3', titulo: 'Repor capacidade de digitalização', fase: 'Digitalização', responsavel: 'Sara Nhaca', projecto: 'Digitalização de arquivo contratual', dl: 57, estado: 'Atrasada', horas: 5, horasEst: 4 },
+  { id: 't13', titulo: 'Revisão de qualidade por amostragem', fase: 'Digitalização', responsavel: 'Cláudia Bila', projecto: 'Digitalização de arquivo contratual', dl: 57, estado: 'Atrasada', horas: 6, horasEst: 12 },
+  { id: 't5', titulo: 'Recolher aceitação formal da Direcção', fase: 'Aceitação e passagem', responsavel: 'Nuno Chirindza', projecto: 'Painel de indicadores da Direcção', dl: 59, estado: 'Em curso', horas: 3, horasEst: 4 },
+  { id: 't11', titulo: 'Mapear activos fixos por unidade', fase: 'Configuração e migração', responsavel: 'Jorge Alfane', projecto: 'Migração do ERP — fase 2', dl: 60, estado: 'Em curso', horas: 11, horasEst: 20 },
+  { id: 't4', titulo: 'Migrar contabilidade analítica', fase: 'Configuração e migração', responsavel: 'Nuno Chirindza', projecto: 'Migração do ERP — fase 2', dl: 63, estado: 'Em curso', horas: 22, horasEst: 30 },
+  { id: 't6', titulo: 'Decidir plataforma de integração', fase: 'Arquitectura de integração', responsavel: 'Hélder Tembe', projecto: 'Integração da rede de agentes', dl: 66, estado: 'Em curso', horas: 12, horasEst: 20 },
+  { id: 't7', titulo: 'Fechar planta definitiva do armazém', fase: 'Plano de layout', responsavel: 'Jorge Alfane', projecto: 'Reestruturação do armazém central', dl: 69, estado: 'Em curso', horas: 18, horasEst: 26 },
+  { id: 't10', titulo: 'Inventariar obrigações declarativas', fase: 'Enquadramento legal', responsavel: 'Cláudia Bila', projecto: 'Programa de conformidade fiscal', dl: 71, estado: 'Em curso', horas: 7, horasEst: 18 },
+  { id: 't8', titulo: 'Guião de formação para 40 utilizadores', fase: 'Testes de aceitação', responsavel: 'Sara Nhaca', projecto: 'Migração do ERP — fase 2', dl: 72, estado: 'Pendente', horas: 0, horasEst: 16 },
+  { id: 't9', titulo: 'Orçamentar obra civil', fase: 'Plano de layout', responsavel: 'Cláudia Bila', projecto: 'Reestruturação do armazém central', dl: 73, estado: 'Pendente', horas: 0, horasEst: 12 },
+  { id: 't12', titulo: 'Levantamento de processos — 4 unidades', fase: 'Descoberta', responsavel: 'Cláudia Bila', projecto: 'Migração do ERP — fase 2', dl: 23, estado: 'Concluída', horas: 38, horasEst: 36,
+    relatorio: 'Levantamento fechado nas quatro unidades. Divergência no fluxo de compras da Matola — proposta a normalização na fase de desenho.' },
+];
+
+const RELATORIOS = [
+  { autor: 'Cláudia Bila', funcao: 'Analista de Processos', situacao: 'Sem obstáculos', quando: 'Hoje, 09:14', tarefa: 'Levantamento de processos — 4 unidades', projecto: 'Migração do ERP — fase 2', validacao: 'Validado por Alcino Maido',
+    texto: 'Levantamento fechado nas quatro unidades dentro do prazo. A única divergência relevante está no fluxo de compras da Matola, onde as requisições passam por uma dupla aprovação informal que não existe no manual. Proponho normalizar isto já na fase de desenho para não arrastarmos a excepção para o sistema novo.' },
+  { autor: 'Nuno Chirindza', funcao: 'Engenheiro de Dados', situacao: 'Com obstáculo', quando: 'Hoje, 08:02', tarefa: 'Extracção do histórico contabilístico', projecto: 'Migração do ERP — fase 2', validacao: 'À espera de validação',
+    texto: 'Extracção concluída para 2023 e 2024. O ano de 2022 tem 1 840 lançamentos sem centro de custo, o que trava a validação automática. Preciso de uma decisão da Direcção Financeira: atribuir um centro de custo genérico ou deixar esse histórico fora do sistema novo.' },
+  { autor: 'Sara Nhaca', funcao: 'Gestora de Mudança', situacao: 'Bloqueado', quando: 'Ontem, 17:40', tarefa: 'Digitalização do lote 6', projecto: 'Digitalização de arquivo contratual', validacao: 'Escalado à Direcção',
+    texto: 'Dois dos quatro scanners estão avariados desde 21 de Agosto e o fornecedor não confirma data de reparação. O ritmo caiu para 380 contratos por dia contra os 620 planeados. Sem equipamento de substituição esta semana, a fase escorrega para Novembro.' },
+  { autor: 'Hélder Tembe', funcao: 'Especialista de Integrações', situacao: 'Com obstáculo', quando: 'Ontem, 15:12', tarefa: 'Testes de emissão em ambiente fiscal', projecto: 'Central de facturação electrónica', validacao: 'À espera de validação',
+    texto: 'Emissão, anulação e notas de crédito passam todos os testes. Continuamos à espera do parecer fiscal externo, pedido a 18 de Agosto. Enquanto não chegar não posso fechar a fase de validação, e a data de entrada em produção fica sob risco.' },
+  { autor: 'Jorge Alfane', funcao: 'Coordenador de Terreno', situacao: 'Sem obstáculos', quando: 'Ontem, 11:26', tarefa: 'Medição de tempos de picking', projecto: 'Reestruturação do armazém central', validacao: 'Validado por Alcino Maido',
+    texto: 'Medições feitas nos três turnos ao longo de duas semanas. O turno da noite tem 34% mais deslocação por linha recolhida, quase todo explicado pela dispersão dos artigos de alta rotação. Isso sustenta a planta alternativa que junta esses artigos junto à expedição.' },
+  { autor: 'Cláudia Bila', funcao: 'Analista de Processos', situacao: 'Sem obstáculos', quando: '26 Ago, 16:55', tarefa: 'Matriz de requisitos fiscais', projecto: 'Programa de conformidade fiscal', validacao: 'Validado por Alcino Maido',
+    texto: 'Matriz fechada com 62 obrigações declarativas mapeadas por tipo de contrato. Duas obrigações municipais precisam de confirmação jurídica antes de entrarem no calendário fiscal, mas não bloqueiam o desenho do programa.' },
+];
+
+class Component extends DCLogic {
+  state = {
+    perfil: 'admin', route: 'painel', filtro: 'Todos', filtroT: 'Abertas',
+    escala: 'mes', shift: 0, ov: {}, dragKey: null,
+    fasesCustom: {}, fasesEditPid: null, fasesDraft: [],
+    npTipo: 'Implementação', npFases: MODELOS['Implementação'].map(([nome, semanas]) => ({ nome, semanas })),
+    sel: null, mtId: null, mtTexto: '', mtSituacao: 'Sem obstáculos', mtTocado: false,
+    novaOpen: false, ntTitulo: '', ntDesc: '', ntProj: 'p1', ntFase: 0, ntPessoa: 'Cláudia Bila',
+    ntData: '', ntHoras: 8, ntPrio: 'Normal', ntAlerta: '3 dias', ntRelatorio: true, ntTocado: false, seq: 1,
+    novoOpen: false, npNome: '', npCliente: '', npEstagio: 'Descoberta', npPessoas: ['Cláudia Bila'],
+    npInicio: '01/09/2026', npFim: '18/12/2026', npOrc: '', npAlerta: '3 dias',
+    membroOpen: false, mbNome: '', mbEmail: '', mbFuncao: '', mbTel: '', mbEntrada: '01/09/2026',
+    mbDept: 'Consultoria', mbAloc: 100, mbAcesso: 'Colaborador', mbProjs: [], mbConvite: true, mbTocado: false,
+    tarefas: TAREFAS, relatorios: RELATORIOS, toastMsg: '',
+  };
+
+  componentDidMount() {
+    this._mm = e => {
+      const dg = this._dg;
+      if (!dg) return;
+      const delta = Math.round((e.clientX - dg.x0) * dg.dpp);
+      const key = dg.key;
+      const cur = this.state.ov[key] || { s: dg.s0, d: dg.d0 };
+      const next = dg.mode === 'move'
+        ? { s: dg.s0 + delta, d: dg.d0 }
+        : { s: dg.s0, d: Math.max(4, dg.d0 + delta) };
+      if (cur.s === next.s && cur.d === next.d) return;
+      const ov = Object.assign({}, this.state.ov);
+      ov[key] = next;
+      this.setState({ ov });
+    };
+    this._mu = () => {
+      if (!this._dg) return;
+      const dg = this._dg;
+      this._dg = null;
+      const o = this.state.ov[dg.key];
+      this.setState({ dragKey: null });
+      if (o) this.flash(dg.nome + ' → ' + this.dataCurta(o.s) + ' a ' + this.dataCurta(o.s + o.d) + ' · plano actualizado');
+    };
+    window.addEventListener('mousemove', this._mm);
+    window.addEventListener('mouseup', this._mu);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('mousemove', this._mm);
+    window.removeEventListener('mouseup', this._mu);
+    clearTimeout(this._t);
+  }
+
+  ini(n) { return n.split(' ').map(w => w[0]).slice(0, 2).join(''); }
+  d(off) { return new Date(BASE + off * 86400000); }
+  dataCurta(off) { const x = this.d(off); return x.getUTCDate() + ' ' + MESES[x.getUTCMonth()]; }
+  dataLonga(off) { const x = this.d(off); return DIAS[x.getUTCDay()] + ', ' + x.getUTCDate() + ' ' + MESES_L[x.getUTCMonth()]; }
+
+  flash(m) {
+    clearTimeout(this._t);
+    this.setState({ toastMsg: m });
+    this._t = setTimeout(() => this.setState({ toastMsg: '' }), 2600);
+  }
+
+  alerta(dl, estado) {
+    const dias = dl - HOJE;
+    if (estado === 'Concluída') return { txt: 'Cumprida', fg: GRN, bg: '#ECFDF3', cor: '#12B76A' };
+    if (dias < 0) return { txt: (-dias) + ' dias em atraso', fg: '#fff', bg: '#D92D20', cor: '#F04438' };
+    if (dias === 0) return { txt: 'Vence hoje', fg: RED, bg: '#FEF3F2', cor: '#F04438' };
+    if (dias <= 2) return { txt: dias === 1 ? 'Vence amanhã' : 'Faltam 2 dias', fg: AMB, bg: '#FFFAEB', cor: '#F79009' };
+    if (dias <= 7) return { txt: 'Faltam ' + dias + ' dias', fg: '#475467', bg: '#F2F4F7', cor: '#98A2B3' };
+    return { txt: 'em ' + dias + ' dias', fg: '#98A2B3', bg: 'transparent', cor: '#D0D5DD' };
+  }
+
+  estagioCor(e) {
+    if (e === 'Descoberta') return ['#475467', '#F2F4F7'];
+    if (e === 'Planeamento') return ['#1E45C4', '#EFF4FF'];
+    if (e === 'Execução') return ['#101828', '#F2F4F7'];
+    if (e === 'Validação') return [AMB, '#FFFAEB'];
+    return [GRN, '#ECFDF3'];
+  }
+  saudeCor(s) { return s === 'No prazo' ? '#12B76A' : s === 'Em risco' ? '#F79009' : '#F04438'; }
+
+  tipoCor(t) {
+    if (t === 'Concurso') return ['#B54708', '#F79009'];
+    if (t === 'Marketing') return ['#1E45C4', '#2C5FF6'];
+    if (t === 'Prospecção') return ['#067647', '#12B76A'];
+    if (t === 'Tarefa regular') return ['#475467', '#98A2B3'];
+    return ['#101828', '#101828'];
+  }
+
+  fasesDe(p) { return this.state.fasesCustom[p.id] || p.fases; }
+
+  abrirFases = pid => () => {
+    const p = PROJ.find(x => x.id === pid);
+    if (!p) return;
+    const draft = this.fasesDe(p).map((f, i) => {
+      const o = this.state.ov[pid + ':' + i] || f;
+      return { nome: f.nome, estado: f.estado, nota: f.nota || '', semanas: Math.max(1, Math.round(o.d / 7)), s: o.s };
+    });
+    this.setState({ fasesEditPid: pid, fasesDraft: draft });
+  };
+
+  mudaFase = (i, campo, valor) => {
+    const d = this.state.fasesDraft.map((f, k) => k === i ? Object.assign({}, f, { [campo]: valor }) : f);
+    this.setState({ fasesDraft: d });
+  };
+
+  gravarFases = () => {
+    const st = this.state, pid = st.fasesEditPid;
+    const draft = st.fasesDraft.filter(f => f.nome.trim());
+    if (!pid || !draft.length) return;
+    let cursor = draft[0].s;
+    const fases = draft.map(f => {
+      const d = f.semanas * 7 - 2;
+      const out = { nome: f.nome.trim(), estado: f.estado, nota: f.nota, s: cursor, d };
+      cursor += d + 2;
+      return out;
+    });
+    const fasesCustom = Object.assign({}, st.fasesCustom);
+    fasesCustom[pid] = fases;
+    const ov = {};
+    Object.keys(st.ov).forEach(k => { if (k.indexOf(pid + ':') !== 0) ov[k] = st.ov[k]; });
+    this.setState({ fasesCustom, ov, fasesEditPid: null });
+    this.flash('Roteiro de ' + fases.length + ' fases gravado · ' + this.dataCurta(fases[0].s) + ' a ' + this.dataCurta(cursor - 2));
+  };
+  estadoCor(e) {
+    if (e === 'Concluída') return [GRN, '#ECFDF3'];
+    if (e === 'Atrasada') return [RED, '#FEF3F2'];
+    if (e === 'Em curso') return ['#1E45C4', '#EFF4FF'];
+    return ['#475467', '#F2F4F7'];
+  }
+  situacaoCor(s) {
+    if (s === 'Sem obstáculos') return [GRN, '#ECFDF3'];
+    if (s === 'Com obstáculo') return [AMB, '#FFFAEB'];
+    return [RED, '#FEF3F2'];
+  }
+  acessoCor(a) {
+    if (a === 'Administrador') return ['#101828', '#F2F4F7'];
+    if (a === 'Gestor de projecto') return ['#1E45C4', '#EFF4FF'];
+    return ['#475467', '#F9FAFB'];
+  }
+
+  janela() {
+    const e = this.state.escala, sh = this.state.shift;
+    if (e === 'mes') return { ws: 0 + sh * 30, len: 184, step: 30 };
+    if (e === 'semana') return { ws: 47 + sh * 7, len: 56, step: 7 };
+    return { ws: 56 + sh, len: 14, step: 1 };
+  }
+
+  colunas(j) {
+    const e = this.state.escala, out = [];
+    if (e === 'mes') {
+      const bounds = [0, 31, 62, 92, 123, 153, 184];
+      for (let i = 0; i < 6; i++) {
+        const s = bounds[i], w = bounds[i + 1] - bounds[i];
+        const dentro = HOJE >= j.ws + s - j.ws && false;
+        out.push({ label: MESES_L[6 + i], sub: '2026', left: ((s - j.ws) / j.len * 100).toFixed(2) + '%', width: (w / j.len * 100).toFixed(2) + '%', bg: (HOJE >= s && HOJE < s + w) ? '#FCFCFD' : 'transparent', fg: (HOJE >= s && HOJE < s + w) ? '#101828' : '#98A2B3' });
+      }
+      return out;
+    }
+    if (e === 'semana') {
+      for (let i = 0; i < 8; i++) {
+        const s = j.ws + i * 7, x = this.d(s);
+        const act = HOJE >= s && HOJE < s + 7;
+        out.push({ label: 'sem ' + x.getUTCDate() + ' ' + MESES[x.getUTCMonth()], sub: act ? 'esta semana' : '', left: (i / 8 * 100).toFixed(2) + '%', width: (100 / 8).toFixed(2) + '%', bg: act ? '#FCFCFD' : 'transparent', fg: act ? '#101828' : '#98A2B3' });
+      }
+      return out;
+    }
+    for (let i = 0; i < 14; i++) {
+      const s = j.ws + i, x = this.d(s), wd = x.getUTCDay();
+      const act = s === HOJE;
+      out.push({ label: (x.getUTCDate() < 10 ? '0' : '') + x.getUTCDate(), sub: DIAS[wd], left: (i / 14 * 100).toFixed(2) + '%', width: (100 / 14).toFixed(2) + '%', bg: act ? '#FEF3F2' : (wd === 0 || wd === 6) ? '#FCFCFD' : 'transparent', fg: act ? RED : '#98A2B3' });
+    }
+    return out;
+  }
+
+  submeter = () => {
+    const t = this.state.tarefas.find(x => x.id === this.state.mtId);
+    if (!t) return;
+    if (this.state.mtTexto.trim().length < 25) { this.setState({ mtTocado: true }); return; }
+    const tarefas = this.state.tarefas.map(x => x.id === t.id ? Object.assign({}, x, { estado: 'Concluída', relatorio: this.state.mtTexto }) : x);
+    const novo = {
+      autor: t.responsavel, funcao: (PESSOAS.find(p => p.nome === t.responsavel) || {}).funcao || 'Equipa',
+      situacao: this.state.mtSituacao, quando: 'Agora mesmo', tarefa: t.titulo, projecto: t.projecto,
+      texto: this.state.mtTexto, validacao: 'À espera de validação',
+    };
+    this.setState({ tarefas, relatorios: [novo].concat(this.state.relatorios), mtId: null, mtTexto: '', mtTocado: false });
+    this.flash('Tarefa cumprida · relatório enviado à gestão');
+  };
+
+  gravarNovo = () => {
+    const st = this.state;
+    if (!st.npNome.trim() || !st.npCliente.trim() || !this.dataOk(st.npFim)) return;
+    this.setState({ novoOpen: false });
+    this.flash('Projecto registado · deadline ' + st.npFim + ' · alerta ' + st.npAlerta + ' antes');
+  };
+
+  dataOk(s) { return /^\d{2}\/\d{2}\/\d{4}$/.test(s.trim()); }
+  emailOk(s) { return /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(s.trim()); }
+
+  dataParaOff(s) {
+    const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec((s || '').trim());
+    if (!m) return null;
+    return Math.round((Date.UTC(+m[3], +m[2] - 1, +m[1]) - BASE) / 86400000);
+  }
+
+  criarTarefa = () => {
+    const st = this.state, off = this.dataParaOff(st.ntData);
+    if (st.ntTitulo.trim().length < 4 || off === null || off < HOJE) { this.setState({ ntTocado: true }); return; }
+    const p = PROJ.find(x => x.id === st.ntProj) || PROJ[0];
+    const fase = (p.fases[st.ntFase] || p.fases[0] || {}).nome || 'Sem fase';
+    const nova = { id: 'n' + st.seq, titulo: st.ntTitulo.trim(), fase, responsavel: st.ntPessoa,
+      projecto: p.nome, dl: off, estado: 'Pendente', horas: 0, horasEst: st.ntHoras,
+      prioridade: st.ntPrio, desc: st.ntDesc.trim(), exigeRelatorio: st.ntRelatorio };
+    this.setState({ tarefas: st.tarefas.concat(nova), seq: st.seq + 1, novaOpen: false, ntTocado: false, ntTitulo: '', ntDesc: '', ntData: '' });
+    this.flash('Tarefa atribuída a ' + st.ntPessoa + ' · deadline ' + this.dataCurta(off));
+  };
+
+  gravarMembro = () => {
+    const st = this.state;
+    if (!st.mbNome.trim() || !this.emailOk(st.mbEmail) || !st.mbFuncao.trim()) { this.setState({ mbTocado: true }); return; }
+    this.setState({ membroOpen: false, mbTocado: false });
+    this.flash(st.mbNome.trim() + ' registado como ' + st.mbAcesso + (st.mbConvite ? ' · convite enviado' : ' · conta sem convite'));
+  };
+
+  renderVals() {
+    const st = this.state, r = st.route, admin = st.perfil === 'admin';
+    const go = k => () => this.setState({ route: k, sel: null });
+    const toast = () => this.flash('Acção registada no histórico do projecto');
+    const eu = admin ? { nome: 'Alcino Maido', funcao: 'Direcção · Administrador' } : { nome: 'Cláudia Bila', funcao: 'Analista de Processos' };
+
+    const abertas = st.tarefas.filter(t => t.estado !== 'Concluída');
+    const atrasadas = st.tarefas.filter(t => t.estado === 'Atrasada');
+
+    const nav = [];
+    const item = (k, label, icon, badge, tipo) => {
+      const on = r === k;
+      const bc = tipo === 'red' ? [RED, '#FEF3F2'] : ['#475467', '#F2F4F7'];
+      nav.push({ isItem: true, isGroup: false, label, icon, go: go(k), badge: badge || false,
+        badgeFg: bc[0], badgeBg: bc[1], bg: on ? '#F4F5F7' : 'transparent', fg: on ? '#101828' : '#475467',
+        weight: on ? 600 : 400, iconFg: on ? '#101828' : '#98A2B3' });
+    };
+    const group = label => nav.push({ isGroup: true, isItem: false, label });
+
+    if (admin) {
+      group('Carteira');
+      item('painel', 'Painel', '◱');
+      item('projectos', 'Projectos', '▤', PROJ.length);
+      item('roadmap', 'Roteiro', '▭');
+      group('Execução');
+      item('tarefas', 'Tarefas', '✓', atrasadas.length, 'red');
+      item('relatorios', 'Relatórios', '✎', st.relatorios.length);
+      group('Organização');
+      item('equipa', 'Equipa e acessos', '◍');
+    } else {
+      group('O meu trabalho');
+      item('minhas', 'As minhas tarefas', '✓', st.tarefas.filter(t => t.responsavel === 'Cláudia Bila' && t.estado !== 'Concluída').length, 'red');
+      item('meusprojectos', 'Os meus projectos', '▤');
+      item('meusrelatorios', 'Os meus relatórios', '✎');
+      group('Equipa');
+      item('roadmap', 'Roteiro', '▭');
+    }
+
+    const rotasAdmin = ['painel', 'projectos', 'roadmap', 'tarefas', 'relatorios', 'equipa'];
+    const rota = admin ? (rotasAdmin.indexOf(r) >= 0 ? r : 'painel') : (['minhas', 'meusprojectos', 'meusrelatorios', 'roadmap'].indexOf(r) >= 0 ? r : 'minhas');
+
+    const titulos = {
+      painel: ['Painel de acompanhamento', PROJ.length + ' projectos activos · ' + PROJ.filter(x => x.cliente.indexOf('interno') < 0).map(x => x.cliente).filter((c, i, a) => a.indexOf(c) === i).length + ' clientes externos · 3 frentes internas'],
+      projectos: ['Carteira de projectos', 'Estágio, responsável, avanço e deadline de entrega'],
+      roadmap: ['Roteiro', 'Arraste as fases para replanear · escala mensal, semanal ou diária'],
+      tarefas: ['Tarefas atribuídas', 'Funções com deadline · conclusão sujeita a mini relatório'],
+      relatorios: ['Relatórios de execução', 'O que a equipa reportou ao fechar cada tarefa'],
+      equipa: ['Equipa e acessos', 'Registo de pessoas, contas de utilizador e níveis de acesso'],
+      minhas: ['As minhas tarefas', 'Funções que lhe foram atribuídas, por urgência'],
+      meusprojectos: ['Os meus projectos', 'Onde está alocada e qual é a sua parte'],
+      meusrelatorios: ['Os meus relatórios', 'O que reportou e o estado de validação'],
+    };
+
+    const projRows = PROJ.map(p => {
+      const [ef, eb] = this.estagioCor(p.estagio);
+      const al = this.alerta(p.dl, '');
+      const [tf, td] = this.tipoCor(p.tipo);
+      return Object.assign({}, p, {
+        estFg: ef, estBg: eb, saudeCor: this.saudeCor(p.saude), tipoFg: tf, tipoDot: td,
+        pct: p.pct + '%', barra: p.pct + '%',
+        barraFg: p.saude === 'Atrasado' ? '#F04438' : p.saude === 'Em risco' ? '#F79009' : '#101828',
+        iniciais: this.ini(p.responsavel), entrega: this.dataCurta(p.dl),
+        alerta: al.txt, alertaFg: al.fg, alertaBg: al.bg,
+        tarefasTxt: p.abertas + '/' + p.total,
+        abrir: () => this.setState({ sel: p.id }),
+      });
+    });
+
+    const filtrar = f => f === 'Todos' ? projRows
+      : f === 'Em risco' ? projRows.filter(p => p.saude !== 'No prazo')
+      : projRows.filter(p => p.tipo === f);
+    const filtros = ['Todos', 'Em risco'].concat(TIPOS).map(f => {
+      const on = st.filtro === f;
+      return { label: f, n: filtrar(f).length, fn: () => this.setState({ filtro: f }),
+        bd: on ? '#101828' : '#EAECF0', bg: on ? '#101828' : '#fff', fg: on ? '#fff' : '#475467', weight: on ? 600 : 400 };
+    });
+
+    const tarefaRow = t => {
+      const [f, b] = this.estadoCor(t.estado);
+      const al = this.alerta(t.dl, t.estado);
+      const done = t.estado === 'Concluída';
+      return Object.assign({}, t, {
+        estadoFg: f, estadoBg: b, iniciais: this.ini(t.responsavel),
+        data: this.dataCurta(t.dl), dataLonga: this.dataLonga(t.dl),
+        alerta: al.txt, alertaFg: al.fg, alertaBg: al.bg, cor: al.cor,
+        esforco: t.horas + 'h de ' + t.horasEst + 'h',
+        tituloFg: done ? '#667085' : '#101828', concluida: done, podeConcluir: !done,
+        fn: () => this.setState({ mtId: t.id, mtTexto: '', mtSituacao: 'Sem obstáculos', mtTocado: false }),
+        pedir: () => this.flash('Pedido de prorrogação enviado à gestão'),
+        verRelatorio: () => { this.setState({ route: admin ? 'relatorios' : 'meusrelatorios' }); this.flash('Relatório de ' + t.responsavel); },
+      });
+    };
+
+    const tarefaRows = (st.filtroT === 'Todas' ? st.tarefas
+      : st.filtroT === 'Atrasadas' ? st.tarefas.filter(t => t.estado === 'Atrasada')
+      : st.filtroT === 'Concluídas' ? st.tarefas.filter(t => t.estado === 'Concluída')
+      : st.tarefas.filter(t => t.estado !== 'Concluída')).slice()
+      .sort((a, b) => (a.estado === 'Concluída' ? 1 : 0) - (b.estado === 'Concluída' ? 1 : 0) || a.dl - b.dl)
+      .map(tarefaRow);
+    const contaT = f => f === 'Todas' ? st.tarefas.length
+      : f === 'Atrasadas' ? atrasadas.length
+      : f === 'Concluídas' ? st.tarefas.filter(t => t.estado === 'Concluída').length : abertas.length;
+    const filtrosT = ['Abertas', 'Atrasadas', 'Concluídas', 'Todas'].map(f => {
+      const on = st.filtroT === f;
+      return { label: f, n: contaT(f), fn: () => this.setState({ filtroT: f }),
+        bd: on ? '#101828' : '#EAECF0', bg: on ? '#101828' : '#fff', fg: on ? '#fff' : '#475467', weight: on ? 600 : 400 };
+    });
+
+    const relRows = st.relatorios.map(x => {
+      const [f, b] = this.situacaoCor(x.situacao);
+      return Object.assign({}, x, { sitFg: f, sitBg: b, iniciais: this.ini(x.autor) });
+    });
+
+    const p = PROJ.find(x => x.id === st.sel);
+    let det = false;
+    if (p) {
+      const [ef, eb] = this.estagioCor(p.estagio);
+      const al = this.alerta(p.dl, '');
+      det = {
+        codigo: p.codigo, nome: p.nome, cliente: p.cliente, responsavel: p.responsavel, estagio: p.estagio,
+        tipo: p.tipo, tipoFg: this.tipoCor(p.tipo)[0], tipoDot: this.tipoCor(p.tipo)[1],
+        editarFases: this.abrirFases(p.id),
+        estFg: ef, estBg: eb, alerta: al.txt, alertaFg: al.fg, alertaBg: al.bg,
+        pct: p.pct + '%', barra: p.pct + '%',
+        barraFg: p.saude === 'Atrasado' ? '#F04438' : p.saude === 'Em risco' ? '#F79009' : '#101828',
+        factos: [
+          { k: 'Deadline de entrega', v: this.dataCurta(p.dl) },
+          { k: 'Orçamento consumido', v: p.consumido },
+          { k: 'Pessoas alocadas', v: p.equipa },
+        ],
+        fases: this.fasesDe(p).map((f, i) => {
+          const o = st.ov[p.id + ':' + i] || f;
+          const [sf, sb] = this.estadoCor(f.estado);
+          const done = f.estado === 'Concluída';
+          return { nome: f.nome, estado: f.estado, nota: f.nota, estFg: sf, estBg: sb,
+            periodo: this.dataCurta(o.s) + ' – ' + this.dataCurta(o.s + o.d),
+            marca: done ? '✓' : '',
+            dotBg: done ? '#101828' : f.estado === 'Em curso' ? BLUE : f.estado === 'Atrasada' ? '#FEF3F2' : '#fff',
+            dotFg: '#fff', dotBd: f.estado === 'Atrasada' ? '#F04438' : done ? '#101828' : f.estado === 'Em curso' ? BLUE : '#D0D5DD' };
+        }),
+        atribuicoes: st.tarefas.filter(t => t.projecto === p.nome).slice().sort((a, b) => a.dl - b.dl).map(t => {
+          const al2 = this.alerta(t.dl, t.estado);
+          return { titulo: t.titulo, pessoa: t.responsavel, funcao: t.fase, iniciais: this.ini(t.responsavel),
+            data: this.dataCurta(t.dl), alerta: al2.txt, alertaFg: al2.fg, alertaBg: al2.bg };
+        }),
+        semTarefas: !st.tarefas.some(t => t.projecto === p.nome),
+        atribuir: () => this.setState({ novaOpen: true, ntProj: p.id, ntFase: 0, ntTocado: false, ntData: '' }),
+      };
+    }
+
+    const j = this.janela();
+    const cols = this.colunas(j);
+    const gantt = PROJ.map(x => ({
+      nome: x.nome, cliente: x.cliente, tipo: x.tipo, tipoDot: this.tipoCor(x.tipo)[1],
+      abrir: () => this.setState({ route: 'projectos', sel: x.id }), editar: this.abrirFases(x.id),
+      fases: this.fasesDe(x).map((f, i) => {
+        const key = x.id + ':' + i;
+        const o = st.ov[key] || { s: f.s, d: f.d };
+        if (o.s + o.d <= j.ws || o.s >= j.ws + j.len) return null;
+        const cor = f.estado === 'Concluída' ? ['#101828', '#fff', '#101828']
+          : f.estado === 'Em curso' ? [BLUE, '#fff', BLUE]
+          : f.estado === 'Atrasada' ? ['#FEF3F2', RED, '#FDA29B']
+          : ['#F9FAFB', '#667085', '#EAECF0'];
+        const start = Math.max(o.s, j.ws), end = Math.min(o.s + o.d, j.ws + j.len);
+        const drag = mode => e => {
+          e.preventDefault(); e.stopPropagation();
+          const track = e.currentTarget.closest('[data-track]');
+          if (!track) return;
+          const w = track.getBoundingClientRect().width;
+          this._dg = { key, mode, nome: f.nome, x0: e.clientX, dpp: j.len / w, s0: o.s, d0: o.d };
+          this.setState({ dragKey: key });
+        };
+        return { nome: f.nome,
+          left: ((start - j.ws) / j.len * 100).toFixed(2) + '%',
+          width: Math.max(1.2, (end - start) / j.len * 100).toFixed(2) + '%',
+          bg: cor[0], fg: cor[1], bd: cor[2],
+          shadow: st.dragKey === key ? '0 6px 16px rgba(16,24,40,.22)' : 'none',
+          opacity: st.dragKey === key ? .92 : 1,
+          mover: drag('move'), redim: drag('resize') };
+      }).filter(Boolean),
+    }));
+    const escalas = [['mes', 'Mês'], ['semana', 'Semana'], ['dia', 'Dia']].map(([k, label]) => {
+      const on = st.escala === k;
+      return { label, fn: () => this.setState({ escala: k, shift: 0 }),
+        bg: on ? '#fff' : 'transparent', fg: on ? '#101828' : '#667085', weight: on ? 600 : 400,
+        shadow: on ? '0 1px 2px rgba(16,24,40,.10)' : 'none' };
+    });
+    const janelaLabel = st.escala === 'mes' ? 'Julho a Dezembro de 2026'
+      : this.dataCurta(j.ws) + ' – ' + this.dataCurta(j.ws + j.len - 1) + ' de 2026';
+    const nEdicoes = Object.keys(st.ov).length;
+
+    const minhas = st.tarefas.filter(t => t.responsavel === 'Cláudia Bila').map(tarefaRow);
+    const minhasAbertas = minhas.filter(t => !t.concluida);
+    const minhasAtrasadas = minhasAbertas.filter(t => t.estado === 'Atrasada');
+
+    const mt0 = st.tarefas.find(x => x.id === st.mtId);
+    const mt = mt0 ? { titulo: mt0.titulo, projecto: mt0.projecto, horas: mt0.horas || 6, horasEst: mt0.horasEst, data: this.dataCurta(mt0.dl) } : false;
+    const mtOk = st.mtTexto.trim().length >= 25;
+    const situacoes = ['Sem obstáculos', 'Com obstáculo', 'Bloqueado'].map(s => {
+      const on = st.mtSituacao === s;
+      const [f, b] = this.situacaoCor(s);
+      return { label: s, nota: s === 'Sem obstáculos' ? 'Entregue como planeado' : s === 'Com obstáculo' ? 'Feito, com ressalva a registar' : 'Depende de terceiros',
+        fn: () => this.setState({ mtSituacao: s }), fg: on ? f : '#475467', bg: on ? b : '#fff', bd: on ? f : '#EAECF0' };
+    });
+
+    const estagiosOpt = ['Descoberta', 'Planeamento', 'Execução', 'Validação', 'Entrega'].map(e => {
+      const on = st.npEstagio === e;
+      return { label: e, fn: () => this.setState({ npEstagio: e }),
+        bd: on ? '#101828' : '#EAECF0', bg: on ? '#101828' : '#fff', fg: on ? '#fff' : '#475467', weight: on ? 600 : 400 };
+    });
+    const pessoasOpt = PESSOAS.map(x => {
+      const on = st.npPessoas.indexOf(x.nome) >= 0;
+      return { nome: x.nome, iniciais: this.ini(x.nome),
+        fn: () => this.setState({ npPessoas: on ? st.npPessoas.filter(n => n !== x.nome) : st.npPessoas.concat(x.nome) }),
+        bd: on ? '#101828' : '#EAECF0', bg: on ? '#F9FAFB' : '#fff', fg: on ? '#101828' : '#475467', weight: on ? 600 : 400,
+        avBg: on ? '#101828' : '#F2F4F7', avFg: on ? '#fff' : '#475467' };
+    });
+    const alertaOpt = ['1 dia', '3 dias', '1 semana', 'Sem alerta'].map(a => {
+      const on = st.npAlerta === a;
+      return { label: a, fn: () => this.setState({ npAlerta: a }),
+        bd: on ? '#101828' : '#EAECF0', bg: on ? '#101828' : '#fff', fg: on ? '#fff' : '#475467', weight: on ? 600 : 400 };
+    });
+    const npDataOk = this.dataOk(st.npFim);
+    const npOk = st.npNome.trim() && st.npCliente.trim() && npDataOk;
+
+    const deptOpt = ['Consultoria', 'Dados', 'Terreno', 'Mudança', 'Financeira'].map(dd => {
+      const on = st.mbDept === dd;
+      return { label: dd, fn: () => this.setState({ mbDept: dd }),
+        bd: on ? '#101828' : '#EAECF0', bg: on ? '#101828' : '#fff', fg: on ? '#fff' : '#475467', weight: on ? 600 : 400 };
+    });
+    const alocOpt = [25, 50, 75, 100].map(a => {
+      const on = st.mbAloc === a;
+      return { label: a + '%', fn: () => this.setState({ mbAloc: a }),
+        bd: on ? '#101828' : '#EAECF0', bg: on ? '#101828' : '#fff', fg: on ? '#fff' : '#475467', weight: on ? 600 : 400 };
+    });
+    const acessoOpt = [
+      ['Administrador', 'Regista projectos, define roteiros, atribui funções e valida relatórios de toda a carteira.'],
+      ['Gestor de projecto', 'Gere os projectos onde é responsável: roteiro, atribuições e validação dos relatórios da sua equipa.'],
+      ['Colaborador', 'Vê apenas as suas tarefas e projectos, assinala conclusões e submete mini relatórios.'],
+    ].map(([label, nota]) => {
+      const on = st.mbAcesso === label;
+      return { label, nota, fn: () => this.setState({ mbAcesso: label }),
+        bd: on ? '#101828' : '#EAECF0', bg: on ? '#F9FAFB' : '#fff', dot: on ? '#101828' : '#D0D5DD' };
+    });
+    const projOpt = PROJ.slice(0, 5).map(x => {
+      const on = st.mbProjs.indexOf(x.id) >= 0;
+      return { label: x.nome, fn: () => this.setState({ mbProjs: on ? st.mbProjs.filter(i => i !== x.id) : st.mbProjs.concat(x.id) }),
+        bd: on ? '#101828' : '#EAECF0', bg: on ? '#F9FAFB' : '#fff', fg: on ? '#101828' : '#475467', weight: on ? 500 : 400 };
+    });
+    const mbNomeErro = st.mbTocado && !st.mbNome.trim() ? 'Indique o nome completo.' : false;
+    const mbEmailErro = st.mbTocado && !this.emailOk(st.mbEmail) ? (st.mbEmail.trim() ? 'Formato de email inválido.' : 'O email é a credencial de acesso.') : false;
+    const mbOk = st.mbNome.trim() && this.emailOk(st.mbEmail) && st.mbFuncao.trim();
+
+    const abrirNova = pid => () => this.setState({ novaOpen: true, ntProj: pid || st.ntProj, ntFase: 0, ntTocado: false });
+    const pill = on => ({ bd: on ? '#101828' : '#EAECF0', bg: on ? '#101828' : '#fff', fg: on ? '#fff' : '#475467', weight: on ? 600 : 400 });
+    const ntProjObj = PROJ.find(x => x.id === st.ntProj) || PROJ[0];
+    const ntProjOpt = PROJ.map(x => {
+      const on = st.ntProj === x.id;
+      return Object.assign({ label: x.nome, fn: () => this.setState({ ntProj: x.id, ntFase: 0 }) },
+        { bd: on ? '#101828' : '#EAECF0', bg: on ? '#F9FAFB' : '#fff', fg: on ? '#101828' : '#475467', weight: on ? 600 : 400 });
+    });
+    const ntFaseOpt = this.fasesDe(ntProjObj).map((f, i) => {
+      const o = st.ov[ntProjObj.id + ':' + i] || f;
+      const on = st.ntFase === i;
+      return Object.assign({ label: f.nome, periodo: this.dataCurta(o.s) + '–' + this.dataCurta(o.s + o.d), fn: () => this.setState({ ntFase: i }) },
+        { bd: on ? '#101828' : '#EAECF0', bg: on ? '#F9FAFB' : '#fff', fg: on ? '#101828' : '#475467', weight: on ? 600 : 400 });
+    });
+    const ntPessoaOpt = PESSOAS.map(x => {
+      const on = st.ntPessoa === x.nome;
+      const n = st.tarefas.filter(t => t.responsavel === x.nome && t.estado !== 'Concluída').length;
+      return { nome: x.nome, iniciais: this.ini(x.nome), fn: () => this.setState({ ntPessoa: x.nome }),
+        carga: n + (n === 1 ? ' tarefa aberta' : ' tarefas abertas'),
+        cargaFg: n >= 4 ? RED : n === 3 ? AMB : '#98A2B3',
+        bd: on ? '#101828' : '#EAECF0', bg: on ? '#F9FAFB' : '#fff', fg: on ? '#101828' : '#475467', weight: on ? 600 : 400,
+        avBg: on ? '#101828' : '#F2F4F7', avFg: on ? '#fff' : '#475467' };
+    });
+    const ntHorasOpt = [4, 8, 16, 40].map(h => Object.assign({ label: h + 'h', fn: () => this.setState({ ntHoras: h }) }, pill(st.ntHoras === h)));
+    const ntPrioOpt = ['Baixa', 'Normal', 'Crítica'].map(x => Object.assign({ label: x, fn: () => this.setState({ ntPrio: x }) }, pill(st.ntPrio === x)));
+    const ntAlertaOpt = ['1 dia', '3 dias', '1 semana'].map(x => Object.assign({ label: x, fn: () => this.setState({ ntAlerta: x }) }, pill(st.ntAlerta === x)));
+    const ntOff = this.dataParaOff(st.ntData);
+    const ntPassado = ntOff !== null && ntOff < HOJE;
+    const ntOk = st.ntTitulo.trim().length >= 4 && ntOff !== null && !ntPassado;
+
+    const tipoOpt = TIPOS.map(t => {
+      const on = st.npTipo === t;
+      const [tf, td] = this.tipoCor(t);
+      return { label: t, dot: td, fn: () => this.setState({ npTipo: t, npFases: MODELOS[t].map(([nome, semanas]) => ({ nome, semanas })) }),
+        bd: on ? '#101828' : '#EAECF0', bg: on ? '#F9FAFB' : '#fff', fg: on ? tf : '#475467', weight: on ? 600 : 400 };
+    });
+    const setNpFases = arr => this.setState({ npFases: arr });
+    let curNp = this.dataParaOff(st.npInicio);
+    const npFasesRows = st.npFases.map((f, i) => {
+      let periodo = '—';
+      if (curNp !== null) { const d = f.semanas * 7 - 2; periodo = this.dataCurta(curNp) + '–' + this.dataCurta(curNp + d); curNp += d + 2; }
+      return { i: i + 1, nome: f.nome, periodo, semanas: f.semanas + (f.semanas === 1 ? ' sem' : ' sem'),
+        setNome: e => setNpFases(st.npFases.map((x, k) => k === i ? { nome: e.target.value, semanas: x.semanas } : x)),
+        menos: () => setNpFases(st.npFases.map((x, k) => k === i ? { nome: x.nome, semanas: Math.max(1, x.semanas - 1) } : x)),
+        mais: () => setNpFases(st.npFases.map((x, k) => k === i ? { nome: x.nome, semanas: Math.min(26, x.semanas + 1) } : x)),
+        remover: () => { if (st.npFases.length > 1) setNpFases(st.npFases.filter((x, k) => k !== i)); } };
+    });
+    const npFaseAdd = () => setNpFases(st.npFases.concat({ nome: '', semanas: 2 }));
+
+    const pEdit = PROJ.find(x => x.id === st.fasesEditPid);
+    let fasesEdit = false, fasesRows = [];
+    if (pEdit) {
+      const [tf, td] = this.tipoCor(pEdit.tipo);
+      let cur = st.fasesDraft.length ? st.fasesDraft[0].s : 0;
+      fasesRows = st.fasesDraft.map((f, i) => {
+        const d = f.semanas * 7 - 2;
+        const periodo = this.dataCurta(cur) + '–' + this.dataCurta(cur + d);
+        cur += d + 2;
+        const [ef2, eb2] = this.estadoCor(f.estado);
+        const ordem = ['Planeada', 'Em curso', 'Concluída', 'Atrasada'];
+        return { nome: f.nome, periodo, estado: f.estado, estFg: ef2, estBg: eb2,
+          semanas: f.semanas + (f.semanas === 1 ? ' sem' : ' sem'),
+          vazio: !f.nome.trim(),
+          setNome: e => this.mudaFase(i, 'nome', e.target.value),
+          ciclo: () => this.mudaFase(i, 'estado', ordem[(ordem.indexOf(f.estado) + 1) % 4]),
+          menos: () => this.mudaFase(i, 'semanas', Math.max(1, f.semanas - 1)),
+          mais: () => this.mudaFase(i, 'semanas', Math.min(26, f.semanas + 1)),
+          remover: () => { if (st.fasesDraft.length > 1) this.setState({ fasesDraft: st.fasesDraft.filter((x, k) => k !== i) }); } };
+      });
+      fasesEdit = { nome: pEdit.nome, tipo: pEdit.tipo, tipoFg: tf, tipoDot: td,
+        resumo: st.fasesDraft.length + ' fases · ' + st.fasesDraft.reduce((a, f) => a + f.semanas, 0) + ' semanas de plano' };
+    }
+
+    return {
+      orgName: this.props.orgName ?? 'NEXORA',
+      euNome: eu.nome, euFuncao: eu.funcao, euIniciais: this.ini(eu.nome),
+      perfis: [['admin', 'Direcção'], ['colab', 'Colaborador']].map(([k, label]) => {
+        const on = st.perfil === k;
+        return { label, fn: () => this.setState({ perfil: k, route: k === 'admin' ? 'painel' : 'minhas', sel: null }),
+          bd: on ? '#101828' : '#EAECF0', bg: on ? '#101828' : '#fff', fg: on ? '#fff' : '#475467', weight: on ? 600 : 400 };
+      }),
+      nav, pageTitle: titulos[rota][0], pageSub: titulos[rota][1],
+      hoje: 'Sábado, 29 de Agosto de 2026',
+      isPainel: rota === 'painel', isProjectos: rota === 'projectos', isRoadmap: rota === 'roadmap',
+      isTarefas: rota === 'tarefas', isRelatorios: rota === 'relatorios', isEquipa: rota === 'equipa',
+      isMinhas: rota === 'minhas', isMeusProjectos: rota === 'meusprojectos', isMeusRelatorios: rota === 'meusrelatorios',
+      goTarefas: go('tarefas'), goProjectos: go('projectos'), goRelatorios: go('relatorios'), goRoadmap: () => this.setState({ route: 'roadmap', sel: null }),
+      toast, toastMsg: st.toastMsg, stop: e => e.stopPropagation(),
+      acaoPrincipal: admin ? (rota === 'equipa' ? 'Registar membro' : rota === 'tarefas' ? 'Atribuir tarefa' : 'Registar projecto') : 'Reportar avanço',
+      acaoPrincipalFn: admin
+        ? (rota === 'equipa' ? () => this.setState({ membroOpen: true, mbTocado: false })
+          : rota === 'tarefas' ? abrirNova(null) : () => this.setState({ novoOpen: true }))
+        : () => { const t = minhasAbertas[0]; if (t) t.fn(); },
+      acaoSec: admin ? 'Exportar' : 'Histórico',
+
+      focoTitulo: 'Três decisões suas estão a travar quatro projectos.',
+      focoNota: 'O parecer fiscal do Grupo Madal e os scanners da Seguradora Costa Sul são dependências externas; a terceira é uma decisão contabilística que só a Direcção pode tomar.',
+      resumo: [
+        { label: 'Avanço médio', value: '49%', sub: 'plano previa 55%', fg: '#101828' },
+        { label: 'Fora de prazo', value: String(atrasadas.length), sub: 'em 3 projectos', fg: RED },
+      ],
+      decisoes: [
+        { titulo: 'Parecer fiscal externo parado', detalhe: 'Central de facturação electrónica · pedido a 18 Ago', alerta: '11 dias em atraso', alertaFg: '#fff', alertaBg: '#D92D20', cor: '#F04438', acao: 'Escalar', fn: toast },
+        { titulo: 'Digitalização 40% abaixo do plano', detalhe: 'Arquivo contratual · dois scanners avariados', alerta: '2 dias em atraso', alertaFg: '#fff', alertaBg: '#D92D20', cor: '#F04438', acao: 'Decidir', fn: toast },
+        { titulo: '1 840 lançamentos sem centro de custo', detalhe: 'Migração do ERP · pedido de decisão da Direcção', alerta: 'Faltam 4 dias', alertaFg: '#475467', alertaBg: '#F2F4F7', cor: '#F79009', acao: 'Responder', fn: toast },
+      ],
+      avancos: projRows.slice(0, 5).map(x => ({ nome: x.nome, cliente: x.cliente, estagio: x.estagio, barra: x.barra, barraFg: x.barraFg, pct: x.pct, saudeCor: x.saudeCor, abrir: () => this.setState({ route: 'projectos', sel: x.id }) })),
+      prazos: st.tarefas.filter(t => t.estado !== 'Concluída').sort((a, b) => a.dl - b.dl).slice(0, 5).map(t => {
+        const al = this.alerta(t.dl, t.estado);
+        return { titulo: t.titulo, responsavel: t.responsavel, data: this.dataCurta(t.dl), alerta: al.txt, alertaFg: al.fg, alertaBg: al.bg };
+      }),
+
+      projectos: filtrar(st.filtro), filtros,
+
+      cols, gantt, escalas, janelaLabel,
+      mostraHoje: st.escala !== 'mes', hojeLeft: ((HOJE - j.ws) / j.len * 100).toFixed(2) + '%',
+      shiftBack: () => this.setState({ shift: st.shift - 1 }),
+      shiftFwd: () => this.setState({ shift: st.shift + 1 }),
+      shiftHoje: () => this.setState({ shift: 0 }),
+      dicaDrag: 'Arraste uma fase para a mover; arraste a aresta direita para alterar a duração.',
+      temEdicoes: nEdicoes > 0, nEdicoes,
+      reporRoteiro: () => { this.setState({ ov: {} }); this.flash('Roteiro reposto no plano original'); },
+
+      tarefas: tarefaRows, filtrosT,
+
+      relatorios: relRows,
+      leitura: 'Três dos seis relatórios desta semana trazem obstáculos, todos por dependência externa: parecer fiscal, equipamento avariado e uma decisão contabilística pendente. Nenhum é problema de capacidade da equipa.',
+      obstaculos: [
+        { tipo: 'Dependência externa', n: 3, barra: '100%', cor: '#F04438' },
+        { tipo: 'Decisão em falta', n: 2, barra: '66%', cor: '#F79009' },
+        { tipo: 'Âmbito alterado', n: 1, barra: '33%', cor: '#D0D5DD' },
+      ],
+
+      equipaNota: PESSOAS.length + ' pessoas · 1 convite pendente · níveis de acesso definem o que cada conta vê',
+      abrirMembro: () => this.setState({ membroOpen: true, mbTocado: false }),
+      equipa: PESSOAS.map((x, i) => {
+        const carga = [86, 72, 94, 68, 91, 57][i];
+        const pct = [92, 88, 74, 81, 69, 95][i];
+        const [af, ab] = this.acessoCor(x.acesso);
+        const pend = x.estado === 'Convite pendente';
+        return { nome: x.nome, funcao: x.funcao, email: x.email, departamento: x.dept, entrada: x.entrada,
+          iniciais: this.ini(x.nome), avBg: pend ? '#F2F4F7' : '#101828', avFg: pend ? '#98A2B3' : '#fff',
+          acesso: x.acesso, acessoFg: af, acessoBg: ab,
+          abertas: st.tarefas.filter(t => t.responsavel === x.nome && t.estado !== 'Concluída').length,
+          alocacao: x.alocacao + '%', pct: pct + '%', pctFg: pct >= 85 ? GRN : pct >= 75 ? AMB : RED,
+          carga: carga > 90 ? 'Sobrecarregada' : carga > 75 ? 'Alta' : 'Equilibrada',
+          cargaFg: carga > 90 ? RED : carga > 75 ? AMB : GRN, cargaBar: carga + '%',
+          cargaCor: carga > 90 ? '#F04438' : carga > 75 ? '#F79009' : '#12B76A',
+          estado: x.estado, estadoFg: pend ? AMB : '#98A2B3',
+          acao: pend ? 'Reenviar' : 'Editar',
+          fn: () => this.flash(pend ? 'Convite reenviado a ' + x.email : 'Ficha de ' + x.nome) };
+      }),
+
+      meuFoco: minhasAtrasadas.length
+        ? 'Tem ' + minhasAbertas.length + ' tarefas suas e ' + minhasAtrasadas.length + ' já passou do prazo.'
+        : 'Tem ' + minhasAbertas.length + ' tarefas suas, nenhuma fora de prazo.',
+      meuFocoNota: 'Ao assinalar uma tarefa como cumprida é obrigatório escrever o mini relatório da situação — é isso que a gestão lê.',
+      minhasTarefas: minhas,
+      meusProjectos: PROJ.filter(x => x.atribuicoes.some(a => a.pessoa === 'Cláudia Bila') || x.responsavel === 'Cláudia Bila').map(x => {
+        const [ef, eb] = this.estagioCor(x.estagio);
+        const minha = x.atribuicoes.filter(a => a.pessoa === 'Cláudia Bila').map(a => a.titulo);
+        return { nome: x.nome, cliente: x.cliente, responsavel: x.responsavel, estagio: x.estagio, estFg: ef, estBg: eb,
+          pct: x.pct + '%', barra: x.pct + '%', entrega: this.dataCurta(x.dl),
+          barraFg: x.saude === 'Atrasado' ? '#F04438' : x.saude === 'Em risco' ? '#F79009' : '#101828',
+          minhaParte: minha.length ? 'A sua parte: ' + minha.join(' · ') : 'Responsável pelo projecto' };
+      }),
+      meusRelatorios: relRows.filter(x => x.autor === 'Cláudia Bila'),
+
+      det, fechar: () => this.setState({ sel: null }),
+
+      novaOpen: st.novaOpen, abrirNovaTarefa: abrirNova(null),
+      fecharNova: () => this.setState({ novaOpen: false, ntTocado: false }),
+      ntTitulo: st.ntTitulo, ntDesc: st.ntDesc, ntData: st.ntData,
+      setNtTitulo: e => this.setState({ ntTitulo: e.target.value }),
+      setNtDesc: e => this.setState({ ntDesc: e.target.value }),
+      setNtData: e => this.setState({ ntData: e.target.value }),
+      ntProjOpt, ntFaseOpt, ntPessoaOpt, ntHorasOpt, ntPrioOpt, ntAlertaOpt,
+      ntTituloBd: st.ntTocado && st.ntTitulo.trim().length < 4 ? '#FDA29B' : '#D0D5DD',
+      ntTituloErro: st.ntTocado && st.ntTitulo.trim().length < 4 ? 'Escreva a tarefa de forma verificável — quem a receber tem de saber o que entregar.' : false,
+      ntDataBd: st.ntTocado && (ntOff === null || ntPassado) ? '#FDA29B' : '#D0D5DD',
+      ntDataNota: ntOff === null ? (st.ntData.trim() ? 'Use o formato dd/mm/aaaa.' : 'Sem deadline não há alerta nem acompanhamento.')
+        : ntPassado ? 'A deadline não pode ser anterior a hoje.' : 'Vence ' + this.dataLonga(ntOff) + ' · alerta ' + st.ntAlerta + ' antes',
+      ntDataNotaFg: ntOff === null || ntPassado ? (st.ntTocado ? RED : '#98A2B3') : '#98A2B3',
+      toggleNtRelatorio: () => this.setState({ ntRelatorio: !st.ntRelatorio }),
+      ntRelBg: st.ntRelatorio ? '#101828' : '#fff', ntRelBd: st.ntRelatorio ? '#101828' : '#D0D5DD',
+      ntRelMarca: st.ntRelatorio ? '✓' : '',
+      ntRelNota: st.ntRelatorio ? 'obrigatório' : 'basta marcar como feita',
+      criarTarefa: this.criarTarefa, criarBg: ntOk ? '#101828' : '#D0D5DD',
+      ntValid: ntOk ? ntProjObj.nome + ' · ' + (ntFaseOpt[st.ntFase] || ntFaseOpt[0] || { label: '—' }).label + ' · ' + st.ntPrio.toLowerCase()
+        : 'Tarefa e deadline válida são obrigatórios',
+      ntValidFg: ntOk ? '#98A2B3' : RED,
+
+      mt, mtTexto: st.mtTexto, setTexto: e => this.setState({ mtTexto: e.target.value }),
+      mtErro: st.mtTocado && !mtOk ? 'Escreva pelo menos uma frase completa: a gestão decide a partir deste texto.' : false,
+      situacoes, submeter: this.submeter, submeterBg: mtOk ? '#101828' : '#D0D5DD',
+      mtValid: mtOk ? 'Pronto a submeter' : 'Relatório obrigatório',
+      fecharModal: () => this.setState({ mtId: null, mtTocado: false }),
+
+      novoOpen: st.novoOpen, fecharNovo: () => this.setState({ novoOpen: false }),
+      npNome: st.npNome, npCliente: st.npCliente, npInicio: st.npInicio, npFim: st.npFim, npOrc: st.npOrc,
+      setNpNome: e => this.setState({ npNome: e.target.value }),
+      setNpCliente: e => this.setState({ npCliente: e.target.value }),
+      setNpInicio: e => this.setState({ npInicio: e.target.value }),
+      setNpFim: e => this.setState({ npFim: e.target.value }),
+      setNpOrc: e => this.setState({ npOrc: e.target.value }),
+      npFimBd: npDataOk ? '#D0D5DD' : '#FDA29B',
+      npErroData: npDataOk ? false : 'A deadline de entrega precisa do formato dd/mm/aaaa.',
+      estagiosOpt, pessoasOpt, alertaOpt, tipoOpt, npFasesRows, npFaseAdd,
+      npTipoNota: 'O modelo de fases muda com o tipo de projecto — pode reescrever, remover ou acrescentar fases.',
+      fasesEdit, fasesRows,
+      addFaseDraft: () => this.setState({ fasesDraft: st.fasesDraft.concat({ nome: '', estado: 'Planeada', nota: '', semanas: 2, s: 0 }) }),
+      gravarFases: this.gravarFases,
+      fecharFases: () => this.setState({ fasesEditPid: null }),
+      gravarNovo: this.gravarNovo, gravarBg: npOk ? '#101828' : '#D0D5DD',
+      npValid: npOk ? st.npPessoas.length + ' responsáveis · alerta ' + st.npAlerta + ' antes de cada deadline' : 'Nome, empresa e deadline são obrigatórios',
+      npValidFg: npOk ? '#98A2B3' : RED,
+
+      membroOpen: st.membroOpen, fecharMembro: () => this.setState({ membroOpen: false, mbTocado: false }),
+      mbNome: st.mbNome, mbEmail: st.mbEmail, mbFuncao: st.mbFuncao, mbTel: st.mbTel, mbEntrada: st.mbEntrada,
+      setMbNome: e => this.setState({ mbNome: e.target.value }),
+      setMbEmail: e => this.setState({ mbEmail: e.target.value }),
+      setMbFuncao: e => this.setState({ mbFuncao: e.target.value }),
+      setMbTel: e => this.setState({ mbTel: e.target.value }),
+      setMbEntrada: e => this.setState({ mbEntrada: e.target.value }),
+      mbNomeBd: mbNomeErro ? '#FDA29B' : '#D0D5DD',
+      mbEmailBd: mbEmailErro ? '#FDA29B' : '#D0D5DD',
+      mbFuncaoBd: st.mbTocado && !st.mbFuncao.trim() ? '#FDA29B' : '#D0D5DD',
+      mbNomeErro, mbEmailErro,
+      deptOpt, alocOpt, acessoOpt, projOpt,
+      toggleConvite: () => this.setState({ mbConvite: !st.mbConvite }),
+      conviteBg: st.mbConvite ? '#101828' : '#fff', conviteBd: st.mbConvite ? '#101828' : '#D0D5DD',
+      conviteMarca: st.mbConvite ? '✓' : '',
+      conviteNota: st.mbConvite ? 'expira em 7 dias' : 'conta criada inactiva',
+      gravarMembro: this.gravarMembro, mbBtnBg: mbOk ? '#101828' : '#D0D5DD',
+      mbBtnLabel: st.mbConvite ? 'Criar conta e convidar' : 'Criar conta',
+      mbValid: mbOk ? 'Acesso ' + st.mbAcesso + ' · ' + st.mbProjs.length + ' projectos atribuídos' : 'Nome, email válido e função são obrigatórios',
+      mbValidFg: mbOk ? '#98A2B3' : RED,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

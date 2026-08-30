@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: nexora-projectos-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nexora
+      POSTGRES_PASSWORD: nexora
+      POSTGRES_DB: nexora_projectos
+    ports:
+      - '5434:5432'
+    volumes:
+      - nexora-projectos-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U nexora -d nexora_projectos']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  nexora-projectos-data:

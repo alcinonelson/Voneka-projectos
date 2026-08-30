@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #F7F8FA; }
+  * { box-sizing: border-box; }
+  a { color: #2C5FF6; text-decoration: none; }
+  a:hover { color: #1E45C4; text-decoration: underline; }
+  input { font: inherit; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #D5D9E0; border-radius: 6px; border: 3px solid #F7F8FA; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  @keyframes nx-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+  @keyframes nx-drawer { from { transform: translateX(24px); opacity: .4; } to { transform: none; opacity: 1; } }
+  @keyframes nx-toast { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+</style>
+</helmet>
+
+<div style="width: 100%; height: 100vh; overflow-x: auto; overflow-y: hidden; background: #F7F8FA;">
+<div style="display: flex; height: 100vh; min-width: 1440px; overflow: hidden; font-family: 'Instrument Sans', system-ui, sans-serif; font-size: 13px; color: #101828; background: #F7F8FA; -webkit-font-smoothing: antialiased;">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside style="width: 236px; flex: 0 0 236px; background: #FFFFFF; border-right: 1px solid #EAECF0; display: flex; flex-direction: column;">
+    <div style="padding: 14px 14px 10px;">
+      <div style="display: flex; align-items: center; gap: 9px; padding: 7px 9px; border: 1px solid #EAECF0; border-radius: 8px; cursor: pointer;" style-hover="background: #F9FAFB;">
+        <svg viewBox="0 0 40 40" style="width: 28px; height: 28px; display: block; flex: 0 0 28px;">
+          <path d="M8 32 H10.8 V8 H8 Z" fill="#101828"></path>
+          <path d="M8 8 H12.2 L32 32 H27.6 Z" fill="#101828"></path>
+          <path d="M27.4 32 H32 V11.5 H27.4 Z" fill="#101828"></path>
+          <path d="M27.4 11.5 H32 V5.6 H27.4 Z" fill="#2C5FF6"></path>
+        </svg>
+        <span style="flex: 1; min-width: 0;">
+          <span style="display: block; font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ orgName }}</span>
+          <span style="display: block; font-size: 11px; color: #98A2B3;">Plano Professional</span>
+        </span>
+        <span style="font-size: 8px; color: #98A2B3;">▼</span>
+      </div>
+    </div>
+
+    <div style="padding: 4px 14px 12px;">
+      <div style="display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 9px; border: 1px solid #EAECF0; border-radius: 7px; cursor: pointer; color: #98A2B3;" style-hover="border-color: #D0D5DD;">
+        <span style="font-size: 12px;">⌕</span>
+        <span style="flex: 1; font-size: 12.5px;">Procurar</span>
+        <span style="font-size: 10.5px; border: 1px solid #EAECF0; border-radius: 4px; padding: 1px 4px; color: #98A2B3;">⌘K</span>
+      </div>
+    </div>
+
+    <div style="flex: 1; overflow-y: auto; padding: 0 8px 12px;">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="16">
+        <sc-if value="{{ n.isGroup }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 14px 10px 6px; font-size: 10.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #98A2B3;">{{ n.label }}</div>
+        </sc-if>
+        <sc-if value="{{ n.isItem }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ n.go }}" style="display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 10px; border-radius: 7px; cursor: pointer; font-size: 13px; background: {{ n.bg }}; color: {{ n.fg }}; font-weight: {{ n.weight }};" style-hover="background: #F4F5F7;">
+            <span style="width: 15px; text-align: center; font-size: 12px; color: {{ n.iconFg }};">{{ n.icon }}</span>
+            <span style="flex: 1;">{{ n.label }}</span>
+            <sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}">
+              <span style="min-width: 18px; height: 17px; padding: 0 5px; border-radius: 5px; background: {{ n.badgeBg }}; color: {{ n.badgeFg }}; font-size: 10.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums;">{{ n.badge }}</span>
+            </sc-if>
+          </div>
+        </sc-if>
+      </sc-for>
+    </div>
+
+    <div style="border-top: 1px solid #EAECF0; padding: 12px 14px;">
+      <div style="border: 1px solid #EAECF0; border-radius: 8px; padding: 10px 11px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 11.5px; color: #667085;">Saúde da operação</span>
+          <span style="font-size: 11.5px; font-weight: 600; color: #067647;">87/100</span>
+        </div>
+        <div style="height: 4px; border-radius: 2px; background: #EAECF0; margin-top: 8px; overflow: hidden;"><div style="height: 100%; width: 87%; background: #12B76A;"></div></div>
+        <div style="font-size: 11px; color: #98A2B3; margin-top: 8px;">+4 pontos em 30 dias</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 9px; margin-top: 12px; padding: 5px 2px; cursor: pointer;">
+        <span style="width: 26px; height: 26px; border-radius: 50%; background: #101828; color: #fff; font-size: 10.5px; font-weight: 600; display: flex; align-items: center; justify-content: center;">AM</span>
+        <span style="flex: 1; min-width: 0;">
+          <span style="display: block; font-size: 12px; font-weight: 500;">Alcino Maido</span>
+          <span style="display: block; font-size: 10.5px; color: #98A2B3;">Direcção Financeira</span>
+        </span>
+        <span style="font-size: 11px; color: #98A2B3;">⌄</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <div style="flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative;">
+
+    <header style="height: 60px; flex: 0 0 60px; background: #fff; border-bottom: 1px solid #EAECF0; display: flex; align-items: center; padding: 0 24px; gap: 16px;">
+      <div style="min-width: 0;">
+        <div style="font-size: 16px; font-weight: 600; letter-spacing: -.01em;">{{ pageTitle }}</div>
+        <div style="font-size: 12px; color: #667085; margin-top: 2px;">{{ pageSub }}</div>
+      </div>
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 7px; height: 32px; padding: 0 11px; border: 1px solid #EAECF0; border-radius: 7px; font-size: 12.5px; cursor: pointer; background: #fff;" style-hover="border-color: #D0D5DD;">
+          <span style="color: #667085;">Agosto 2026</span><span style="font-size: 8px; color: #98A2B3;">▼</span>
+        </div>
+        <div onClick="{{ toast }}" style="height: 32px; padding: 0 12px; display: flex; align-items: center; border: 1px solid #EAECF0; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; background: #fff;" style-hover="border-color: #D0D5DD;">Exportar</div>
+        <div onClick="{{ toast }}" style="height: 32px; padding: 0 13px; display: flex; align-items: center; gap: 7px; background: #101828; color: #fff; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer;" style-hover="background: #1D2939;">
+          <span style="font-size: 13px;">+</span>{{ primaryAction }}
+        </div>
+      </div>
+    </header>
+
+    <main style="flex: 1; overflow-y: auto; padding: 20px 24px 44px;">
+
+      <!-- =============== DASHBOARD =============== -->
+      <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+        <div style="animation: nx-in .24s ease both; display: flex; flex-direction: column; gap: 18px;">
+
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+            <sc-for list="{{ tiles }}" as="t" hint-placeholder-count="4">
+              <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; padding: 15px 16px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-size: 12px; color: #667085; font-weight: 500;">{{ t.label }}</span>
+                  <span style="font-size: 11px; font-weight: 600; color: {{ t.deltaFg }}; background: {{ t.deltaBg }}; padding: 2px 6px; border-radius: 5px;">{{ t.delta }}</span>
+                </div>
+                <div style="font-size: 26px; font-weight: 600; letter-spacing: -.02em; margin-top: 12px; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ t.value }}</div>
+                <div style="font-size: 11.5px; color: #98A2B3; margin-top: 6px;">{{ t.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-bottom: 1px solid #EAECF0;">
+              <span style="font-size: 13.5px; font-weight: 600;">Precisa de acção</span>
+              <span style="font-size: 11.5px; color: #667085; background: #F2F4F7; padding: 2px 7px; border-radius: 5px; font-weight: 500;">6 itens</span>
+              <span onClick="{{ goWatch }}" style="margin-left: auto; font-size: 12.5px; color: #2C5FF6; cursor: pointer; font-weight: 500;">Ver todos</span>
+            </div>
+            <sc-for list="{{ acoes }}" as="a" hint-placeholder-count="4">
+              <div style="display: flex; align-items: center; gap: 14px; padding: 13px 16px; border-bottom: 1px solid #F2F4F7;" style-hover="background: #FCFCFD;">
+                <span style="width: 22px; height: 22px; border-radius: 6px; background: {{ a.iconBg }}; color: {{ a.iconFg }}; font-size: 11px; display: flex; align-items: center; justify-content: center; flex: 0 0 22px;">{{ a.icone }}</span>
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-size: 13px; font-weight: 500;">{{ a.titulo }}</div>
+                  <div style="font-size: 11.5px; color: #667085; margin-top: 3px;">{{ a.detalhe }}</div>
+                </div>
+                <span style="font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ a.valor }}</span>
+                <span style="font-size: 11.5px; color: #98A2B3; width: 92px; text-align: right;">{{ a.prazo }}</span>
+                <span onClick="{{ a.fn }}" style="height: 30px; padding: 0 13px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; background: #fff; white-space: nowrap;" style-hover="background: #101828; color: #fff; border-color: #101828;">{{ a.acao }}</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.55fr 1fr; gap: 14px;">
+            <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px;">
+              <div style="display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid #EAECF0;">
+                <span style="font-size: 13.5px; font-weight: 600;">Caixa projectada</span>
+                <span style="font-size: 11.5px; color: #667085;">Próximos 90 dias</span>
+                <span style="margin-left: auto; font-size: 11.5px; color: #B42318; background: #FEF3F2; padding: 2px 7px; border-radius: 5px; font-weight: 500;">1 semana sob pressão</span>
+              </div>
+              <div style="padding: 16px 16px 10px;">
+                <svg viewBox="0 0 700 180" style="width: 100%; height: 180px; display: block;">
+                  <defs>
+                    <linearGradient id="nxA" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#2C5FF6" stop-opacity="0.14" />
+                      <stop offset="100%" stop-color="#2C5FF6" stop-opacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <line x1="0" y1="24" x2="700" y2="24" stroke="#F2F4F7"></line>
+                  <line x1="0" y1="70" x2="700" y2="70" stroke="#F2F4F7"></line>
+                  <line x1="0" y1="116" x2="700" y2="116" stroke="#F2F4F7"></line>
+                  <line x1="0" y1="152" x2="700" y2="152" stroke="#EAECF0"></line>
+                  <rect x="498" y="0" width="66" height="152" fill="#B42318" opacity="0.05"></rect>
+                  <path d="M0 84 L58 78 L117 92 L175 74 L233 88 L292 66 L350 84 L408 104 L467 120 L525 140 L583 124 L642 106 L700 96 L700 152 L0 152 Z" fill="url(#nxA)"></path>
+                  <polyline points="0,84 58,78 117,92 175,74 233,88 292,66 350,84 408,104 467,120 525,140 583,124 642,106 700,96" fill="none" stroke="#2C5FF6" stroke-width="2"></polyline>
+                  <line x1="0" y1="134" x2="700" y2="134" stroke="#D0D5DD" stroke-width="1" stroke-dasharray="4 4"></line>
+                  <circle cx="525" cy="140" r="4" fill="#fff" stroke="#B42318" stroke-width="2"></circle>
+                </svg>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: #98A2B3; font-variant-numeric: tabular-nums;">
+                  <span>Hoje</span><span>Set</span><span>Out</span><span>Nov</span>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-top: 1px solid #F2F4F7;">
+                <span style="font-size: 12.5px; color: #475467;">Semana de 18 Out: saldo desce a <strong style="font-weight: 600; color: #101828;">612 000 MT</strong>, abaixo do mínimo de 800 000 MT.</span>
+                <span onClick="{{ goTesouraria }}" style="margin-left: auto; font-size: 12.5px; color: #2C5FF6; cursor: pointer; font-weight: 500; white-space: nowrap;">Ver previsão</span>
+              </div>
+            </div>
+
+            <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px;">
+              <div style="display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-bottom: 1px solid #EAECF0;">
+                <span style="font-size: 13.5px; font-weight: 600;">Despesa por categoria</span>
+                <span style="margin-left: auto; font-size: 12px; color: #667085; font-variant-numeric: tabular-nums;">1 932 400 MT</span>
+              </div>
+              <div style="padding: 6px 16px 14px;">
+                <sc-for list="{{ categorias }}" as="c" hint-placeholder-count="5">
+                  <div style="padding: 11px 0; border-bottom: 1px solid #F2F4F7;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <span style="font-size: 12.5px; flex: 1;">{{ c.nome }}</span>
+                      <span style="font-size: 12.5px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ c.valor }}</span>
+                      <span style="font-size: 11.5px; color: #98A2B3; width: 30px; text-align: right; font-variant-numeric: tabular-nums;">{{ c.pct }}%</span>
+                    </div>
+                    <div style="height: 4px; border-radius: 2px; background: #F2F4F7; margin-top: 8px; overflow: hidden;"><div style="height: 100%; width: {{ c.pct }}%; background: {{ c.cor }};"></div></div>
+                  </div>
+                </sc-for>
+                <div style="font-size: 11.5px; color: #667085; margin-top: 12px; line-height: 1.5;">Serviços cresceram 34% face a Julho — quase tudo num só fornecedor. <span onClick="{{ goFornecedores }}" style="color: #2C5FF6; cursor: pointer; font-weight: 500;">Analisar</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== ALERTAS (WATCH) =============== -->
+      <sc-if value="{{ isWatch }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <sc-for list="{{ sevFiltros }}" as="s" hint-placeholder-count="4">
+              <div onClick="{{ s.set }}" style="display: flex; align-items: center; gap: 7px; height: 30px; padding: 0 11px; border: 1px solid {{ s.borda }}; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; background: {{ s.bg }}; color: {{ s.fg }};" style-hover="border-color: #D0D5DD;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: {{ s.dot }};"></span>{{ s.label }}
+                <span style="color: #98A2B3; font-variant-numeric: tabular-nums;">{{ s.n }}</span>
+              </div>
+            </sc-for>
+            <div style="margin-left: auto; font-size: 12px; color: #667085;">Regras do WATCH avaliadas a cada 15 minutos · último ciclo às 08:15</div>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px;">
+            <div style="display: grid; grid-template-columns: 120px 1fr 130px 110px 130px 200px; gap: 14px; padding: 10px 16px; border-bottom: 1px solid #EAECF0; font-size: 11px; font-weight: 600; color: #667085;">
+              <span>Severidade</span><span>Alerta</span><span style="text-align: right;">Valor</span><span>Detectado</span><span>Responsável</span><span></span>
+            </div>
+            <sc-for list="{{ alertas }}" as="a" hint-placeholder-count="6">
+              <div style="display: grid; grid-template-columns: 120px 1fr 130px 110px 130px 200px; gap: 14px; align-items: center; padding: 13px 16px; border-bottom: 1px solid #F2F4F7;" style-hover="background: #FCFCFD;">
+                <span><span style="display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 5px; font-size: 11.5px; font-weight: 600; background: {{ a.sevBg }}; color: {{ a.sevFg }};"><span style="width: 5px; height: 5px; border-radius: 50%; background: {{ a.sevFg }};"></span>{{ a.sev }}</span></span>
+                <span>
+                  <span style="display: block; font-size: 13px; font-weight: 500;">{{ a.titulo }}</span>
+                  <span style="display: block; font-size: 11.5px; color: #667085; margin-top: 3px;">{{ a.detalhe }}</span>
+                </span>
+                <span style="text-align: right; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ a.valor }}</span>
+                <span style="font-size: 12px; color: #667085;">{{ a.quando }}</span>
+                <span style="font-size: 12px; color: #475467;">{{ a.responsavel }}</span>
+                <span style="display: flex; gap: 8px; justify-content: flex-end;">
+                  <span onClick="{{ a.resolve }}" style="height: 30px; padding: 0 12px; display: flex; align-items: center; background: #101828; color: #fff; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer; white-space: nowrap;" style-hover="background: #1D2939;">{{ a.acao }}</span>
+                  <span onClick="{{ toast }}" style="height: 30px; padding: 0 11px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; cursor: pointer; background: #fff; white-space: nowrap;" style-hover="border-color: #98A2B3;">Adiar</span>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+            <sc-for list="{{ watchKpis }}" as="k" hint-placeholder-count="4">
+              <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; padding: 14px 16px;">
+                <div style="font-size: 12px; color: #667085;">{{ k.label }}</div>
+                <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 9px;">
+                  <span style="font-size: 21px; font-weight: 600; font-variant-numeric: tabular-nums;">{{ k.valor }}</span>
+                  <span style="font-size: 11.5px; font-weight: 500; color: {{ k.cor }};">{{ k.delta }}</span>
+                </div>
+                <div style="height: 3px; border-radius: 2px; background: #F2F4F7; margin-top: 11px; overflow: hidden;"><div style="height: 100%; width: {{ k.pct }}%; background: {{ k.cor }};"></div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== DESPESAS =============== -->
+      <sc-if value="{{ isDespesas }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 20px; border-bottom: 1px solid #EAECF0;">
+            <sc-for list="{{ vistas }}" as="v" hint-placeholder-count="4">
+              <div onClick="{{ v.set }}" style="display: flex; align-items: center; gap: 7px; padding: 0 0 11px; cursor: pointer; font-size: 13px; color: {{ v.fg }}; font-weight: {{ v.weight }}; box-shadow: {{ v.underline }};">
+                {{ v.label }}<span style="font-size: 11px; color: #98A2B3; background: #F2F4F7; padding: 1px 6px; border-radius: 5px; font-variant-numeric: tabular-nums;">{{ v.n }}</span>
+              </div>
+            </sc-for>
+            <span onClick="{{ toast }}" style="margin-left: auto; padding-bottom: 11px; font-size: 12.5px; color: #2C5FF6; cursor: pointer; font-weight: 500;">Guardar vista</span>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 11px; border: 1px solid #EAECF0; border-radius: 7px; background: #fff; font-size: 12.5px; color: #667085; min-width: 220px;">
+              <span style="font-size: 12px;">⌕</span><span>Fornecedor, referência ou valor</span>
+            </div>
+            <sc-for list="{{ chips }}" as="c" hint-placeholder-count="4">
+              <div onClick="{{ toast }}" style="display: flex; align-items: center; gap: 7px; height: 32px; padding: 0 11px; border: 1px dashed #D0D5DD; border-radius: 7px; font-size: 12.5px; cursor: pointer; background: #fff; color: #475467;" style-hover="border-color: #98A2B3; border-style: solid;">
+                <span style="color: #98A2B3;">+</span>{{ c }}
+              </div>
+            </sc-for>
+            <div style="margin-left: auto; font-size: 12px; color: #667085;">{{ resumoFrase }}</div>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; overflow: hidden;">
+            <div style="display: grid; grid-template-columns: 36px 1.9fr 1fr 0.9fr 1.2fr 1.3fr 36px; gap: 14px; align-items: center; padding: 10px 16px; border-bottom: 1px solid #EAECF0; font-size: 11px; font-weight: 600; color: #667085;">
+              <span onClick="{{ toggleTodas }}" style="width: 15px; height: 15px; border: 1px solid {{ todasBorda }}; border-radius: 4px; background: {{ todasFundo }}; color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer;">{{ todasMarca }}</span>
+              <span>Fornecedor</span><span style="text-align: right;">Valor</span><span>Vencimento</span><span>Rubrica · projecto</span><span>Estado</span><span></span>
+            </div>
+            <sc-for list="{{ despesas }}" as="d" hint-placeholder-count="10">
+              <div onClick="{{ d.open }}" style="display: grid; grid-template-columns: 36px 1.9fr 1fr 0.9fr 1.2fr 1.3fr 36px; gap: 14px; align-items: center; padding: 12px 16px; border-bottom: 1px solid #F2F4F7; cursor: pointer; background: {{ d.rowBg }};" style-hover="background: #FCFCFD;">
+                <span onClick="{{ d.pick }}" style="width: 15px; height: 15px; border: 1px solid {{ d.cbBorda }}; border-radius: 4px; background: {{ d.cbFundo }}; color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer;">{{ d.cbMarca }}</span>
+                <span style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                  <span style="width: 26px; height: 26px; border-radius: 6px; background: #F2F4F7; color: #475467; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: 0 0 26px;">{{ d.sigla }}</span>
+                  <span style="min-width: 0;">
+                    <span style="display: block; font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ d.fornecedor }}</span>
+                    <span style="display: block; font-size: 11.5px; color: #98A2B3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ d.descricao }}</span>
+                  </span>
+                </span>
+                <span style="text-align: right; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ d.valor }}</span>
+                <span style="font-size: 12.5px; color: {{ d.vencCor }}; font-variant-numeric: tabular-nums;">{{ d.vencimento }}</span>
+                <span style="min-width: 0;">
+                  <span style="display: block; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ d.rubrica }}</span>
+                  <span style="display: block; font-size: 11.5px; color: #98A2B3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ d.projecto }}</span>
+                </span>
+                <span><span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 5px; font-size: 11.5px; font-weight: 600; background: {{ d.estadoBg }}; color: {{ d.estadoFg }};"><span style="width: 5px; height: 5px; border-radius: 50%; background: {{ d.estadoFg }};"></span>{{ d.estado }}</span></span>
+                <span style="color: #C4CBD6; font-size: 13px; text-align: right;">›</span>
+              </div>
+            </sc-for>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; font-size: 12px; color: #667085;">
+              <span>1–10 de 214</span>
+              <div style="display: flex; gap: 8px;">
+                <span style="height: 28px; padding: 0 10px; display: flex; align-items: center; border: 1px solid #EAECF0; border-radius: 6px; cursor: pointer; color: #98A2B3;">Anterior</span>
+                <span style="height: 28px; padding: 0 10px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 6px; cursor: pointer; font-weight: 500;">Seguinte</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== APROVAÇÕES =============== -->
+      <sc-if value="{{ isAprovacoes }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both; display: grid; grid-template-columns: 1fr 300px; gap: 16px; align-items: start;">
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-bottom: 1px solid #EAECF0;">
+              <span style="font-size: 13.5px; font-weight: 600;">Na sua fila</span>
+              <span style="font-size: 11.5px; color: #667085; background: #F2F4F7; padding: 2px 7px; border-radius: 5px; font-weight: 500;">{{ nAprov }}</span>
+              <span onClick="{{ aprovarTodas }}" style="margin-left: auto; height: 30px; padding: 0 12px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer;" style-hover="border-color: #98A2B3;">Aprovar as que cumprem a política</span>
+            </div>
+            <sc-for list="{{ aprovacoes }}" as="a" hint-placeholder-count="4">
+              <div style="padding: 16px; border-bottom: 1px solid #F2F4F7;" style-hover="background: #FCFCFD;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                  <span style="width: 30px; height: 30px; border-radius: 7px; background: #F2F4F7; color: #475467; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: 0 0 30px;">{{ a.sigla }}</span>
+                  <div style="flex: 1; min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 9px;">
+                      <span style="font-size: 13.5px; font-weight: 600;">{{ a.fornecedor }}</span>
+                      <span style="font-size: 11.5px; color: #98A2B3; font-variant-numeric: tabular-nums;">{{ a.ref }}</span>
+                      <span style="display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; background: {{ a.polBg }}; color: {{ a.polFg }};">{{ a.politica }}</span>
+                    </div>
+                    <div style="font-size: 12px; color: #667085; margin-top: 4px;">{{ a.descricao }}</div>
+                  </div>
+                  <div style="text-align: right;">
+                    <div style="font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ a.valor }}</div>
+                    <div style="font-size: 11.5px; color: {{ a.prazoFg }}; margin-top: 3px;">{{ a.prazo }}</div>
+                  </div>
+                  <div style="display: flex; gap: 8px;">
+                    <span onClick="{{ a.aprovar }}" style="height: 32px; padding: 0 15px; display: flex; align-items: center; background: #101828; color: #fff; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer;" style-hover="background: #1D2939;">Aprovar</span>
+                    <span onClick="{{ toast }}" style="height: 32px; padding: 0 12px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; cursor: pointer; background: #fff;" style-hover="border-color: #98A2B3;">Devolver</span>
+                    <span onClick="{{ a.open }}" style="height: 32px; width: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 13px; cursor: pointer; background: #fff; color: #667085;" style-hover="border-color: #98A2B3;">›</span>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 22px; margin-top: 13px; padding: 10px 12px; background: #FCFCFD; border: 1px solid #F2F4F7; border-radius: 8px;">
+                  <span style="font-size: 12px; color: #475467;"><strong style="font-weight: 600;">Política:</strong> {{ a.regra }}</span>
+                  <span style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+                    <sc-for list="{{ a.aprovadores }}" as="p" hint-placeholder-count="2">
+                      <span style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #475467;">
+                        <span style="width: 20px; height: 20px; border-radius: 50%; background: {{ p.bg }}; color: {{ p.fg }}; font-size: 9.5px; font-weight: 600; display: flex; align-items: center; justify-content: center;">{{ p.sigla }}</span>{{ p.estado }}
+                      </span>
+                    </sc-for>
+                  </span>
+                </div>
+                <div style="display: flex; gap: 26px; margin-top: 11px; font-size: 11.5px; color: #667085;">
+                  <span>Rubrica <strong style="color: #344054; font-weight: 500;">{{ a.rubrica }}</strong></span>
+                  <span>Fonte <strong style="color: #344054; font-weight: 500;">{{ a.fonte }}</strong></span>
+                  <span>Saldo disponível <strong style="color: #067647; font-weight: 500;">{{ a.saldo }}</strong></span>
+                  <span>Verificação <strong style="color: #344054; font-weight: 500;">{{ a.verificacao }}</strong></span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; padding: 14px 16px;">
+              <div style="font-size: 12.5px; font-weight: 600;">Tempo de ciclo</div>
+              <div style="display: flex; flex-direction: column; gap: 11px; margin-top: 13px;">
+                <sc-for list="{{ tempos }}" as="t" hint-placeholder-count="3">
+                  <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                      <span style="color: #475467;">{{ t.nome }}</span>
+                      <span style="font-weight: 600; font-variant-numeric: tabular-nums; color: {{ t.cor }};">{{ t.valor }}</span>
+                    </div>
+                    <div style="height: 4px; border-radius: 2px; background: #F2F4F7; margin-top: 6px; overflow: hidden;"><div style="height: 100%; width: {{ t.pct }}%; background: {{ t.cor }};"></div></div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font-size: 11.5px; color: #667085; margin-top: 13px; line-height: 1.5;">Meta interna: 2 dias. A Administração é o passo que trava o ciclo.</div>
+            </div>
+            <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; padding: 14px 16px;">
+              <div style="font-size: 12.5px; font-weight: 600;">Delegação activa</div>
+              <div style="font-size: 12px; color: #475467; margin-top: 10px; line-height: 1.6;">24–31 Ago: aprovações até 500 000 MT seguem para <strong style="font-weight: 600;">Helena Cossa</strong>.</div>
+              <div onClick="{{ toast }}" style="margin-top: 12px; height: 30px; display: flex; align-items: center; justify-content: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer;" style-hover="border-color: #98A2B3;">Gerir delegações</div>
+            </div>
+            <div style="background: #FCFCFD; border: 1px solid #EAECF0; border-radius: 10px; padding: 14px 16px; font-size: 11.5px; color: #667085; line-height: 1.6;">Segregação de funções activa: ninguém cria, aprova e paga a mesma despesa. O sistema recusa e registta a tentativa.</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== PAGAMENTOS =============== -->
+      <sc-if value="{{ isPagamentos }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both; display: flex; flex-direction: column; gap: 14px;">
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; display: grid; grid-template-columns: repeat(6, 1fr);">
+            <sc-for list="{{ pipeline }}" as="p" hint-placeholder-count="6">
+              <div style="padding: 14px 16px; border-right: 1px solid #F2F4F7;">
+                <div style="display: flex; align-items: center; gap: 7px;">
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background: {{ p.cor }};"></span>
+                  <span style="font-size: 12px; color: #667085;">{{ p.nome }}</span>
+                </div>
+                <div style="font-size: 20px; font-weight: 600; margin-top: 9px; font-variant-numeric: tabular-nums;">{{ p.n }}</div>
+                <div style="font-size: 11.5px; color: #98A2B3; margin-top: 4px; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ p.valor }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-bottom: 1px solid #EAECF0;">
+              <span style="font-size: 13.5px; font-weight: 600;">Fila de pagamento</span>
+              <span style="font-size: 11.5px; color: #667085;">A conta de origem é determinada pela fonte de financiamento</span>
+              <span onClick="{{ criarLote }}" style="margin-left: auto; height: 30px; padding: 0 13px; display: flex; align-items: center; background: #101828; color: #fff; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer;" style-hover="background: #1D2939;">Criar lote</span>
+              <span onClick="{{ toast }}" style="height: 30px; padding: 0 12px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer;" style-hover="border-color: #98A2B3;">Ficheiro bancário</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.8fr 1fr 0.9fr 1.5fr 1.1fr 1.1fr; gap: 14px; padding: 10px 16px; border-bottom: 1px solid #EAECF0; font-size: 11px; font-weight: 600; color: #667085;">
+              <span>Beneficiário</span><span style="text-align: right;">Valor</span><span>Vence</span><span>Conta de origem</span><span>Fonte</span><span>Estado</span>
+            </div>
+            <sc-for list="{{ fila }}" as="f" hint-placeholder-count="6">
+              <div style="display: grid; grid-template-columns: 1.8fr 1fr 0.9fr 1.5fr 1.1fr 1.1fr; gap: 14px; align-items: center; padding: 12px 16px; border-bottom: 1px solid #F2F4F7;" style-hover="background: #FCFCFD;">
+                <span style="font-size: 13px; font-weight: 500;">{{ f.nome }}</span>
+                <span style="text-align: right; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ f.valor }}</span>
+                <span style="font-size: 12.5px; color: {{ f.vencCor }};">{{ f.vencimento }}</span>
+                <span style="font-size: 12px; color: #475467; font-variant-numeric: tabular-nums;">{{ f.conta }}</span>
+                <span style="font-size: 12px; color: #475467;">{{ f.fonte }}</span>
+                <span><span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 5px; font-size: 11.5px; font-weight: 600; background: {{ f.bg }}; color: {{ f.fg }};"><span style="width: 5px; height: 5px; border-radius: 50%; background: {{ f.fg }};"></span>{{ f.estado }}</span></span>
+              </div>
+            </sc-for>
+            <div style="display: flex; align-items: center; gap: 30px; padding: 13px 16px; background: #FCFCFD;">
+              <span style="font-size: 12px; color: #667085;">Total da fila <strong style="font-size: 14px; color: #101828; font-weight: 600; margin-left: 7px; font-variant-numeric: tabular-nums;">1 286 900 MT</strong></span>
+              <span style="font-size: 12px; color: #667085;">Vence em 7 dias <strong style="font-size: 14px; color: #B54708; font-weight: 600; margin-left: 7px; font-variant-numeric: tabular-nums;">742 300 MT</strong></span>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== RECONCILIAÇÃO =============== -->
+      <sc-if value="{{ isReconciliacao }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both; display: flex; flex-direction: column; gap: 14px;">
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; padding: 15px 16px; display: flex; align-items: center; gap: 26px;">
+            <div>
+              <div style="font-size: 12px; color: #667085;">Extrato BCI 1234567 · Agosto</div>
+              <div style="display: flex; align-items: baseline; gap: 9px; margin-top: 8px;">
+                <span style="font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums;">{{ reconciliados }}</span>
+                <span style="font-size: 12.5px; color: #667085;">de 128 movimentos correspondidos</span>
+              </div>
+            </div>
+            <div style="flex: 1; max-width: 340px;">
+              <div style="height: 6px; border-radius: 3px; background: #F2F4F7; overflow: hidden;"><div style="height: 100%; width: 96%; background: #12B76A;"></div></div>
+              <div style="font-size: 11.5px; color: #667085; margin-top: 9px;">{{ propostosN }} propostas por confirmar · 7 sem correspondência</div>
+            </div>
+            <div style="margin-left: auto; display: flex; gap: 8px;">
+              <div onClick="{{ toast }}" style="height: 32px; padding: 0 12px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer;" style-hover="border-color: #98A2B3;">Importar extrato</div>
+              <div onClick="{{ confirmarTodas }}" style="height: 32px; padding: 0 14px; display: flex; align-items: center; background: #101828; color: #fff; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer;" style-hover="background: #1D2939;">Confirmar todas as propostas</div>
+            </div>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; overflow: hidden;">
+            <div style="display: grid; grid-template-columns: 1fr 130px 1fr 110px; gap: 16px; padding: 10px 16px; border-bottom: 1px solid #EAECF0; font-size: 11px; font-weight: 600; color: #667085;">
+              <span>Movimento no banco</span><span style="text-align: center;">Correspondência</span><span>Despesa no NEXORA</span><span></span>
+            </div>
+            <sc-for list="{{ propostas }}" as="m" hint-placeholder-count="5">
+              <div style="display: grid; grid-template-columns: 1fr 130px 1fr 110px; gap: 16px; align-items: center; padding: 13px 16px; border-bottom: 1px solid #F2F4F7;" style-hover="background: #FCFCFD;">
+                <div>
+                  <div style="font-size: 12.5px; font-weight: 500;">{{ m.descBanco }}</div>
+                  <div style="font-size: 11.5px; color: #98A2B3; margin-top: 3px; font-variant-numeric: tabular-nums;">{{ m.dataBanco }} · {{ m.valorBanco }}</div>
+                </div>
+                <div style="text-align: center;">
+                  <span style="display: inline-block; padding: 3px 9px; border-radius: 5px; font-size: 11.5px; font-weight: 600; background: {{ m.confBg }}; color: {{ m.confFg }};">{{ m.confTexto }} · {{ m.conf }}%</span>
+                </div>
+                <div>
+                  <div style="font-size: 12.5px; font-weight: 500;">{{ m.descNexora }}</div>
+                  <div style="font-size: 11.5px; color: #98A2B3; margin-top: 3px; font-variant-numeric: tabular-nums;">{{ m.refNexora }} · {{ m.valorNexora }}</div>
+                </div>
+                <div style="display: flex; gap: 7px; justify-content: flex-end;">
+                  <span onClick="{{ m.confirmar }}" style="height: 29px; padding: 0 12px; display: flex; align-items: center; background: #101828; color: #fff; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer;" style-hover="background: #1D2939;">Confirmar</span>
+                  <span onClick="{{ toast }}" style="height: 29px; width: 29px; display: flex; align-items: center; justify-content: center; border: 1px solid #D0D5DD; border-radius: 6px; font-size: 12px; cursor: pointer; color: #667085; background: #fff;" style-hover="border-color: #98A2B3;">⋯</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 9px; padding: 13px 16px; border-bottom: 1px solid #EAECF0;">
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: #B42318;"></span>
+              <span style="font-size: 13.5px; font-weight: 600;">Sem correspondência</span>
+              <span style="font-size: 11.5px; color: #667085;">Exigem decisão · 1 452 850 MT em causa</span>
+            </div>
+            <sc-for list="{{ semPar }}" as="s" hint-placeholder-count="3">
+              <div style="display: flex; align-items: center; gap: 16px; padding: 12px 16px; border-bottom: 1px solid #F2F4F7;" style-hover="background: #FCFCFD;">
+                <span style="flex: 1; font-size: 12.5px;">{{ s.desc }}</span>
+                <span style="font-size: 11.5px; color: #98A2B3;">{{ s.data }}</span>
+                <span style="font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; width: 130px; text-align: right;">{{ s.valor }}</span>
+                <span onClick="{{ toast }}" style="height: 29px; padding: 0 12px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; background: #fff; white-space: nowrap;" style-hover="border-color: #98A2B3;">{{ s.acao }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== EXCEPÇÕES =============== -->
+      <sc-if value="{{ isExcepcoes }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+            <sc-for list="{{ excResumo }}" as="e" hint-placeholder-count="3">
+              <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; padding: 14px 16px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background: {{ e.cor }};"></span>
+                  <span style="font-size: 12px; color: #667085;">{{ e.label }}</span>
+                </div>
+                <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 9px;">
+                  <span style="font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums;">{{ e.n }}</span>
+                  <span style="font-size: 12.5px; color: #667085; font-variant-numeric: tabular-nums;">{{ e.valor }}</span>
+                </div>
+                <div style="font-size: 11.5px; color: #98A2B3; margin-top: 5px;">{{ e.nota }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; overflow: hidden;">
+            <div style="display: grid; grid-template-columns: 150px 1fr 120px 100px 120px 150px; gap: 14px; padding: 10px 16px; border-bottom: 1px solid #EAECF0; font-size: 11px; font-weight: 600; color: #667085;">
+              <span>Tipo</span><span>Situação</span><span style="text-align: right;">Valor</span><span>Aberta há</span><span>Responsável</span><span></span>
+            </div>
+            <sc-for list="{{ excepcoes }}" as="e" hint-placeholder-count="6">
+              <div style="display: grid; grid-template-columns: 150px 1fr 120px 100px 120px 150px; gap: 14px; align-items: center; padding: 12px 16px; border-bottom: 1px solid #F2F4F7;" style-hover="background: #FCFCFD;">
+                <span><span style="display: inline-block; padding: 3px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; background: {{ e.bg }}; color: {{ e.fg }};">{{ e.tipo }}</span></span>
+                <span>
+                  <span style="display: block; font-size: 12.5px; font-weight: 500;">{{ e.titulo }}</span>
+                  <span style="display: block; font-size: 11.5px; color: #667085; margin-top: 3px;">{{ e.detalhe }}</span>
+                </span>
+                <span style="text-align: right; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ e.valor }}</span>
+                <span style="font-size: 12px; color: {{ e.fg }}; font-variant-numeric: tabular-nums;">{{ e.dias }}</span>
+                <span style="font-size: 12px; color: #475467;">{{ e.responsavel }}</span>
+                <span style="display: flex; justify-content: flex-end;">
+                  <span onClick="{{ toast }}" style="height: 29px; padding: 0 12px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; background: #fff; white-space: nowrap;" style-hover="background: #101828; color: #fff; border-color: #101828;">{{ e.acao }}</span>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== TESOURARIA =============== -->
+      <sc-if value="{{ isTesouraria }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="display: flex; border: 1px solid #EAECF0; border-radius: 7px; overflow: hidden; background: #fff;">
+              <sc-for list="{{ horizontes }}" as="h" hint-placeholder-count="3">
+                <div onClick="{{ h.set }}" style="height: 32px; padding: 0 14px; display: flex; align-items: center; font-size: 12.5px; font-weight: 500; cursor: pointer; border-right: 1px solid #F2F4F7; background: {{ h.bg }}; color: {{ h.fg }};">{{ h.label }}</div>
+              </sc-for>
+            </div>
+            <span style="font-size: 12px; color: #667085; margin-left: 6px;">Base: saldo, pagamentos aprovados, recorrências, receitas confirmadas e histórico de 14 meses</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 320px; gap: 14px; align-items: start;">
+            <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px;">
+              <div style="display: flex; align-items: center; gap: 20px; padding: 15px 16px; border-bottom: 1px solid #EAECF0;">
+                <div>
+                  <div style="font-size: 12px; color: #667085;">Saldo no fim do período</div>
+                  <div style="font-size: 24px; font-weight: 600; margin-top: 7px; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ saldoFim }}</div>
+                </div>
+                <div>
+                  <div style="font-size: 12px; color: #667085;">Ponto mais baixo</div>
+                  <div style="font-size: 24px; font-weight: 600; margin-top: 7px; color: #B42318; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ pontoBaixo }}</div>
+                </div>
+                <div style="margin-left: auto; display: flex; gap: 16px; font-size: 11.5px; color: #667085;">
+                  <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 9px; height: 9px; border-radius: 2px; background: #2C5FF6;"></span>Entradas</span>
+                  <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 9px; height: 9px; border-radius: 2px; background: #D0D5DD;"></span>Saídas</span>
+                  <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 9px; height: 9px; border-radius: 2px; background: #F97066;"></span>Semana sob pressão</span>
+                </div>
+              </div>
+              <div style="padding: 18px 16px 12px;">
+                <div style="display: flex; align-items: flex-end; gap: 10px; height: 180px; border-bottom: 1px solid #EAECF0;">
+                  <sc-for list="{{ semanas }}" as="s" hint-placeholder-count="13">
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; gap: 6px;">
+                      <div style="display: flex; align-items: flex-end; gap: 3px; width: 100%; justify-content: center; height: 100%;">
+                        <div style="width: 42%; background: #2C5FF6; border-radius: 3px 3px 0 0; height: {{ s.hIn }}px;"></div>
+                        <div style="width: 42%; background: {{ s.corOut }}; border-radius: 3px 3px 0 0; height: {{ s.hOut }}px;"></div>
+                      </div>
+                      <span style="font-size: 10.5px; color: #98A2B3;">{{ s.label }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="font-size: 12.5px; color: #475467; line-height: 1.6; margin-top: 16px;">{{ tesourariaFrase }}</div>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px;">
+                <div style="padding: 13px 16px; border-bottom: 1px solid #EAECF0; font-size: 12.5px; font-weight: 600;">Composição</div>
+                <sc-for list="{{ drivers }}" as="d" hint-placeholder-count="5">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 11px 16px; border-bottom: 1px solid #F2F4F7;">
+                    <span style="font-size: 12px; color: #475467;">{{ d.nome }}</span>
+                    <span style="font-size: 12.5px; font-weight: 600; color: {{ d.cor }}; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ d.valor }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px;">
+                <div style="padding: 13px 16px; border-bottom: 1px solid #EAECF0; font-size: 12.5px; font-weight: 600;">Cenários</div>
+                <sc-for list="{{ cenarios }}" as="c" hint-placeholder-count="3">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 16px; border-bottom: 1px solid #F2F4F7;">
+                    <span style="font-size: 12px; color: #475467;">{{ c.nome }}</span>
+                    <span style="font-size: 13px; font-weight: 600; color: {{ c.cor }}; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ c.valor }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== PROJECTOS =============== -->
+      <sc-if value="{{ isProjectos }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;">
+            <sc-for list="{{ projectos }}" as="p" hint-placeholder-count="4">
+              <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; padding: 16px;">
+                <div style="display: flex; align-items: flex-start; gap: 14px;">
+                  <div style="flex: 1;">
+                    <div style="font-size: 14px; font-weight: 600;">{{ p.nome }}</div>
+                    <div style="font-size: 11.5px; color: #667085; margin-top: 4px;">{{ p.financiador }} · gestor {{ p.gestor }}</div>
+                  </div>
+                  <span style="display: inline-block; padding: 3px 9px; border-radius: 5px; font-size: 11px; font-weight: 600; background: {{ p.estadoBg }}; color: {{ p.estadoFg }}; white-space: nowrap;">{{ p.estado }}</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 16px;">
+                  <sc-for list="{{ p.numeros }}" as="n" hint-placeholder-count="4">
+                    <div>
+                      <div style="font-size: 11px; color: #98A2B3;">{{ n.label }}</div>
+                      <div style="font-size: 14px; font-weight: 600; margin-top: 5px; color: {{ n.cor }}; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ n.valor }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="height: 8px; border-radius: 4px; background: #F2F4F7; margin-top: 16px; position: relative; overflow: hidden;">
+                  <div style="position: absolute; left: 0; top: 0; height: 100%; width: {{ p.pctComprometido }}%; background: {{ p.corClara }};"></div>
+                  <div style="position: absolute; left: 0; top: 0; height: 100%; width: {{ p.pct }}%; background: {{ p.cor }};"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: #667085; margin-top: 8px;">
+                  <span>{{ p.pct }}% executado · {{ p.pctComprometido }}% comprometido</span>
+                  <span>{{ p.nota }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; overflow: hidden;">
+            <div style="padding: 13px 16px; border-bottom: 1px solid #EAECF0; font-size: 13.5px; font-weight: 600;">Fundos e justificação</div>
+            <div style="display: grid; grid-template-columns: 1.8fr 1.2fr 1fr 1fr 1fr 1.2fr; gap: 14px; padding: 10px 16px; border-bottom: 1px solid #EAECF0; font-size: 11px; font-weight: 600; color: #667085;">
+              <span>Fonte</span><span>Conta associada</span><span style="text-align: right;">Recebido</span><span style="text-align: right;">Aplicado</span><span style="text-align: right;">Por justificar</span><span>Próximo relatório</span>
+            </div>
+            <sc-for list="{{ grants }}" as="g" hint-placeholder-count="4">
+              <div style="display: grid; grid-template-columns: 1.8fr 1.2fr 1fr 1fr 1fr 1.2fr; gap: 14px; align-items: center; padding: 12px 16px; border-bottom: 1px solid #F2F4F7;" style-hover="background: #FCFCFD;">
+                <span style="font-size: 12.5px; font-weight: 500;">{{ g.fonte }}</span>
+                <span style="font-size: 12px; color: #475467; font-variant-numeric: tabular-nums;">{{ g.conta }}</span>
+                <span style="text-align: right; font-size: 12.5px; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ g.recebido }}</span>
+                <span style="text-align: right; font-size: 12.5px; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ g.aplicado }}</span>
+                <span style="text-align: right; font-size: 12.5px; font-weight: 600; color: {{ g.cor }}; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ g.porJustificar }}</span>
+                <span style="font-size: 12px; color: #475467;">{{ g.relatorio }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== FORNECEDORES =============== -->
+      <sc-if value="{{ isFornecedores }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;">
+            <sc-for list="{{ insights }}" as="i" hint-placeholder-count="2">
+              <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; padding: 15px 16px; display: flex; gap: 13px;">
+                <span style="width: 26px; height: 26px; border-radius: 7px; background: {{ i.bg }}; color: {{ i.fg }}; font-size: 12px; display: flex; align-items: center; justify-content: center; flex: 0 0 26px;">{{ i.icone }}</span>
+                <div>
+                  <div style="font-size: 13px; font-weight: 600;">{{ i.titulo }}</div>
+                  <div style="font-size: 12px; color: #667085; margin-top: 6px; line-height: 1.6;">{{ i.detalhe }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; overflow: hidden;">
+            <div style="display: grid; grid-template-columns: 1.9fr 0.8fr 1.1fr 1fr 0.9fr 1.2fr; gap: 14px; padding: 10px 16px; border-bottom: 1px solid #EAECF0; font-size: 11px; font-weight: 600; color: #667085;">
+              <span>Fornecedor</span><span style="text-align: right;">Facturas</span><span style="text-align: right;">Total 12M</span><span style="text-align: right;">Média</span><span style="text-align: right;">Variação</span><span>Peso na despesa</span>
+            </div>
+            <sc-for list="{{ fornecedores }}" as="f" hint-placeholder-count="7">
+              <div style="display: grid; grid-template-columns: 1.9fr 0.8fr 1.1fr 1fr 0.9fr 1.2fr; gap: 14px; align-items: center; padding: 12px 16px; border-bottom: 1px solid #F2F4F7;" style-hover="background: #FCFCFD;">
+                <span style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                  <span style="width: 26px; height: 26px; border-radius: 6px; background: #F2F4F7; color: #475467; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: 0 0 26px;">{{ f.sigla }}</span>
+                  <span style="font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ f.nome }}</span>
+                </span>
+                <span style="text-align: right; font-size: 12.5px; color: #475467; font-variant-numeric: tabular-nums;">{{ f.transacoes }}</span>
+                <span style="text-align: right; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ f.acumulado }}</span>
+                <span style="text-align: right; font-size: 12.5px; color: #475467; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ f.medio }}</span>
+                <span style="text-align: right; font-size: 12.5px; font-weight: 600; color: {{ f.varCor }}; font-variant-numeric: tabular-nums;">{{ f.variacao }}</span>
+                <span style="display: flex; align-items: center; gap: 10px;">
+                  <span style="flex: 1; height: 5px; border-radius: 3px; background: #F2F4F7; overflow: hidden;"><span style="display: block; height: 100%; width: {{ f.pctBar }}%; background: {{ f.barCor }};"></span></span>
+                  <span style="font-size: 11.5px; color: #475467; font-variant-numeric: tabular-nums; width: 28px; text-align: right;">{{ f.pct }}%</span>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== RELATÓRIOS =============== -->
+      <sc-if value="{{ isRelatorios }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both; display: grid; grid-template-columns: 272px 1fr; gap: 14px; align-items: start;">
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; padding: 16px;">
+            <div style="font-size: 12.5px; font-weight: 600;">Configuração</div>
+            <div style="display: flex; flex-direction: column; gap: 13px; margin-top: 14px;">
+              <sc-for list="{{ camposRelatorio }}" as="c" hint-placeholder-count="4">
+                <div>
+                  <div style="font-size: 11.5px; color: #667085; margin-bottom: 6px;">{{ c.label }}</div>
+                  <div style="height: 34px; border: 1px solid #EAECF0; border-radius: 7px; display: flex; align-items: center; justify-content: space-between; padding: 0 11px; font-size: 12.5px; font-weight: 500; cursor: pointer;" style-hover="border-color: #D0D5DD;">
+                    <span>{{ c.valor }}</span><span style="font-size: 8px; color: #98A2B3;">▼</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 18px;">
+              <div onClick="{{ toast }}" style="height: 34px; display: flex; align-items: center; justify-content: center; background: #101828; color: #fff; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer;" style-hover="background: #1D2939;">Exportar PDF</div>
+              <div style="display: flex; gap: 8px;">
+                <div onClick="{{ toast }}" style="flex: 1; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12px; cursor: pointer;" style-hover="border-color: #98A2B3;">Excel</div>
+                <div onClick="{{ toast }}" style="flex: 1; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12px; cursor: pointer;" style-hover="border-color: #98A2B3;">CSV</div>
+              </div>
+              <div onClick="{{ toast }}" style="height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #2C5FF6; color: #2C5FF6; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer;" style-hover="background: #F5F8FF;">Lote para contabilidade</div>
+            </div>
+            <div style="font-size: 11.5px; color: #667085; margin-top: 16px; line-height: 1.6;">O lote sai classificado por rubrica, com factura e comprovativo bancário anexos a cada movimento.</div>
+          </div>
+
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; overflow: hidden;">
+            <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding: 16px; border-bottom: 1px solid #EAECF0;">
+              <div>
+                <div style="font-size: 15px; font-weight: 600;">Despesa por rubrica · Agosto 2026</div>
+                <div style="font-size: 12px; color: #667085; margin-top: 4px;">214 despesas · todas as fontes · gerado hoje às 08:41</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 11.5px; color: #667085;">Total</div>
+                <div style="font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap;">1 932 400 MT</div>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 2.2fr 0.6fr 1fr 1fr 1.1fr; gap: 14px; padding: 10px 16px; border-bottom: 1px solid #EAECF0; font-size: 11px; font-weight: 600; color: #667085;">
+              <span>Rubrica</span><span style="text-align: right;">Nº</span><span style="text-align: right;">Pago</span><span style="text-align: right;">Por pagar</span><span>Peso</span>
+            </div>
+            <sc-for list="{{ linhasRelatorio }}" as="l" hint-placeholder-count="8">
+              <div style="display: grid; grid-template-columns: 2.2fr 0.6fr 1fr 1fr 1.1fr; gap: 14px; align-items: center; padding: 11px 16px; border-bottom: 1px solid #F2F4F7;" style-hover="background: #FCFCFD;">
+                <span style="font-size: 12.5px;">{{ l.rubrica }}</span>
+                <span style="text-align: right; font-size: 12px; color: #98A2B3; font-variant-numeric: tabular-nums;">{{ l.n }}</span>
+                <span style="text-align: right; font-size: 12.5px; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ l.pago }}</span>
+                <span style="text-align: right; font-size: 12.5px; color: {{ l.corPorPagar }}; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ l.porPagar }}</span>
+                <span style="display: flex; align-items: center; gap: 10px;">
+                  <span style="flex: 1; height: 5px; border-radius: 3px; background: #F2F4F7; overflow: hidden;"><span style="display: block; height: 100%; width: {{ l.pct }}%; background: #2C5FF6;"></span></span>
+                  <span style="font-size: 11.5px; color: #475467; font-variant-numeric: tabular-nums; width: 28px; text-align: right;">{{ l.pct }}%</span>
+                </span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- =============== POLÍTICAS / CONFIG =============== -->
+      <sc-if value="{{ isConfig }}" hint-placeholder-val="{{ false }}">
+        <div style="animation: nx-in .24s ease both; display: grid; grid-template-columns: 210px 1fr; gap: 20px; align-items: start;">
+          <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px; padding: 8px;">
+            <sc-for list="{{ tabsConfig }}" as="t" hint-placeholder-count="7">
+              <div onClick="{{ t.set }}" style="height: 32px; padding: 0 10px; display: flex; align-items: center; border-radius: 7px; font-size: 12.5px; cursor: pointer; background: {{ t.bg }}; color: {{ t.fg }}; font-weight: {{ t.weight }};" style-hover="background: #F4F5F7;">{{ t.label }}</div>
+            </sc-for>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px;">
+              <div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #EAECF0;">
+                <div>
+                  <div style="font-size: 13.5px; font-weight: 600;">Política de aprovação · v4 activa</div>
+                  <div style="font-size: 11.5px; color: #667085; margin-top: 3px;">Regras em linguagem simples. Cada alteração fica registada com autor e data.</div>
+                </div>
+                <span onClick="{{ toast }}" style="margin-left: auto; height: 30px; padding: 0 13px; display: flex; align-items: center; background: #101828; color: #fff; border-radius: 7px; font-size: 12.5px; font-weight: 500; cursor: pointer;" style-hover="background: #1D2939;">Nova regra</span>
+              </div>
+              <sc-for list="{{ politicas }}" as="p" hint-placeholder-count="6">
+                <div style="display: flex; align-items: center; gap: 16px; padding: 14px 16px; border-bottom: 1px solid #F2F4F7;" style-hover="background: #FCFCFD;">
+                  <span style="display: inline-block; padding: 3px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; background: #F2F4F7; color: #475467; white-space: nowrap;">{{ p.dimensao }}</span>
+                  <span style="flex: 1; font-size: 12.5px; line-height: 1.55;">{{ p.frase }}</span>
+                  <span style="font-size: 11.5px; color: #667085; white-space: nowrap;">{{ p.niveis }}</span>
+                  <span onClick="{{ toast }}" style="font-size: 12px; color: #2C5FF6; cursor: pointer; font-weight: 500;">Editar</span>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px;">
+              <div style="padding: 14px 16px; border-bottom: 1px solid #EAECF0;">
+                <div style="font-size: 13.5px; font-weight: 600;">Etapas do ciclo</div>
+                <div style="font-size: 11.5px; color: #667085; margin-top: 3px;">Active apenas o que existe no seu processo. O rasto de auditoria não se desliga.</div>
+              </div>
+              <sc-for list="{{ etapas }}" as="e" hint-placeholder-count="8">
+                <div onClick="{{ e.toggle }}" style="display: flex; align-items: center; gap: 14px; padding: 13px 16px; border-bottom: 1px solid #F2F4F7; cursor: pointer;" style-hover="background: #FCFCFD;">
+                  <span style="width: 34px; height: 20px; border-radius: 10px; background: {{ e.trackBg }}; position: relative; flex: 0 0 34px; transition: background .15s ease;">
+                    <span style="position: absolute; top: 2px; left: {{ e.knobLeft }}px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(16,24,40,.2); transition: left .15s ease;"></span>
+                  </span>
+                  <span style="flex: 1;">
+                    <span style="display: block; font-size: 13px; font-weight: 500; color: {{ e.corTitulo }};">{{ e.nome }}</span>
+                    <span style="display: block; font-size: 11.5px; color: #667085; margin-top: 3px;">{{ e.descricao }}</span>
+                  </span>
+                  <span style="font-size: 11px; color: #98A2B3;">{{ e.tag }}</span>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+              <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px;">
+                <div style="padding: 13px 16px; border-bottom: 1px solid #EAECF0;">
+                  <div style="font-size: 12.5px; font-weight: 600;">Fonte de financiamento → conta</div>
+                  <div style="font-size: 11.5px; color: #667085; margin-top: 3px;">O sistema recusa combinações não previstas.</div>
+                </div>
+                <sc-for list="{{ ligacoes }}" as="l" hint-placeholder-count="4">
+                  <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #F2F4F7; font-size: 12.5px;">
+                    <span style="flex: 1; font-weight: 500;">{{ l.fonte }}</span>
+                    <span style="color: #C4CBD6;">→</span>
+                    <span style="flex: 1; color: #475467; font-variant-numeric: tabular-nums;">{{ l.conta }}</span>
+                    <span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 5px; background: {{ l.bg }}; color: {{ l.fg }}; white-space: nowrap;">{{ l.regra }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 10px;">
+                <div style="padding: 13px 16px; border-bottom: 1px solid #EAECF0;">
+                  <div style="font-size: 12.5px; font-weight: 600;">Documento de autorização</div>
+                  <div style="font-size: 11.5px; color: #667085; margin-top: 3px;">Gerado a partir da despesa registada.</div>
+                </div>
+                <div style="padding: 14px 16px;">
+                  <sc-for list="{{ docConfig }}" as="d" hint-placeholder-count="5">
+                    <div style="display: flex; gap: 14px; padding: 7px 0; font-size: 12.5px;">
+                      <span style="color: #667085; width: 140px; flex: 0 0 140px;">{{ d.label }}</span>
+                      <span style="font-weight: 500;">{{ d.valor }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+    </main>
+
+    <!-- =============== BARRA DE SELECÇÃO =============== -->
+    <sc-if value="{{ temSeleccao }}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); background: #101828; color: #fff; border-radius: 10px; padding: 9px 12px 9px 16px; display: flex; align-items: center; gap: 16px; box-shadow: 0 12px 28px rgba(16,24,40,.24); z-index: 40;">
+        <span style="font-size: 12.5px; font-weight: 500;">{{ selTexto }}</span>
+        <span style="font-size: 12.5px; color: #98A2B3; font-variant-numeric: tabular-nums;">{{ selTotal }}</span>
+        <span style="width: 1px; height: 20px; background: #344054;"></span>
+        <span onClick="{{ aprovarSel }}" style="height: 30px; padding: 0 12px; display: flex; align-items: center; background: #fff; color: #101828; border-radius: 7px; font-size: 12.5px; font-weight: 600; cursor: pointer;" style-hover="background: #EAECF0;">Aprovar</span>
+        <span onClick="{{ toast }}" style="height: 30px; padding: 0 12px; display: flex; align-items: center; border: 1px solid #475467; border-radius: 7px; font-size: 12.5px; cursor: pointer;" style-hover="border-color: #98A2B3;">Pôr na fila</span>
+        <span onClick="{{ toast }}" style="height: 30px; padding: 0 12px; display: flex; align-items: center; border: 1px solid #475467; border-radius: 7px; font-size: 12.5px; cursor: pointer;" style-hover="border-color: #98A2B3;">Exportar</span>
+        <span onClick="{{ limparSel }}" style="font-size: 12.5px; color: #98A2B3; cursor: pointer; padding: 0 4px;">✕</span>
+      </div>
+    </sc-if>
+
+    <!-- =============== GAVETA DE DETALHE =============== -->
+    <sc-if value="{{ drawerAberta }}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; inset: 0; background: rgba(16,24,40,.18); z-index: 50; display: flex; justify-content: flex-end;">
+        <div onClick="{{ fecharDrawer }}" style="flex: 1;"></div>
+        <div style="width: 560px; background: #fff; border-left: 1px solid #EAECF0; display: flex; flex-direction: column; animation: nx-drawer .2s ease both;">
+          <div style="padding: 16px 20px; border-bottom: 1px solid #EAECF0; display: flex; align-items: flex-start; gap: 14px;">
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; gap: 9px;">
+                <span style="font-size: 15px; font-weight: 600;">{{ sel.fornecedor }}</span>
+                <span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 5px; font-size: 11.5px; font-weight: 600; background: {{ sel.estadoBg }}; color: {{ sel.estadoFg }};"><span style="width: 5px; height: 5px; border-radius: 50%; background: {{ sel.estadoFg }};"></span>{{ sel.estado }}</span>
+              </div>
+              <div style="font-size: 12px; color: #667085; margin-top: 5px;">{{ sel.descricao }} · {{ sel.ref }}</div>
+            </div>
+            <span onClick="{{ fecharDrawer }}" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: 1px solid #EAECF0; border-radius: 7px; font-size: 12px; color: #667085; cursor: pointer;" style-hover="border-color: #D0D5DD;">✕</span>
+          </div>
+
+          <div style="flex: 1; overflow-y: auto; padding: 18px 20px 24px;">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+              <div style="border: 1px solid #EAECF0; border-radius: 9px; padding: 12px 13px;">
+                <div style="font-size: 11px; color: #667085;">Valor</div>
+                <div style="font-size: 18px; font-weight: 600; margin-top: 6px; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ sel.valor }}</div>
+              </div>
+              <div style="border: 1px solid #EAECF0; border-radius: 9px; padding: 12px 13px;">
+                <div style="font-size: 11px; color: #667085;">Vencimento</div>
+                <div style="font-size: 18px; font-weight: 600; margin-top: 6px;">{{ sel.vencimento }}</div>
+              </div>
+              <div style="border: 1px solid #EAECF0; border-radius: 9px; padding: 12px 13px;">
+                <div style="font-size: 11px; color: #667085;">Saldo da rubrica</div>
+                <div style="font-size: 18px; font-weight: 600; margin-top: 6px; color: #067647; white-space: nowrap;">1,24 M</div>
+              </div>
+            </div>
+
+            <div style="margin-top: 18px; border: 1px solid #EAECF0; border-radius: 9px; overflow: hidden;">
+              <div style="padding: 11px 14px; background: #FCFCFD; border-bottom: 1px solid #EAECF0; display: flex; align-items: center; gap: 9px;">
+                <span style="font-size: 12.5px; font-weight: 600;">Política aplicada</span>
+                <span style="font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 5px; background: #FFFAEB; color: #B54708;">2 aprovadores</span>
+              </div>
+              <div style="padding: 13px 14px; font-size: 12.5px; color: #475467; line-height: 1.6;">Acima de 250 000 MT em despesa de Serviços financiada pelo Fundo Doador UE — o gestor do projecto aprova também. Matriz v4, vigente desde 01/07/2026.</div>
+            </div>
+
+            <div style="margin-top: 18px;">
+              <div style="display: flex; align-items: center; gap: 9px; margin-bottom: 9px;">
+                <span style="font-size: 12.5px; font-weight: 600;">Verificação financeira</span>
+                <span style="font-size: 11.5px; color: #667085;">{{ checkResumo }}</span>
+              </div>
+              <div style="border: 1px solid #EAECF0; border-radius: 9px; overflow: hidden;">
+                <sc-for list="{{ checklist }}" as="c" hint-placeholder-count="5">
+                  <div onClick="{{ c.toggle }}" style="display: flex; align-items: center; gap: 11px; padding: 11px 14px; border-bottom: 1px solid #F2F4F7; cursor: pointer;" style-hover="background: #FCFCFD;">
+                    <span style="width: 16px; height: 16px; border-radius: 4px; border: 1px solid {{ c.borda }}; background: {{ c.fundo }}; color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center; flex: 0 0 16px;">{{ c.marca }}</span>
+                    <span style="flex: 1; font-size: 12.5px; color: {{ c.corTexto }};">{{ c.texto }}</span>
+                    <span style="font-size: 11px; color: #98A2B3; white-space: nowrap;">{{ c.autor }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="margin-top: 18px;">
+              <div style="font-size: 12.5px; font-weight: 600; margin-bottom: 9px;">Dados lidos da factura</div>
+              <div style="border: 1px solid #EAECF0; border-radius: 9px; overflow: hidden;">
+                <sc-for list="{{ campos }}" as="c" hint-placeholder-count="8">
+                  <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid #F2F4F7;">
+                    <span style="font-size: 11.5px; color: #667085; width: 130px; flex: 0 0 130px;">{{ c.label }}</span>
+                    <span style="flex: 1; font-size: 12.5px; font-weight: 500;">{{ c.valor }}</span>
+                    <sc-if value="{{ c.rever }}" hint-placeholder-val="{{ false }}">
+                      <span style="font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 5px; background: #FFFAEB; color: #B54708; cursor: pointer;">rever</span>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="margin-top: 18px;">
+              <div style="font-size: 12.5px; font-weight: 600; margin-bottom: 11px;">Percurso e auditoria</div>
+              <sc-for list="{{ percurso }}" as="p" hint-placeholder-count="5">
+                <div style="display: flex; gap: 12px;">
+                  <div style="display: flex; flex-direction: column; align-items: center; flex: 0 0 14px;">
+                    <span style="width: 11px; height: 11px; border-radius: 50%; border: 2px solid {{ p.cor }}; background: {{ p.fundo }};"></span>
+                    <span style="width: 1px; flex: 1; background: #EAECF0; min-height: 20px;"></span>
+                  </div>
+                  <div style="padding-bottom: 16px; flex: 1;">
+                    <div style="font-size: 12.5px; font-weight: 500; color: {{ p.corTitulo }};">{{ p.etapa }}</div>
+                    <div style="font-size: 11.5px; color: #667085; margin-top: 3px; line-height: 1.5;">{{ p.detalhe }}</div>
+                    <div style="font-size: 11px; color: #98A2B3; margin-top: 3px;">{{ p.quando }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="padding: 12px 20px; border-top: 1px solid #EAECF0; display: flex; align-items: center; gap: 9px; background: #FCFCFD;">
+            <span onClick="{{ toast }}" style="height: 34px; padding: 0 13px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; cursor: pointer; background: #fff;" style-hover="border-color: #98A2B3;">Devolver</span>
+            <span onClick="{{ toast }}" style="height: 34px; padding: 0 13px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 7px; font-size: 12.5px; cursor: pointer; background: #fff;" style-hover="border-color: #98A2B3;">Nota de autorização</span>
+            <span onClick="{{ aprovarSelId }}" style="margin-left: auto; height: 34px; padding: 0 18px; display: flex; align-items: center; background: #101828; color: #fff; border-radius: 7px; font-size: 12.5px; font-weight: 600; cursor: pointer;" style-hover="background: #1D2939;">Aprovar despesa</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ toastMsg }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; bottom: 24px; left: 50%; background: #101828; color: #fff; padding: 11px 18px; border-radius: 8px; font-size: 12.5px; font-weight: 500; box-shadow: 0 10px 26px rgba(16,24,40,.24); animation: nx-toast .18s ease both; z-index: 70;">{{ toastMsg }}</div>
+  </sc-if>
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1600, &quot;height&quot;: 1000}, &quot;orgName&quot;: {&quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;Grupo Zambeze&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Organização&quot;}}">
+class Component extends DCLogic {
+  state = {
+    route: 'dashboard', vista: 'todas', horizonte: 90, tabConfig: 'politica',
+    drawer: null, picked: [], aprovadas: [], confirmadas: [], sev: 'todas',
+    checked: [0, 1, 2], etapasOff: ['requisicao'], toastMsg: null
+  };
+
+  go(route) { this.setState({ route, picked: [] }); }
+
+  flash(msg) {
+    this.setState({ toastMsg: msg });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toastMsg: null }), 2600);
+  }
+
+  renderVals() {
+    const r = this.state.route;
+    const BLUE = '#2C5FF6', RED = '#B42318', AMB = '#B54708', GRN = '#067647', GRAY = '#475467', MUT = '#667085';
+    const tint = { blue: '#F0F4FF', red: '#FEF3F2', amb: '#FFFAEB', grn: '#ECFDF3', gray: '#F2F4F7' };
+    const und = on => on ? 'inset 0 -2px 0 #101828' : 'none';
+
+    const meta = {
+      dashboard: ['Visão geral', 'Terça, 12 de Agosto · actualizado há 4 min', 'Nova despesa'],
+      watch: ['Alertas', '6 alertas abertos · 2 críticos', 'Nova regra'],
+      despesas: ['Despesas', '214 despesas em Agosto · 1 932 400 MT', 'Nova despesa'],
+      aprovacoes: ['Aprovações', 'Fila pessoal · política v4 activa', 'Nova despesa'],
+      pagamentos: ['Pagamentos', '21 prontos a pagar · 1 286 900 MT na fila', 'Novo pagamento'],
+      reconciliacao: ['Reconciliação', 'Extrato BCI 1234567 · Agosto 2026', 'Importar extrato'],
+      excepcoes: ['Excepções', '11 abertas · 2 214 750 MT em causa', 'Nova regra'],
+      tesouraria: ['Tesouraria', 'Projecção a partir de dados confirmados', 'Novo cenário'],
+      projectos: ['Projectos e fundos', '4 projectos activos · 3 financiadores', 'Novo projecto'],
+      fornecedores: ['Fornecedores', '38 activos · 12 meses de histórico', 'Novo fornecedor'],
+      relatorios: ['Relatórios', 'Selecção e exportação', 'Novo relatório'],
+      config: ['Configuração', 'Políticas, etapas e nomenclatura desta organização', 'Nova regra']
+    };
+    const [pageTitle, pageSub, primaryAction] = meta[r] || meta.dashboard;
+
+    const navDef = [
+      { g: 'Operação' },
+      { k: 'dashboard', label: 'Visão geral', icon: '◫' },
+      { k: 'watch', label: 'Alertas', icon: '◔', badge: '6', badgeBg: tint.red, badgeFg: RED },
+      { g: 'Contas a pagar' },
+      { k: 'despesas', label: 'Despesas', icon: '☰' },
+      { k: 'aprovacoes', label: 'Aprovações', icon: '✓', badge: String(4 - this.state.aprovadas.length), badgeBg: tint.amb, badgeFg: AMB },
+      { k: 'pagamentos', label: 'Pagamentos', icon: '⇄' },
+      { k: 'reconciliacao', label: 'Reconciliação', icon: '⇋' },
+      { k: 'excepcoes', label: 'Excepções', icon: '⚠', badge: '11', badgeBg: tint.gray, badgeFg: GRAY },
+      { g: 'Análise' },
+      { k: 'tesouraria', label: 'Tesouraria', icon: '◈' },
+      { k: 'projectos', label: 'Projectos e fundos', icon: '▤' },
+      { k: 'fornecedores', label: 'Fornecedores', icon: '◇' },
+      { k: 'relatorios', label: 'Relatórios', icon: '⎘' },
+      { g: 'Administração' },
+      { k: 'config', label: 'Configuração', icon: '⚙' }
+    ];
+    const nav = navDef.map(n => n.g
+      ? { isGroup: true, isItem: false, label: n.g }
+      : {
+          isGroup: false, isItem: true, label: n.label, icon: n.icon,
+          badge: n.badge || null, badgeBg: n.badgeBg || tint.gray, badgeFg: n.badgeFg || GRAY,
+          bg: r === n.k ? '#F2F4F7' : 'transparent',
+          fg: r === n.k ? '#101828' : '#475467',
+          iconFg: r === n.k ? '#101828' : '#98A2B3',
+          weight: r === n.k ? '600' : '400',
+          go: () => this.go(n.k)
+        });
+
+    const tiles = [
+      { label: 'Saldo disponível', value: '4 812 400', sub: '4 contas · MT', delta: '+6,2%', deltaFg: GRN, deltaBg: tint.grn },
+      { label: 'Comprometido', value: '1 286 900', sub: '48 despesas aprovadas, não pagas', delta: '48', deltaFg: AMB, deltaBg: tint.amb },
+      { label: 'A pagar em 7 dias', value: '742 300', sub: '9 pagamentos · 2 vencem hoje', delta: 'urgente', deltaFg: RED, deltaBg: tint.red },
+      { label: 'Reconciliado', value: '96%', sub: '104 de 128 movimentos de Agosto', delta: '+11 pts', deltaFg: GRN, deltaBg: tint.grn }
+    ];
+
+    const acoes = [
+      { icone: '!', iconBg: tint.red, iconFg: RED, titulo: '2 pagamentos vencem hoje sem confirmação no banco', detalhe: 'Sasol Moçambique e EDM · iniciados há 2 dias', valor: '186 400 MT', prazo: 'hoje', acao: 'Confirmar', fn: () => this.go('pagamentos') },
+      { icone: '◔', iconBg: tint.red, iconFg: RED, titulo: 'Projecto Zambeze passou 80% do orçamento', detalhe: 'Ao ritmo actual esgota a 2 de Novembro', valor: '387 500 MT', prazo: 'disponível', acao: 'Ver projecto', fn: () => this.go('projectos') },
+      { icone: '✓', iconBg: tint.amb, iconFg: AMB, titulo: '4 despesas à sua espera há mais de 3 dias', detalhe: 'A mais antiga: auditoria do projecto, 8 de Agosto', valor: '512 900 MT', prazo: 'há 4 dias', acao: 'Aprovar', fn: () => this.go('aprovacoes') },
+      { icone: '⇋', iconBg: tint.gray, iconFg: GRAY, titulo: '1,4 M MT entraram no banco sem receita registada', detalhe: 'Tranche 3 da União Europeia · 5 de Agosto', valor: '1 400 000 MT', prazo: 'há 7 dias', acao: 'Registar', fn: () => this.go('reconciliacao') }
+    ];
+
+    const categorias = [
+      { nome: 'Serviços e consultoria', valor: '676 340 MT', pct: 35, cor: BLUE },
+      { nome: 'Salários e encargos', valor: '482 100 MT', pct: 25, cor: '#5E7BF7' },
+      { nome: 'Compras e equipamento', valor: '348 200 MT', pct: 18, cor: '#8FA4FA' },
+      { nome: 'Viagens e logística', valor: '251 200 MT', pct: 13, cor: '#B9C6FC' },
+      { nome: 'Outros', valor: '174 560 MT', pct: 9, cor: '#D9E0FE' }
+    ];
+
+    const sevDef = [['todas', 'Todos', 6, MUT], ['critico', 'Crítico', 2, RED], ['risco', 'Risco', 2, AMB], ['info', 'Informativo', 2, GRN]];
+    const sevFiltros = sevDef.map(([k, label, n, dot]) => ({
+      label, n, dot, set: () => this.setState({ sev: k }),
+      bg: this.state.sev === k ? '#F2F4F7' : '#fff',
+      fg: this.state.sev === k ? '#101828' : '#475467',
+      borda: this.state.sev === k ? '#D0D5DD' : '#EAECF0'
+    }));
+
+    const alertasDef = [
+      ['critico', 'Crítico', RED, tint.red, 'Pagamento à Sasol vence hoje e o banco não o confirma', 'Iniciado a 10 de Agosto · sem movimento correspondente no extrato', '118 400 MT', 'há 2 horas', 'Tesouraria', 'Confirmar'],
+      ['critico', 'Crítico', RED, tint.red, 'Possível factura duplicada da Tecnhosat', 'FAC-0839 e FAC-0841 · mesmo valor e descrição, meses diferentes', '412 500 MT', 'há 5 horas', 'Nélio Bila', 'Comparar'],
+      ['risco', 'Risco', AMB, tint.amb, 'Projecto Zambeze com 84% do orçamento executado', 'Faltam 4 meses de execução · esgota a 2 de Novembro', '387 500 MT', 'hoje', 'C. Mabjaia', 'Ver execução'],
+      ['risco', 'Risco', AMB, tint.amb, 'Tecnhosat concentra 21% da despesa operacional', 'Limite interno da organização: 15%', '4 962 000 MT', 'hoje', 'Direcção', 'Analisar'],
+      ['info', 'Informativo', GRN, tint.grn, '96% do extrato de Agosto está reconciliado', 'A reconciliação deixou de ser tarefa de fecho de mês', '—', 'hoje', 'Helena Cossa', 'Ver extrato'],
+      ['info', 'Informativo', GRN, tint.grn, 'Tempo médio de aprovação caiu de 3,2 para 1,4 dias', 'Desde a entrada da política v4, em Julho', '—', 'esta semana', 'Direcção', 'Ver indicador']
+    ];
+    const alertas = alertasDef
+      .filter(a => this.state.sev === 'todas' || a[0] === this.state.sev)
+      .map(a => ({
+        sev: a[1], sevFg: a[2], sevBg: a[3], titulo: a[4], detalhe: a[5], valor: a[6],
+        quando: a[7], responsavel: a[8], acao: a[9],
+        resolve: () => this.flash('Acção registada · rasto de auditoria actualizado.')
+      }));
+
+    const watchKpis = [
+      { label: 'Reconciliação', valor: '96%', delta: '+11 pts', cor: GRN, pct: 96 },
+      { label: 'Despesas com factura', valor: '91%', delta: '+3 pts', cor: GRN, pct: 91 },
+      { label: 'Aprovadas em menos de 48h', valor: '78%', delta: '−4 pts', cor: AMB, pct: 78 },
+      { label: 'Excepções abertas', valor: '11', delta: '−3 esta semana', cor: GRAY, pct: 42 }
+    ];
+
+    const estados = {
+      'Aguarda aprovação': [tint.amb, AMB], 'Aprovada': [tint.blue, BLUE], 'Pronta a pagar': [tint.blue, BLUE],
+      'Paga': [tint.grn, GRN], 'Reconciliada': [tint.grn, GRN], 'Em verificação': [tint.gray, GRAY], 'Sem factura': [tint.red, RED]
+    };
+    const dBase = [
+      ['DSP-2026-0841', 'TS', 'Tecnhosat Serviços', 'Manutenção de rede e servidores · Agosto', '412 500 MT', 412500, '18 Ago', '6.2.1 Serviços de TI', 'Zambeze · Saúde', 'Aguarda aprovação'],
+      ['DSP-2026-0840', 'SM', 'Sasol Moçambique', 'Combustível da frota · lote mensal', '118 400 MT', 118400, 'hoje', '6.3.1 Combustíveis', 'Operação corrente', 'Pronta a pagar'],
+      ['DSP-2026-0839', 'TS', 'Tecnhosat Serviços', 'Manutenção de rede e servidores · Julho', '412 500 MT', 412500, 'pago', '6.2.1 Serviços de TI', 'Zambeze · Saúde', 'Paga'],
+      ['DSP-2026-0838', 'CL', 'Cornelder Logística', 'Desembaraço aduaneiro · 2 contentores', '286 900 MT', 286900, '24 Ago', '6.3.2 Logística', 'Programa Nampula', 'Em verificação'],
+      ['DSP-2026-0837', 'CA', 'Clínica Cruz Azul', 'Seguro de saúde dos colaboradores', '164 200 MT', 164200, '30 Ago', '6.1.2 Encargos', 'Operação corrente', 'Aprovada'],
+      ['DSP-2026-0836', 'MC', 'Moza Consulting', 'Auditoria intermédia do projecto', '350 000 MT', 350000, '5 Set', '6.2.4 Auditoria', 'Zambeze · Saúde', 'Aguarda aprovação'],
+      ['DSP-2026-0835', 'PC', 'Papelaria Central', 'Consumíveis de escritório', '38 750 MT', 38750, '11 Ago', '6.5.2 Consumíveis', 'Operação corrente', 'Sem factura'],
+      ['DSP-2026-0834', 'TD', 'TDM Telecom', 'Internet dedicada · 3 delegações', '96 300 MT', 96300, 'pago', '6.2.2 Comunicações', 'Operação corrente', 'Reconciliada'],
+      ['DSP-2026-0833', 'HC', 'Hotel Cardoso', 'Alojamento da missão a Sofala', '74 600 MT', 74600, 'pago', '6.4.1 Viagens', 'Emergência Sofala', 'Paga'],
+      ['DSP-2026-0832', 'EM', 'Electricidade de Moçambique', 'Energia · sede e armazém', '142 800 MT', 142800, '15 Ago', '6.1.3 Utilidades', 'Operação corrente', 'Aprovada']
+    ];
+    const pick = (id, e) => {
+      if (e && e.stopPropagation) e.stopPropagation();
+      this.setState(s => ({ picked: s.picked.includes(id) ? s.picked.filter(x => x !== id) : s.picked.concat(id) }));
+    };
+    let despesas = dBase.map(d => {
+      const on = this.state.picked.includes(d[0]);
+      return {
+        ref: d[0], sigla: d[1], fornecedor: d[2], descricao: d[3], valor: d[4], bruto: d[5],
+        vencimento: d[6], vencCor: d[6] === 'hoje' ? RED : d[6] === 'pago' ? '#98A2B3' : GRAY,
+        rubrica: d[7], projecto: d[8], estado: d[9], estadoBg: estados[d[9]][0], estadoFg: estados[d[9]][1],
+        rowBg: on ? '#F8FAFF' : '#fff',
+        cbBorda: on ? '#101828' : '#D0D5DD', cbFundo: on ? '#101828' : '#fff', cbMarca: on ? '✓' : '',
+        pick: e => pick(d[0], e),
+        open: () => this.setState({ drawer: d[0] })
+      };
+    });
+    const v = this.state.vista;
+    if (v === 'aprovar') despesas = despesas.filter(d => d.estado === 'Aguarda aprovação' || d.estado === 'Em verificação');
+    if (v === 'naopagas') despesas = despesas.filter(d => d.estado === 'Aprovada' || d.estado === 'Pronta a pagar');
+    if (v === 'semdoc') despesas = despesas.filter(d => d.estado === 'Sem factura');
+
+    const vistas = [['todas', 'Todas', 214], ['aprovar', 'Por aprovar', 12], ['naopagas', 'Aprovadas, não pagas', 48], ['semdoc', 'Sem factura', 3]]
+      .map(([k, label, n]) => ({
+        label, n, set: () => this.setState({ vista: k, picked: [] }),
+        fg: v === k ? '#101828' : '#667085', weight: v === k ? '600' : '400', underline: und(v === k)
+      }));
+
+    const resumoFrase = v === 'todas' ? '786 900 MT aprovados e ainda não pagos'
+      : v === 'aprovar' ? '512 900 MT retidos à espera de decisão'
+      : v === 'naopagas' ? '48 despesas · 786 900 MT'
+      : '3 despesas sem factura · 94 200 MT';
+
+    const selTotal = this.state.picked.length
+      ? this.state.picked.reduce((s2, id) => s2 + dBase.find(d => d[0] === id)[5], 0).toLocaleString('pt-PT') + ' MT'
+      : '';
+
+    const allIds = despesas.map(d => d.ref);
+    const todasOn = allIds.length > 0 && allIds.every(id => this.state.picked.includes(id));
+
+    const checklistDef = [
+      ['Saldo disponível na rubrica 6.2.1', 'Helena Cossa · 11 Ago'],
+      ['Factura e contrato anexados', 'Helena Cossa · 11 Ago'],
+      ['Retenção na fonte de 10% calculada', 'Helena Cossa · 11 Ago'],
+      ['Despesa elegível face às regras do financiador', 'por confirmar'],
+      ['Sem adiantamentos anteriores a abater', 'por confirmar']
+    ];
+    const checklist = checklistDef.map(([texto, autor], i) => {
+      const on = this.state.checked.includes(i);
+      return {
+        texto, autor: on ? autor : 'por confirmar', marca: on ? '✓' : '',
+        borda: on ? GRN : '#D0D5DD', fundo: on ? '#12B76A' : '#fff', corTexto: on ? '#101828' : MUT,
+        toggle: () => this.setState(s => ({ checked: on ? s.checked.filter(x => x !== i) : s.checked.concat(i) }))
+      };
+    });
+    const checkResumo = this.state.checked.length + ' de 5 confirmadas';
+
+    const campos = [
+      ['Fornecedor', 'Tecnhosat Serviços, Lda', false], ['NUIT', '400 218 776', false],
+      ['Nº de factura', 'FAC-2026-0841', false], ['Emitida a', '02/08/2026', false],
+      ['Vencimento', '18/08/2026', true], ['Rubrica', '6.2.1 · Serviços de TI', false],
+      ['Fonte', 'Fundo Doador UE', false], ['Projecto', 'Zambeze · Saúde', false],
+      ['Centro de custo', 'Sistemas de Informação', false], ['Solicitado por', 'Nélio Bila', false]
+    ].map(([label, valor, rever]) => ({ label, valor, rever }));
+
+    const percurso = [
+      ['Registada', 'Nélio Bila carregou a factura; o sistema leu os campos', '2 Ago, 09:14', 'done'],
+      ['Verificada', 'Helena Cossa · 3 de 5 confirmações', '11 Ago, 15:02', 'done'],
+      ['A sua aprovação', 'Direcção Financeira', 'à espera há 22 horas', 'active'],
+      ['Aprovação do projecto', 'Gestor do Zambeze · exigido pela fonte de financiamento', 'por iniciar', 'todo'],
+      ['Pagamento e banco', 'Fila de pagamento e extrato BCI', 'por iniciar', 'todo']
+    ].map(([etapa, detalhe, quando, st]) => ({
+      etapa, detalhe, quando,
+      cor: st === 'done' ? '#12B76A' : st === 'active' ? BLUE : '#D0D5DD',
+      fundo: st === 'done' ? '#12B76A' : '#fff',
+      corTitulo: st === 'todo' ? '#98A2B3' : '#101828'
+    }));
+
+    const av = (sigla, estado, ok) => ({ sigla, estado, bg: ok ? tint.grn : tint.gray, fg: ok ? GRN : GRAY });
+    const aprovDef = [
+      ['TS', 'Tecnhosat Serviços', 'DSP-2026-0841', 'Manutenção de rede e servidores · Agosto', '412 500 MT', '6.2.1 Serviços de TI', 'Fundo Doador UE', '1,24 M MT', 'feita', 'acima de 250 000 MT com fundos de doador → 2 aprovadores, um deles o gestor do projecto', 'vence em 6 dias', AMB, 'Excede limiar', tint.amb, AMB, [av('AM', 'você', false), av('CM', 'gestor', false)]],
+      ['MC', 'Moza Consulting', 'DSP-2026-0836', 'Auditoria intermédia do projecto', '350 000 MT', '6.2.4 Auditoria', 'Fundo Doador UE', '812 000 MT', 'feita', 'despesa de projecto com financiamento externo → gestor do projecto obrigatório', 'espera há 4 dias', RED, 'Atrasada', tint.red, RED, [av('AM', 'você', false), av('CM', 'gestor', false)]],
+      ['CL', 'Cornelder Logística', 'DSP-2026-0838', 'Desembaraço aduaneiro · 2 contentores', '286 900 MT', '6.3.2 Logística', 'DANIDA', '498 300 MT', 'em curso', 'escalão de 250 000 a 1 000 000 MT → verificação financeira e 2 aprovadores', 'vence em 12 dias', MUT, 'Cumpre política', tint.grn, GRN, [av('HC', 'verificou', true), av('AM', 'você', false)]],
+      ['EM', 'Electricidade de Moçambique', 'DSP-2026-0832', 'Energia · sede e armazém', '142 800 MT', '6.1.3 Utilidades', 'Fundos próprios', '2,10 M MT', 'dispensada', 'recorrente abaixo de 250 000 MT → basta a sua aprovação', 'vence em 3 dias', AMB, 'Cumpre política', tint.grn, GRN, [av('AM', 'você', false)]]
+    ];
+    const aprovacoes = aprovDef.filter(a => !this.state.aprovadas.includes(a[2])).map(a => ({
+      sigla: a[0], fornecedor: a[1], ref: a[2], descricao: a[3], valor: a[4], rubrica: a[5], fonte: a[6],
+      saldo: a[7], verificacao: a[8], regra: a[9], prazo: a[10], prazoFg: a[11],
+      politica: a[12], polBg: a[13], polFg: a[14], aprovadores: a[15],
+      aprovar: () => { this.setState(s => ({ aprovadas: s.aprovadas.concat(a[2]) })); this.flash(a[1] + ' aprovada · segue para pagamento.'); },
+      open: () => this.setState({ drawer: a[2] })
+    }));
+
+    const tempos = [
+      { nome: 'Direcção Financeira', valor: '1,4 dias', pct: 34, cor: GRN },
+      { nome: 'Gestores de projecto', valor: '2,8 dias', pct: 62, cor: AMB },
+      { nome: 'Administração', valor: '4,1 dias', pct: 88, cor: RED }
+    ];
+
+    const pipeline = [
+      ['Aprovada', 48, '786 900 MT', BLUE], ['Pronta a pagar', 21, '512 400 MT', BLUE],
+      ['A pagamento', 6, '186 400 MT', AMB], ['Paga', 112, '1 145 500 MT', GRN],
+      ['No extrato', 108, '1 098 200 MT', GRN], ['Reconciliada', 104, '1 062 700 MT', GRN]
+    ].map(([nome, n, valor, cor]) => ({ nome, n, valor, cor }));
+
+    const fila = [
+      ['Sasol Moçambique', '118 400 MT', 'hoje', 'BCI 1234567', 'Fundos próprios', 'A pagamento', tint.amb, AMB],
+      ['Electricidade de Moçambique', '142 800 MT', '15 Ago', 'BCI 1234567', 'Fundos próprios', 'Pronta a pagar', tint.blue, BLUE],
+      ['Cornelder Logística', '286 900 MT', '24 Ago', 'Millennium 7745120', 'DANIDA', 'Pronta a pagar', tint.blue, BLUE],
+      ['Clínica Cruz Azul', '164 200 MT', '30 Ago', 'BCI 1234567', 'Fundos próprios', 'Pronta a pagar', tint.blue, BLUE],
+      ['Tecnhosat Serviços', '412 500 MT', 'pago', 'Standard 9982211', 'Fundo Doador UE', 'Paga', tint.grn, GRN],
+      ['Hotel Cardoso', '74 600 MT', 'pago', 'BCI 1234567', 'Fundos próprios', 'Paga', tint.grn, GRN]
+    ].map(x => ({ nome: x[0], valor: x[1], vencimento: x[2], vencCor: x[2] === 'hoje' ? RED : x[2] === 'pago' ? '#98A2B3' : GRAY, conta: x[3], fonte: x[4], estado: x[5], bg: x[6], fg: x[7] }));
+
+    const propostasDef = [
+      ['TRF TECHNOSAT SERVICOS LDA', '2 Ago', '412 500,00 MT', 'Tecnhosat · manutenção de Julho', 'DSP-2026-0839', '412 500,00 MT', 99],
+      ['DEB DIRECTO EDM SEDE', '7 Ago', '142 800,00 MT', 'EDM · energia de Agosto', 'DSP-2026-0832', '142 800,00 MT', 96],
+      ['TRF HOTEL CARDOSO SA', '9 Ago', '74 600,00 MT', 'Hotel Cardoso · missão a Sofala', 'DSP-2026-0833', '74 600,00 MT', 94],
+      ['TRF TDM TELECOMUNICACOES', '6 Ago', '96 300,00 MT', 'TDM · internet dedicada', 'DSP-2026-0834', '96 300,00 MT', 88],
+      ['TRF PAPELARIA CENTRAL', '11 Ago', '38 750,00 MT', 'Papelaria Central · consumíveis', 'DSP-2026-0835', '38 750,00 MT', 72]
+    ];
+    const propostas = propostasDef.filter(p => !this.state.confirmadas.includes(p[4])).map(p => ({
+      descBanco: p[0], dataBanco: p[1], valorBanco: p[2], descNexora: p[3], refNexora: p[4], valorNexora: p[5], conf: p[6],
+      confTexto: p[6] >= 95 ? 'Exacta' : p[6] >= 80 ? 'Provável' : 'Revisão',
+      confBg: p[6] >= 95 ? tint.grn : p[6] >= 80 ? tint.blue : tint.amb,
+      confFg: p[6] >= 95 ? GRN : p[6] >= 80 ? BLUE : AMB,
+      confirmar: () => { this.setState(s => ({ confirmadas: s.confirmadas.concat(p[4]) })); this.flash('Reconciliada · ' + p[3] + '.'); }
+    }));
+
+    const semPar = [
+      { desc: 'Transferência recebida da Delegação da UE — tranche 3', data: '5 Ago', valor: '+1 400 000 MT', acao: 'Registar receita' },
+      { desc: 'Adiantamento enviado a M. Chirindza', data: '3 Ago', valor: '−48 000 MT', acao: 'Ligar a adiantamento' },
+      { desc: 'Comissões e encargos bancários', data: '1 Ago', valor: '−4 850 MT', acao: 'Criar despesa' }
+    ];
+
+    const excResumo = [
+      { label: 'Crítico · dinheiro em risco', n: 3, valor: '1 682 600 MT', nota: 'mais antiga há 9 dias', cor: RED },
+      { label: 'A corrigir antes do fecho', n: 5, valor: '484 150 MT', nota: 'fecho a 31 de Agosto', cor: AMB },
+      { label: 'Em acompanhamento', n: 3, valor: '48 000 MT', nota: 'com responsável atribuído', cor: GRAY }
+    ];
+    const excepcoes = [
+      ['Sem correspondência', tint.red, RED, 'Entrada de 1,4 M MT sem receita registada', 'Tranche 3 da UE · extrato de 5 de Agosto', '1 400 000 MT', '7 dias', 'Helena Cossa', 'Registar receita'],
+      ['Aprovada não paga', tint.red, RED, 'Clínica Cruz Azul aprovada há 9 dias', 'Ainda dentro do prazo, mas fora do SLA interno', '164 200 MT', '9 dias', 'Tesouraria', 'Pôr na fila'],
+      ['Vencida hoje', tint.red, RED, 'Sasol sem confirmação bancária', 'Pagamento iniciado a 10 de Agosto', '118 400 MT', 'hoje', 'Tesouraria', 'Confirmar'],
+      ['Duplicação', tint.gray, GRAY, 'Duas facturas Tecnhosat com o mesmo valor', 'FAC-0839 e FAC-0841', '412 500 MT', '3 dias', 'Nélio Bila', 'Comparar'],
+      ['Sem factura', tint.amb, AMB, '3 despesas de Agosto sem documento', 'Fecho do mês a 31 de Agosto', '94 200 MT', '6 dias', 'Nélio Bila', 'Pedir documento'],
+      ['Adiantamento', tint.amb, AMB, 'M. Chirindza com saldo por regularizar', 'Sem despesa a abater desde 2 de Julho', '48 000 MT', '41 dias', 'Recursos Humanos', 'Notificar']
+    ].map(e => ({ tipo: e[0], bg: e[1], fg: e[2], titulo: e[3], detalhe: e[4], valor: e[5], dias: e[6], responsavel: e[7], acao: e[8] }));
+
+    const h = this.state.horizonte;
+    const horizontes = [30, 60, 90].map(x => ({
+      label: x + ' dias', set: () => this.setState({ horizonte: x }),
+      bg: h === x ? '#F2F4F7' : '#fff', fg: h === x ? '#101828' : '#667085'
+    }));
+    const nSem = h === 30 ? 5 : h === 60 ? 9 : 13;
+    const inflows = [820, 240, 1400, 180, 260, 940, 210, 180, 1250, 240, 190, 880, 320];
+    const outflows = [610, 780, 520, 690, 1240, 580, 640, 1180, 610, 720, 560, 690, 640];
+    const semanas = Array.from({ length: nSem }, (_, i) => ({
+      label: i === 0 ? 'agora' : 'S' + i,
+      hIn: Math.round(inflows[i] / 8.5), hOut: Math.round(outflows[i] / 8.5),
+      corOut: outflows[i] > 1000 ? '#F97066' : '#D0D5DD'
+    }));
+    const saldoFim = h === 30 ? '4 424 000 MT' : h === 60 ? '3 182 000 MT' : '3 964 000 MT';
+    const pontoBaixo = h === 30 ? '3 940 000 MT' : '612 000 MT';
+    const tesourariaFrase = h === 30
+      ? 'Nos próximos 30 dias as saídas mantêm-se abaixo das entradas em todas as semanas — sem pressão prevista.'
+      : 'A semana de 18 de Outubro é a única de risco: três pagamentos de projecto somam 1 240 000 MT e o saldo desce a 612 000 MT, abaixo do mínimo de 800 000 MT definido pela organização. Reescalonar dois deles resolve.';
+
+    const drivers = [
+      { nome: 'Saldo de hoje', valor: '4 812 400 MT', cor: '#101828' },
+      { nome: 'Pagamentos aprovados', valor: '−1 286 900 MT', cor: AMB },
+      { nome: 'Despesa recorrente estimada', valor: '−2 410 000 MT', cor: AMB },
+      { nome: 'Tranches confirmadas', valor: '+2 145 000 MT', cor: BLUE },
+      { nome: 'Receita própria projectada', valor: '+840 000 MT', cor: BLUE }
+    ];
+    const cenarios = [
+      { nome: 'Como está previsto', valor: '3 964 000 MT', cor: '#101828' },
+      { nome: 'Tranche da UE atrasa 30 dias', valor: '2 564 000 MT', cor: AMB },
+      { nome: 'Atrasa e despesa sobe 10%', valor: '1 890 000 MT', cor: RED }
+    ];
+
+    const projectos = [
+      ['Projecto Zambeze · Saúde', 'União Europeia', 'C. Mabjaia', 84, 92, '5,00 M', '4,20 M', '412 500', '387 500', 'esgota a 2 Nov', 'Acima de 80%', tint.red, RED],
+      ['Programa Nampula', 'DANIDA', 'R. Sitoe', 61, 68, '3,00 M', '1,83 M', '186 000', '984 000', 'no calendário', 'Normal', tint.grn, GRN],
+      ['Operação corrente', 'Fundos próprios', 'H. Cossa', 47, 52, '2,40 M', '1,13 M', '120 000', '1,15 M', 'dentro do previsto', 'Normal', tint.grn, GRN],
+      ['Fundo Emergência Sofala', 'USAID', 'R. Sitoe', 22, 30, '1,20 M', '264 000', '96 000', '840 000', 'arranque recente', 'Início', tint.gray, GRAY]
+    ].map(p => {
+      const cor = p[3] >= 80 ? '#F04438' : p[3] >= 60 ? '#F79009' : BLUE;
+      return {
+        nome: p[0], financiador: p[1], gestor: p[2], pct: p[3], pctComprometido: p[4],
+        numeros: [
+          { label: 'Orçamento', valor: p[5] + ' MT', cor: '#101828' },
+          { label: 'Executado', valor: p[6] + ' MT', cor: cor },
+          { label: 'Comprometido', valor: p[7] + ' MT', cor: GRAY },
+          { label: 'Disponível', valor: p[8] + ' MT', cor: p[3] >= 80 ? RED : GRN }
+        ],
+        cor, corClara: p[3] >= 80 ? '#FEE4E2' : p[3] >= 60 ? '#FEF0C7' : '#D9E0FE',
+        nota: p[9], estado: p[10], estadoBg: p[11], estadoFg: p[12]
+      };
+    });
+
+    const grants = [
+      { fonte: 'Fundo Doador UE · FED/2026/041', conta: 'Standard 9982211', recebido: '4,20 M MT', aplicado: '3,81 M MT', porJustificar: '387 500 MT', cor: AMB, relatorio: '30 Set · trimestral' },
+      { fonte: 'DANIDA · Programa Nampula', conta: 'Millennium 7745120', recebido: '3,00 M MT', aplicado: '1,83 M MT', porJustificar: '—', cor: '#98A2B3', relatorio: '15 Out · semestral' },
+      { fonte: 'USAID · Emergência Sofala', conta: 'BCI 5541203', recebido: '1,20 M MT', aplicado: '264 000 MT', porJustificar: '—', cor: '#98A2B3', relatorio: '31 Dez · final' },
+      { fonte: 'Fundos próprios', conta: 'BCI 1234567', recebido: '—', aplicado: '1,13 M MT', porJustificar: '—', cor: '#98A2B3', relatorio: '—' }
+    ];
+
+    const insights = [
+      { icone: '▲', bg: tint.red, fg: RED, titulo: 'Tecnhosat cobra 38% mais do que há três meses', detalhe: 'Passou de 298 000 para 412 500 MT por ciclo sem alteração de contrato registada. Vale confirmar o âmbito facturado antes da próxima aprovação.' },
+      { icone: '◉', bg: tint.amb, fg: AMB, titulo: 'Um fornecedor pesa 21% da despesa operacional', detalhe: 'Acima do limite interno de 15%. Os cinco maiores somam 54% de tudo o que a organização gasta.' }
+    ];
+    const fornecedores = [
+      ['TS', 'Tecnhosat Serviços', 14, '4,96 M MT', '354 428 MT', '+38%', RED, 21],
+      ['SM', 'Sasol Moçambique', 12, '1,81 M MT', '151 033 MT', '+4%', GRAY, 12],
+      ['CL', 'Cornelder Logística', 9, '1,60 M MT', '178 322 MT', '−7%', GRN, 9],
+      ['MC', 'Moza Consulting', 4, '1,40 M MT', '350 000 MT', '+12%', AMB, 8],
+      ['EM', 'Electricidade de Moçambique', 12, '1,35 M MT', '112 383 MT', '+2%', GRAY, 7],
+      ['TD', 'TDM Telecom', 12, '984 300 MT', '82 025 MT', '0%', GRAY, 5],
+      ['HC', 'Hotel Cardoso', 7, '512 800 MT', '73 257 MT', '−18%', GRN, 3]
+    ].map(x => ({
+      sigla: x[0], nome: x[1], transacoes: x[2], acumulado: x[3], medio: x[4], variacao: x[5], varCor: x[6],
+      pct: x[7], pctBar: x[7] * 4, barCor: x[7] >= 15 ? '#F04438' : BLUE
+    }));
+
+    const camposRelatorio = [
+      { label: 'Período', valor: 'Agosto de 2026' },
+      { label: 'Agrupar por', valor: 'Rubrica orçamental' },
+      { label: 'Fonte de financiamento', valor: 'Todas' },
+      { label: 'Estado', valor: 'Aprovadas, pagas e reconciliadas' }
+    ];
+    const linhasRelatorio = [
+      ['6.2.1 · Serviços de TI', 6, '412 400 MT', '412 500 MT', 43],
+      ['6.1.1 · Salários e encargos', 41, '482 100 MT', '—', 25],
+      ['6.3.2 · Logística e transporte', 18, '—', '286 900 MT', 15],
+      ['6.1.3 · Utilidades', 9, '—', '142 800 MT', 7],
+      ['6.4.1 · Viagens e ajudas de custo', 12, '74 600 MT', '—', 4],
+      ['6.2.4 · Auditoria e consultoria', 3, '68 300 MT', '—', 3],
+      ['6.5.2 · Consumíveis', 22, '38 750 MT', '—', 2],
+      ['6.9.9 · Outros', 103, '14 050 MT', '—', 1]
+    ].map(l => ({ rubrica: l[0], n: l[1], pago: l[2], porPagar: l[3], pct: l[4], corPorPagar: l[3] === '—' ? '#98A2B3' : AMB }));
+
+    const tabsConfig = [['politica', 'Política de aprovação'], ['etapas', 'Etapas do ciclo'], ['doc', 'Documento de autorização'], ['check', 'Lista de verificação'], ['nomes', 'Rubricas e nomes'], ['contas', 'Fontes e contas'], ['papeis', 'Pessoas e permissões']]
+      .map(([k, label]) => ({
+        label, set: () => this.setState({ tabConfig: k }),
+        bg: this.state.tabConfig === k ? '#F2F4F7' : 'transparent',
+        fg: this.state.tabConfig === k ? '#101828' : '#475467',
+        weight: this.state.tabConfig === k ? '600' : '400'
+      }));
+
+    const politicas = [
+      ['Valor', 'Até 250 000 MT, aprova o responsável financeiro.', '1 nível'],
+      ['Valor', 'Entre 250 000 e 1 000 000 MT, aprova o responsável financeiro e depois a Direcção.', '2 níveis'],
+      ['Valor', 'Acima de 1 000 000 MT, sobe até ao Conselho de Administração.', '3 níveis'],
+      ['Fonte', 'Se usar o Fundo Doador UE, o gestor do projecto aprova sempre — qualquer que seja o valor.', '+1 nível'],
+      ['Tipo', 'Salários e encargos seguem por Recursos Humanos e Direcção, sem verificação financeira.', '2 níveis'],
+      ['Excepção', 'Se a despesa estiver fora de orçamento, sobe automaticamente um nível.', '+1 nível']
+    ].map(p => ({ dimensao: p[0], frase: p[1], niveis: p[2] }));
+
+    const etapasDef = [
+      ['requisicao', 'Requisição e cotações', 'Necessidade, cotações e justificação da escolha do fornecedor', 'opcional'],
+      ['despesa', 'Registo da despesa', 'O núcleo do sistema', 'sempre activo'],
+      ['verificacao', 'Verificação financeira', 'A lista de confirmações que a sua equipa já usa', 'configurável'],
+      ['autorizacao', 'Documento de autorização', 'O memorando ou nota que a organização assina', 'configurável'],
+      ['aprovacao', 'Aprovação', 'Segundo a política definida acima', 'sempre activo'],
+      ['pagamento', 'Pagamento', 'Fila, lotes e estados até ao banco', 'sempre activo'],
+      ['adiantamentos', 'Adiantamentos', 'Saldos próprios abatidos em despesas seguintes', 'opcional'],
+      ['reconciliacao', 'Reconciliação bancária', 'Importação do extrato e correspondência automática', 'sempre activo']
+    ];
+    const etapas = etapasDef.map(([k, nome, descricao, tag]) => {
+      const fixed = tag === 'sempre activo';
+      const on = fixed || !this.state.etapasOff.includes(k);
+      return {
+        nome, descricao, tag,
+        trackBg: on ? (fixed ? '#D0D5DD' : '#101828') : '#E4E7EC',
+        knobLeft: on ? 16 : 2,
+        corTitulo: on ? '#101828' : '#98A2B3',
+        toggle: () => {
+          if (fixed) { this.flash('Etapa estrutural — o rasto de auditoria não se desliga.'); return; }
+          this.setState(s => ({ etapasOff: on ? s.etapasOff.concat(k) : s.etapasOff.filter(x => x !== k) }));
+        }
+      };
+    });
+
+    const ligacoes = [
+      { fonte: 'Fundo Doador UE', conta: 'Standard 9982211', regra: 'exclusiva', bg: tint.blue, fg: BLUE },
+      { fonte: 'DANIDA · Nampula', conta: 'Millennium 7745120', regra: 'exclusiva', bg: tint.blue, fg: BLUE },
+      { fonte: 'USAID · Sofala', conta: 'BCI 5541203', regra: 'exclusiva', bg: tint.blue, fg: BLUE },
+      { fonte: 'Fundos próprios', conta: 'BCI 1234567', regra: 'excepção autorizável', bg: tint.amb, fg: AMB }
+    ];
+    const docConfig = [
+      { label: 'Existe no processo', valor: 'Sim' },
+      { label: 'Designação', valor: 'Nota de Autorização de Pagamento' },
+      { label: 'Numeração', valor: 'NAP-2026-0148' },
+      { label: 'Gerado', valor: 'após a verificação financeira' },
+      { label: 'Assinam', valor: 'Contabilista · Resp. Financeiro · Direcção' }
+    ];
+
+    const drawerId = this.state.drawer;
+    const dRow = dBase.find(d => d[0] === drawerId);
+    const sel = dRow
+      ? { fornecedor: dRow[2], descricao: dRow[3], ref: dRow[0], valor: dRow[4], vencimento: dRow[6], estado: dRow[9], estadoBg: estados[dRow[9]][0], estadoFg: estados[dRow[9]][1] }
+      : { fornecedor: '', descricao: '', ref: '', valor: '', vencimento: '', estado: '', estadoBg: tint.gray, estadoFg: GRAY };
+
+    return {
+      orgName: this.props.orgName ?? 'Grupo Zambeze',
+      pageTitle, pageSub, primaryAction, nav,
+      isDashboard: r === 'dashboard', isWatch: r === 'watch', isDespesas: r === 'despesas',
+      isAprovacoes: r === 'aprovacoes', isPagamentos: r === 'pagamentos', isReconciliacao: r === 'reconciliacao',
+      isExcepcoes: r === 'excepcoes', isTesouraria: r === 'tesouraria', isProjectos: r === 'projectos',
+      isFornecedores: r === 'fornecedores', isRelatorios: r === 'relatorios', isConfig: r === 'config',
+      goWatch: () => this.go('watch'), goTesouraria: () => this.go('tesouraria'), goFornecedores: () => this.go('fornecedores'),
+      toast: () => this.flash('Acção registada · rasto de auditoria actualizado.'),
+      toastMsg: this.state.toastMsg,
+      tiles, acoes, categorias,
+      sevFiltros, alertas, watchKpis,
+      despesas, vistas, resumoFrase, chips: ['Rubrica', 'Fonte', 'Projecto', 'Estado'],
+      toggleTodas: () => this.setState({ picked: todasOn ? [] : allIds }),
+      todasBorda: todasOn ? '#101828' : '#D0D5DD', todasFundo: todasOn ? '#101828' : '#fff', todasMarca: todasOn ? '✓' : '',
+      temSeleccao: this.state.picked.length > 0,
+      selTexto: this.state.picked.length + ' seleccionadas',
+      selTotal,
+      aprovarSel: () => { this.flash(this.state.picked.length + ' despesas aprovadas em bloco.'); this.setState({ picked: [] }); },
+      limparSel: () => this.setState({ picked: [] }),
+      aprovacoes, nAprov: aprovacoes.length + ' na fila',
+      aprovarTodas: () => this.flash('2 despesas que cumprem a política foram aprovadas.'),
+      tempos, pipeline, fila,
+      criarLote: () => this.flash('Lote criado · 3 pagamentos · 594 100 MT.'),
+      propostas, semPar,
+      reconciliados: 104 + this.state.confirmadas.length,
+      propostosN: propostas.length + 19,
+      confirmarTodas: () => { this.setState({ confirmadas: propostasDef.map(p => p[4]) }); this.flash('24 correspondências confirmadas · 7 excepções mantidas.'); },
+      excResumo, excepcoes,
+      horizontes, saldoFim, pontoBaixo, semanas, tesourariaFrase, drivers, cenarios,
+      projectos, grants, insights, fornecedores,
+      camposRelatorio, linhasRelatorio,
+      tabsConfig, politicas, etapas, ligacoes, docConfig,
+      drawerAberta: !!drawerId, sel, checklist, checkResumo, campos, percurso,
+      fecharDrawer: () => this.setState({ drawer: null }),
+      aprovarSelId: () => { this.flash(sel.fornecedor + ' aprovada · segue para pagamento.'); this.setState({ drawer: null }); }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #FFFFFF; }
+  * { box-sizing: border-box; }
+  a { color: #101828; text-decoration: none; }
+  a:hover { color: #2C5FF6; }
+  input, select, textarea { font: inherit; }
+  @keyframes nx-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes nx-toast { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+</style>
+</helmet>
+
+<div style="width: 100%; min-width: 1180px; font-family: 'Instrument Sans', system-ui, sans-serif; font-size: 14px; color: #101828; background: #fff; -webkit-font-smoothing: antialiased;">
+
+  <!-- ===================== NAV ===================== -->
+  <div style="position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.92); backdrop-filter: blur(10px); border-bottom: 1px solid #EAECF0;">
+    <div style="max-width: 1180px; margin: 0 auto; height: 64px; display: flex; align-items: center; gap: 30px; padding: 0 24px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <svg viewBox="0 0 40 40" style="width: 30px; height: 30px; display: block;">
+          <path d="M8 32 H10.8 V8 H8 Z" fill="#101828"></path>
+          <path d="M8 8 H12.2 L32 32 H27.6 Z" fill="#101828"></path>
+          <path d="M27.4 32 H32 V11.5 H27.4 Z" fill="#101828"></path>
+          <path d="M27.4 11.5 H32 V5.6 H27.4 Z" fill="#2C5FF6"></path>
+        </svg>
+        <span style="font-size: 16.5px; font-weight: 500; letter-spacing: .105em;">NEXORA</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 24px; font-size: 13.5px; color: #475467;">
+        <a href="#produto" style="color: #475467;">Produto</a>
+        <a href="#modulos" style="color: #475467;">Módulos</a>
+        <a href="#implementacao" style="color: #475467;">Implementação</a>
+        <a href="#planos" style="color: #475467;">Planos</a>
+        <a href="#partner" style="color: #475467;">Design Partner</a>
+      </div>
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 13.5px; color: #475467; cursor: pointer;" style-hover="color: #101828;">Entrar</span>
+        <span onClick="{{ irParaDemo }}" style="height: 36px; padding: 0 16px; display: flex; align-items: center; background: #101828; color: #fff; border-radius: 8px; font-size: 13.5px; font-weight: 500; cursor: pointer;" style-hover="background: #1D2939;">Agendar demonstração</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== HERO ===================== -->
+  <div style="border-bottom: 1px solid #EAECF0; background: linear-gradient(180deg, #FBFCFE 0%, #FFFFFF 62%); overflow: hidden;">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 68px 24px 0;">
+      <div style="display: grid; grid-template-columns: 1.05fr 1fr; gap: 56px; align-items: center;">
+        <div style="animation: nx-up .5s ease both;">
+          <div style="display: inline-flex; align-items: center; gap: 8px; height: 28px; padding: 0 11px; border: 1px solid #EAECF0; border-radius: 20px; font-size: 12.5px; color: #475467; background: #fff;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #12B76A;"></span>
+            Programa Design Partner aberto · 4 vagas
+          </div>
+          <h1 style="font-size: 54px; line-height: 1.04; letter-spacing: -.035em; font-weight: 600; margin: 22px 0 0;">Da factura ao<br />banco, sem<br />reconstruir nada.</h1>
+          <p style="font-size: 17px; line-height: 1.6; color: #475467; margin: 22px 0 0; max-width: 470px; text-wrap: pretty;">O NEXORA acompanha cada unidade monetária desde a factura até ao extrato bancário — aprovação, pagamento, reconciliação e relatório — e transforma esse percurso em inteligência para quem decide.</p>
+          <div style="display: flex; align-items: center; gap: 12px; margin-top: 28px;">
+            <span onClick="{{ irParaDemo }}" style="height: 46px; padding: 0 22px; display: flex; align-items: center; background: #101828; color: #fff; border-radius: 9px; font-size: 14.5px; font-weight: 500; cursor: pointer;" style-hover="background: #1D2939;">Agendar demonstração</span>
+            <span onClick="{{ verProduto }}" style="height: 46px; padding: 0 20px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 9px; font-size: 14.5px; font-weight: 500; cursor: pointer; background: #fff;" style-hover="border-color: #98A2B3;">Ver o produto</span>
+          </div>
+          <div style="display: flex; gap: 26px; margin-top: 30px; padding-top: 26px; border-top: 1px solid #EAECF0;">
+            <sc-for list="{{ heroProof }}" as="p" hint-placeholder-count="3">
+              <div>
+                <div style="font-size: 21px; font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums;">{{ p.n }}</div>
+                <div style="font-size: 12.5px; color: #667085; margin-top: 4px; line-height: 1.45;">{{ p.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- mock do produto -->
+        <div style="animation: nx-up .6s ease both; position: relative;">
+          <div style="border: 1px solid #EAECF0; border-radius: 12px; background: #fff; box-shadow: 0 24px 60px rgba(16,24,40,.10); overflow: hidden;">
+            <div style="height: 36px; border-bottom: 1px solid #EAECF0; display: flex; align-items: center; gap: 7px; padding: 0 12px; background: #FCFCFD;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #E4E7EC;"></span>
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #E4E7EC;"></span>
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #E4E7EC;"></span>
+              <span style="margin-left: 10px; font-size: 11px; color: #98A2B3;">app.nexora.co · Visão geral</span>
+            </div>
+            <div style="padding: 14px; display: flex; flex-direction: column; gap: 10px; background: #F7F8FA;">
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                <sc-for list="{{ mockTiles }}" as="t" hint-placeholder-count="3">
+                  <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 9px; padding: 11px 12px;">
+                    <div style="font-size: 10.5px; color: #667085;">{{ t.label }}</div>
+                    <div style="font-size: 17px; font-weight: 600; margin-top: 7px; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ t.v }}</div>
+                    <div style="font-size: 10px; color: {{ t.cor }}; margin-top: 4px;">{{ t.d }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 9px;">
+                <div style="padding: 9px 12px; border-bottom: 1px solid #F2F4F7; display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 11.5px; font-weight: 600;">Precisa de acção</span>
+                  <span style="font-size: 10px; color: #B42318; background: #FEF3F2; padding: 1px 6px; border-radius: 4px; font-weight: 600;">2 críticos</span>
+                </div>
+                <sc-for list="{{ mockAcoes }}" as="a" hint-placeholder-count="3">
+                  <div style="display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-bottom: 1px solid #F7F8FA;">
+                    <span style="width: 5px; height: 5px; border-radius: 50%; background: {{ a.cor }};"></span>
+                    <span style="flex: 1; font-size: 11px; color: #344054; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ a.t }}</span>
+                    <span style="font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap;">{{ a.v }}</span>
+                    <span style="font-size: 10px; padding: 2px 7px; border: 1px solid #E4E7EC; border-radius: 5px; color: #475467; white-space: nowrap;">{{ a.b }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 9px; padding: 11px 12px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 11.5px; font-weight: 600;">Caixa projectada · 90 dias</span>
+                  <span style="margin-left: auto; font-size: 10px; color: #B42318; background: #FEF3F2; padding: 1px 6px; border-radius: 4px; font-weight: 600;">1 semana sob pressão</span>
+                </div>
+                <svg viewBox="0 0 400 90" style="width: 100%; height: 90px; margin-top: 8px; display: block;">
+                  <defs>
+                    <linearGradient id="lpA" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#2C5FF6" stop-opacity=".16" />
+                      <stop offset="100%" stop-color="#2C5FF6" stop-opacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M0 44 L40 38 L80 50 L120 34 L160 46 L200 28 L240 44 L280 58 L320 70 L360 56 L400 46 L400 84 L0 84 Z" fill="url(#lpA)"></path>
+                  <polyline points="0,44 40,38 80,50 120,34 160,46 200,28 240,44 280,58 320,70 360,56 400,46" fill="none" stroke="#2C5FF6" stroke-width="1.8"></polyline>
+                  <circle cx="320" cy="70" r="3" fill="#fff" stroke="#B42318" stroke-width="1.8"></circle>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 30px; padding: 34px 0 30px; margin-top: 40px; border-top: 1px solid #EAECF0;">
+        <span style="font-size: 12px; color: #98A2B3; white-space: nowrap;">Construído para o processo real de</span>
+        <sc-for list="{{ perfis }}" as="p" hint-placeholder-count="5">
+          <span style="font-size: 13.5px; font-weight: 500; color: #667085;">{{ p }}</span>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PROBLEMA ===================== -->
+  <div style="border-bottom: 1px solid #EAECF0;">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 76px 24px;">
+      <div style="max-width: 660px;">
+        <div style="font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #98A2B3;">O problema</div>
+        <h2 style="font-size: 34px; line-height: 1.15; letter-spacing: -.025em; font-weight: 600; margin: 14px 0 0;">A informação financeira existe. Está apenas espalhada por seis sítios.</h2>
+        <p style="font-size: 16px; line-height: 1.65; color: #475467; margin: 16px 0 0;">A pergunta mais simples que uma direcção faz — <em>quanto temos comprometido e ainda não pago?</em> — costuma exigir meio dia de trabalho para ser respondida.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 40px;">
+        <sc-for list="{{ problema }}" as="p" hint-placeholder-count="6">
+          <div style="border: 1px solid #EAECF0; border-radius: 11px; padding: 18px 20px;">
+            <div style="display: flex; align-items: center; gap: 9px;">
+              <span style="font-size: 11px; font-weight: 600; color: #98A2B3; font-variant-numeric: tabular-nums;">{{ p.n }}</span>
+              <span style="font-size: 14px; font-weight: 600;">{{ p.etapa }}</span>
+            </div>
+            <div style="font-size: 12.5px; color: #667085; margin-top: 10px;">Hoje vive em <strong style="color: #344054; font-weight: 500;">{{ p.onde }}</strong></div>
+            <div style="display: flex; align-items: flex-start; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #F2F4F7;">
+              <span style="color: #B42318; font-size: 12px; line-height: 1.3;">✕</span>
+              <span style="font-size: 12.5px; color: #B42318; line-height: 1.5;">{{ p.mal }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CICLO / PRODUTO ===================== -->
+  <div id="produto" style="background: #101828; color: #fff;">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 80px 24px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: start;">
+        <div>
+          <div style="font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #667085;">Um único fluxo</div>
+          <h2 style="font-size: 34px; line-height: 1.15; letter-spacing: -.025em; font-weight: 600; margin: 14px 0 0;">Sete etapas. Cada uma alimenta a seguinte, sozinha.</h2>
+          <p style="font-size: 16px; line-height: 1.65; color: #98A2B3; margin: 16px 0 0;">Cada despesa é registada uma única vez. O estado de qualquer despesa é conhecido a qualquer momento, por qualquer pessoa autorizada, sem perguntar a ninguém.</p>
+          <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 30px;">
+            <sc-for list="{{ promessas }}" as="p" hint-placeholder-count="3">
+              <div style="display: flex; gap: 13px; align-items: flex-start;">
+                <span style="width: 22px; height: 22px; border-radius: 6px; background: rgba(255,255,255,.1); color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; flex: 0 0 22px;">✓</span>
+                <div>
+                  <div style="font-size: 14.5px; font-weight: 600;">{{ p.t }}</div>
+                  <div style="font-size: 13px; color: #98A2B3; margin-top: 4px; line-height: 1.6;">{{ p.d }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <sc-for list="{{ ciclo }}" as="c" hint-placeholder-count="7">
+            <div onClick="{{ c.pick }}" style="border: 1px solid {{ c.borda }}; background: {{ c.fundo }}; border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: background .15s ease;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 11px; font-weight: 600; color: {{ c.numFg }}; font-variant-numeric: tabular-nums; width: 16px;">{{ c.n }}</span>
+                <span style="font-size: 14px; font-weight: 600; letter-spacing: .01em;">{{ c.nome }}</span>
+                <span style="margin-left: auto; font-size: 11.5px; color: #667085;">{{ c.tag }}</span>
+              </div>
+              <sc-if value="{{ c.aberto }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size: 13px; color: #98A2B3; line-height: 1.6; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.08);">{{ c.desc }}</div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== DIFERENÇA ===================== -->
+  <div style="border-bottom: 1px solid #EAECF0;">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 76px 24px;">
+      <div style="max-width: 640px;">
+        <div style="font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #98A2B3;">A diferença</div>
+        <h2 style="font-size: 34px; line-height: 1.15; letter-spacing: -.025em; font-weight: 600; margin: 14px 0 0;">A maioria dos sistemas mostra informação. O NEXORA procura os problemas.</h2>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 36px;">
+        <div style="border: 1px solid #EAECF0; border-radius: 12px; overflow: hidden;">
+          <div style="padding: 14px 18px; border-bottom: 1px solid #EAECF0; background: #FCFCFD; font-size: 13px; font-weight: 600; color: #667085;">Antes</div>
+          <sc-for list="{{ antes }}" as="a" hint-placeholder-count="6">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 13px 18px; border-bottom: 1px solid #F2F4F7;">
+              <span style="font-size: 13px; color: #667085; flex: 1;">{{ a.o }}</span>
+              <span style="font-size: 12.5px; color: #98A2B3; text-align: right; flex: 1;">{{ a.antes }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="border: 1px solid #101828; border-radius: 12px; overflow: hidden;">
+          <div style="padding: 14px 18px; border-bottom: 1px solid #EAECF0; background: #101828; color: #fff; font-size: 13px; font-weight: 600;">Com o NEXORA</div>
+          <sc-for list="{{ antes }}" as="a" hint-placeholder-count="6">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 13px 18px; border-bottom: 1px solid #F2F4F7;">
+              <span style="color: #12B76A; font-size: 12px;">✓</span>
+              <span style="font-size: 13px; font-weight: 500; flex: 1;">{{ a.depois }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="margin-top: 22px; border: 1px solid #EAECF0; border-radius: 12px; padding: 22px 24px; display: flex; align-items: center; gap: 28px; background: #FCFCFD;">
+        <div style="flex: 1;">
+          <div style="font-size: 16px; font-weight: 600;">O indicador que propomos medir é só um: horas eliminadas das operações financeiras.</div>
+          <div style="font-size: 13.5px; color: #667085; margin-top: 7px; line-height: 1.6;">Linha de base recolhida antes do arranque, comparação aos 30, 60 e 90 dias. Se não entregarmos os resultados acordados, não há contrato.</div>
+        </div>
+        <span onClick="{{ irParaDemo }}" style="height: 42px; padding: 0 18px; display: flex; align-items: center; background: #101828; color: #fff; border-radius: 9px; font-size: 13.5px; font-weight: 500; cursor: pointer; white-space: nowrap;" style-hover="background: #1D2939;">Falar com a equipa</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MÓDULOS ===================== -->
+  <div id="modulos" style="border-bottom: 1px solid #EAECF0;">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 76px 24px;">
+      <div style="display: flex; align-items: flex-end; gap: 30px;">
+        <div style="max-width: 620px;">
+          <div style="font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #98A2B3;">Módulos</div>
+          <h2 style="font-size: 34px; line-height: 1.15; letter-spacing: -.025em; font-weight: 600; margin: 14px 0 0;">Configurável, não prescritivo.</h2>
+          <p style="font-size: 16px; line-height: 1.65; color: #475467; margin: 14px 0 0;">Nenhuma organização deve alterar o seu processo financeiro para caber num sistema. Active os módulos que correspondem ao seu ciclo — o que é obrigatório é o rasto.</p>
+        </div>
+        <div style="margin-left: auto; display: flex; gap: 8px;">
+          <sc-for list="{{ modFiltros }}" as="m" hint-placeholder-count="3">
+            <span onClick="{{ m.set }}" style="height: 34px; padding: 0 14px; display: flex; align-items: center; border: 1px solid {{ m.borda }}; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; background: {{ m.bg }}; color: {{ m.fg }};" style-hover="border-color: #98A2B3;">{{ m.label }}</span>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 34px;">
+        <sc-for list="{{ modulos }}" as="m" hint-placeholder-count="9">
+          <div style="border: 1px solid #EAECF0; border-radius: 11px; padding: 18px 20px;" style-hover="border-color: #D0D5DD;">
+            <div style="display: flex; align-items: center; gap: 9px;">
+              <span style="font-size: 14.5px; font-weight: 600;">{{ m.nome }}</span>
+              <sc-if value="{{ m.tag }}" hint-placeholder-val="{{ false }}">
+                <span style="font-size: 10.5px; font-weight: 600; padding: 2px 7px; border-radius: 5px; background: {{ m.tagBg }}; color: {{ m.tagFg }};">{{ m.tag }}</span>
+              </sc-if>
+            </div>
+            <div style="font-size: 13px; color: #667085; margin-top: 9px; line-height: 1.6;">{{ m.desc }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== AUDITORIA ===================== -->
+  <div style="border-bottom: 1px solid #EAECF0; background: #FBFCFE;">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 76px 24px;">
+      <div style="display: grid; grid-template-columns: 380px 1fr; gap: 50px; align-items: start;">
+        <div>
+          <div style="font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #98A2B3;">Auditoria</div>
+          <h2 style="font-size: 32px; line-height: 1.16; letter-spacing: -.025em; font-weight: 600; margin: 14px 0 0;">Quatro perguntas. Respondidas por construção.</h2>
+          <p style="font-size: 15.5px; line-height: 1.65; color: #475467; margin: 14px 0 0;">Para quem gere fundos de terceiros, esta é frequentemente a razão mais forte para adoptar a plataforma. A poupança de horas é o benefício visível; chegar à auditoria com o processo já defensável evita o custo que ninguém orçamenta.</p>
+        </div>
+        <div style="background: #fff; border: 1px solid #EAECF0; border-radius: 12px; overflow: hidden;">
+          <sc-for list="{{ auditoria }}" as="a" hint-placeholder-count="5">
+            <div style="display: grid; grid-template-columns: 1fr 1.35fr; gap: 20px; padding: 16px 20px; border-bottom: 1px solid #F2F4F7;">
+              <span style="font-size: 13.5px; font-weight: 500;">{{ a.p }}</span>
+              <span style="font-size: 13px; color: #667085; line-height: 1.6;">{{ a.r }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== IMPLEMENTAÇÃO ===================== -->
+  <div id="implementacao" style="border-bottom: 1px solid #EAECF0;">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 76px 24px;">
+      <div style="max-width: 640px;">
+        <div style="font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #98A2B3;">Implementação</div>
+        <h2 style="font-size: 34px; line-height: 1.15; letter-spacing: -.025em; font-weight: 600; margin: 14px 0 0;">Seis semanas, com algo funcional em cada uma.</h2>
+        <p style="font-size: 16px; line-height: 1.65; color: #475467; margin: 14px 0 0;">Não há um período longo sem nada visível. Ao fim da segunda semana já está a registar despesas reais.</p>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 36px;">
+        <sc-for list="{{ semanas }}" as="s" hint-placeholder-count="6">
+          <div style="border: 1px solid #EAECF0; border-radius: 11px; padding: 16px; border-top: 3px solid {{ s.cor }};">
+            <div style="font-size: 11.5px; font-weight: 600; color: #98A2B3;">Semana {{ s.n }}</div>
+            <div style="font-size: 13.5px; font-weight: 600; margin-top: 9px; line-height: 1.4;">{{ s.ambito }}</div>
+            <div style="font-size: 12px; color: #667085; margin-top: 10px; padding-top: 10px; border-top: 1px solid #F2F4F7; line-height: 1.5;">{{ s.resultado }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PLANOS ===================== -->
+  <div id="planos" style="border-bottom: 1px solid #EAECF0; background: #FBFCFE;">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 76px 24px;">
+      <div style="max-width: 640px;">
+        <div style="font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #98A2B3;">Planos</div>
+        <h2 style="font-size: 34px; line-height: 1.15; letter-spacing: -.025em; font-weight: 600; margin: 14px 0 0;">Não cobramos por utilizador.</h2>
+        <p style="font-size: 16px; line-height: 1.65; color: #475467; margin: 14px 0 0;">Queremos Finanças, Direcção e Administração todos dentro da plataforma — cobrar por pessoa penalizaria exactamente o que gera valor. O preço resulta do escalão, do volume processado e dos módulos activos.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 36px;">
+        <sc-for list="{{ planos }}" as="p" hint-placeholder-count="3">
+          <div style="background: {{ p.fundo }}; color: {{ p.texto }}; border: 1px solid {{ p.borda }}; border-radius: 12px; padding: 24px; display: flex; flex-direction: column;">
+            <div style="display: flex; align-items: center; gap: 9px;">
+              <span style="font-size: 17px; font-weight: 600;">{{ p.nome }}</span>
+              <sc-if value="{{ p.destaque }}" hint-placeholder-val="{{ false }}">
+                <span style="font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 5px; background: rgba(255,255,255,.14); color: #fff;">mais escolhido</span>
+              </sc-if>
+            </div>
+            <div style="font-size: 13px; color: {{ p.mutado }}; margin-top: 8px; line-height: 1.55;">{{ p.perfil }}</div>
+            <div style="display: flex; align-items: baseline; gap: 7px; margin-top: 20px;">
+              <span style="font-size: 30px; font-weight: 600; letter-spacing: -.02em;">{{ p.preco }}</span>
+              <span style="font-size: 13px; color: {{ p.mutado }};">{{ p.unidade }}</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 9px; margin-top: 22px; padding-top: 20px; border-top: 1px solid {{ p.linha }};">
+              <sc-for list="{{ p.itens }}" as="i" hint-placeholder-count="7">
+                <div style="display: flex; gap: 9px; align-items: flex-start;">
+                  <span style="font-size: 11px; color: {{ i.cor }};">{{ i.marca }}</span>
+                  <span style="font-size: 13px; color: {{ i.fg }}; line-height: 1.5;">{{ i.t }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <span onClick="{{ irParaDemo }}" style="margin-top: 24px; height: 42px; display: flex; align-items: center; justify-content: center; background: {{ p.btnBg }}; color: {{ p.btnFg }}; border: 1px solid {{ p.btnBorda }}; border-radius: 9px; font-size: 13.5px; font-weight: 500; cursor: pointer;">{{ p.cta }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-size: 13px; color: #667085; margin-top: 18px; line-height: 1.6; max-width: 780px;">A implementação inicial — configuração de fluxos, importação de fornecedores e histórico, adaptação ao formato do seu extrato bancário e formação das equipas — é orçamentada separadamente. O pagamento anual antecipado tem desconto e encaixa no ciclo orçamental de quem planeia por exercício ou por projecto.</div>
+    </div>
+  </div>
+
+  <!-- ===================== DESIGN PARTNER ===================== -->
+  <div id="partner" style="background: #101828; color: #fff;">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 24px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center;">
+        <div>
+          <div style="font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #667085;">Programa Design Partner</div>
+          <h2 style="font-size: 32px; line-height: 1.16; letter-spacing: -.025em; font-weight: 600; margin: 14px 0 0;">As primeiras organizações não entram como clientes comuns.</h2>
+          <p style="font-size: 15.5px; line-height: 1.7; color: #98A2B3; margin: 16px 0 0;">Condições comerciais próprias durante o primeiro ano e influência directa nas prioridades de desenvolvimento. Em contrapartida pedimos trinta minutos por semana de acompanhamento e autorização para partilhar os resultados.</p>
+          <div style="margin-top: 22px; padding: 16px 18px; border: 1px solid rgba(255,255,255,.14); border-radius: 10px; font-size: 14px; line-height: 1.65;">Os objectivos do piloto são acordados por escrito antes do arranque, e a conversão em contrato fica condicionada ao seu cumprimento. <strong style="font-weight: 600;">Se não entregarmos os resultados, não há contrato.</strong></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <sc-for list="{{ passos }}" as="p" hint-placeholder-count="6">
+            <div style="display: flex; align-items: center; gap: 14px; padding: 15px 18px; border: 1px solid rgba(255,255,255,.1); border-radius: 10px;">
+              <span style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,.1); font-size: 11.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: 0 0 24px; font-variant-numeric: tabular-nums;">{{ p.n }}</span>
+              <span style="font-size: 13.5px; line-height: 1.5;">{{ p.t }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== AGENDAR DEMO ===================== -->
+  <div id="demo" style="border-bottom: 1px solid #EAECF0;">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 76px 24px;">
+      <div style="display: grid; grid-template-columns: 400px 1fr; gap: 50px; align-items: start;">
+        <div>
+          <div style="font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #98A2B3;">Demonstração</div>
+          <h2 style="font-size: 34px; line-height: 1.14; letter-spacing: -.025em; font-weight: 600; margin: 14px 0 0;">45 minutos sobre o seu processo, não sobre o nosso produto.</h2>
+          <p style="font-size: 15.5px; line-height: 1.7; color: #475467; margin: 16px 0 0;">Traga uma factura típica e um extrato bancário. Mapeamos o seu fluxo actual de despesas, verificações e aprovações, e mostramos o mesmo percurso já dentro do NEXORA.</p>
+          <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 26px;">
+            <sc-for list="{{ demoInclui }}" as="d" hint-placeholder-count="4">
+              <div style="display: flex; gap: 11px; align-items: flex-start;">
+                <span style="width: 20px; height: 20px; border-radius: 6px; background: #F2F4F7; color: #101828; font-size: 10px; display: flex; align-items: center; justify-content: center; flex: 0 0 20px;">✓</span>
+                <span style="font-size: 13.5px; color: #475467; line-height: 1.55;">{{ d }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top: 26px; padding-top: 22px; border-top: 1px solid #EAECF0; display: flex; align-items: center; gap: 12px;">
+            <span style="width: 38px; height: 38px; border-radius: 50%; background: #101828; color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center;">AM</span>
+            <div>
+              <div style="font-size: 13.5px; font-weight: 600;">Alcino Maido Nelson</div>
+              <div style="font-size: 12.5px; color: #667085;">Fundador · Maputo, Moçambique</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border: 1px solid #EAECF0; border-radius: 14px; overflow: hidden; box-shadow: 0 16px 44px rgba(16,24,40,.06);">
+          <sc-if value="{{ demoPendente }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <div style="padding: 18px 22px; border-bottom: 1px solid #EAECF0; display: flex; align-items: center; gap: 12px; background: #FCFCFD;">
+                <div>
+                  <div style="font-size: 15px; font-weight: 600;">Agendar demonstração</div>
+                  <div style="font-size: 12.5px; color: #667085; margin-top: 3px;">45 min · videochamada ou presencial em Maputo</div>
+                </div>
+                <span style="margin-left: auto; font-size: 12px; color: #667085; background: #fff; border: 1px solid #EAECF0; padding: 4px 9px; border-radius: 6px;">Fuso: CAT (UTC+2)</span>
+              </div>
+
+              <div style="padding: 20px 22px;">
+                <div style="font-size: 12px; font-weight: 600; color: #667085; margin-bottom: 10px;">1 · Escolha o dia</div>
+                <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;">
+                  <sc-for list="{{ dias }}" as="d" hint-placeholder-count="6">
+                    <div onClick="{{ d.pick }}" style="border: 1px solid {{ d.borda }}; background: {{ d.bg }}; color: {{ d.fg }}; border-radius: 9px; padding: 10px 6px; text-align: center; cursor: pointer;" style-hover="border-color: #98A2B3;">
+                      <div style="font-size: 11px; color: {{ d.mut }};">{{ d.dow }}</div>
+                      <div style="font-size: 17px; font-weight: 600; margin-top: 4px; font-variant-numeric: tabular-nums;">{{ d.dia }}</div>
+                      <div style="font-size: 10.5px; color: {{ d.mut }}; margin-top: 3px;">{{ d.mes }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+
+                <div style="font-size: 12px; font-weight: 600; color: #667085; margin: 22px 0 10px;">2 · Escolha a hora</div>
+                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+                  <sc-for list="{{ horas }}" as="hh" hint-placeholder-count="5">
+                    <div onClick="{{ hh.pick }}" style="border: 1px solid {{ hh.borda }}; background: {{ hh.bg }}; color: {{ hh.fg }}; border-radius: 9px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; cursor: {{ hh.cursor }}; font-variant-numeric: tabular-nums; text-decoration: {{ hh.risco }};" style-hover="border-color: #98A2B3;">{{ hh.label }}</div>
+                  </sc-for>
+                </div>
+
+                <div style="font-size: 12px; font-weight: 600; color: #667085; margin: 22px 0 10px;">3 · Os seus dados</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                  <sc-for list="{{ campos }}" as="c" hint-placeholder-count="6">
+                    <div style="grid-column: {{ c.span }};">
+                      <div style="font-size: 11.5px; color: #667085; margin-bottom: 5px;">{{ c.label }}</div>
+                      <sc-if value="{{ c.isSelect }}" hint-placeholder-val="{{ false }}">
+                        <div onClick="{{ c.cycle }}" style="height: 38px; border: 1px solid #E4E7EC; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; padding: 0 11px; font-size: 13px; cursor: pointer; background: #fff;" style-hover="border-color: #D0D5DD;">
+                          <span>{{ c.valor }}</span><span style="font-size: 8px; color: #98A2B3;">▼</span>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ c.isInput }}" hint-placeholder-val="{{ true }}">
+                        <input placeholder="{{ c.placeholder }}" value="{{ c.valor }}" onChange="{{ c.set }}" style="width: 100%; height: 38px; border: 1px solid #E4E7EC; border-radius: 8px; padding: 0 11px; font-size: 13px; color: #101828; outline: none; background: #fff;" style-focus="border-color: #2C5FF6; box-shadow: 0 0 0 3px rgba(44,95,246,.12);" />
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 14px; margin-top: 20px; padding-top: 18px; border-top: 1px solid #F2F4F7;">
+                  <div style="font-size: 12.5px; color: #667085; line-height: 1.5;">{{ resumoDemo }}</div>
+                  <span onClick="{{ confirmarDemo }}" style="margin-left: auto; height: 44px; padding: 0 22px; display: flex; align-items: center; background: {{ btnDemoBg }}; color: #fff; border-radius: 9px; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;" style-hover="background: #1D2939;">Confirmar demonstração</span>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ demoConfirmada }}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 40px 34px; animation: nx-up .3s ease both;">
+              <span style="width: 42px; height: 42px; border-radius: 50%; background: #ECFDF3; color: #067647; font-size: 18px; display: flex; align-items: center; justify-content: center;">✓</span>
+              <div style="font-size: 22px; font-weight: 600; letter-spacing: -.02em; margin-top: 18px;">Demonstração marcada</div>
+              <div style="font-size: 14.5px; color: #475467; margin-top: 10px; line-height: 1.65;">{{ confirmacaoTexto }}</div>
+              <div style="margin-top: 22px; border: 1px solid #EAECF0; border-radius: 10px; overflow: hidden;">
+                <sc-for list="{{ confirmacaoLinhas }}" as="l" hint-placeholder-count="4">
+                  <div style="display: flex; gap: 16px; padding: 12px 16px; border-bottom: 1px solid #F2F4F7; font-size: 13px;">
+                    <span style="color: #667085; width: 130px; flex: 0 0 130px;">{{ l.label }}</span>
+                    <span style="font-weight: 500;">{{ l.valor }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font-size: 13px; color: #667085; margin-top: 18px; line-height: 1.65;">Enviámos o convite com a ligação da chamada e uma lista curta do que trazer: uma factura típica, um extrato bancário e o nome do documento de autorização que usam hoje.</div>
+              <div style="display: flex; gap: 10px; margin-top: 22px;">
+                <span onClick="{{ reagendar }}" style="height: 40px; padding: 0 16px; display: flex; align-items: center; border: 1px solid #D0D5DD; border-radius: 9px; font-size: 13.5px; font-weight: 500; cursor: pointer;" style-hover="border-color: #98A2B3;">Escolher outra hora</span>
+                <span onClick="{{ verProduto }}" style="height: 40px; padding: 0 16px; display: flex; align-items: center; background: #101828; color: #fff; border-radius: 9px; font-size: 13.5px; font-weight: 500; cursor: pointer;" style-hover="background: #1D2939;">Ver o produto entretanto</span>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== FAQ ===================== -->
+  <div style="border-bottom: 1px solid #EAECF0;">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 24px;">
+      <div style="display: grid; grid-template-columns: 320px 1fr; gap: 50px; align-items: start;">
+        <h2 style="font-size: 30px; line-height: 1.16; letter-spacing: -.025em; font-weight: 600; margin: 0;">Perguntas que costumam surgir</h2>
+        <div style="border-top: 1px solid #EAECF0;">
+          <sc-for list="{{ faq }}" as="f" hint-placeholder-count="6">
+            <div onClick="{{ f.toggle }}" style="border-bottom: 1px solid #EAECF0; padding: 18px 0; cursor: pointer;">
+              <div style="display: flex; align-items: center; gap: 16px;">
+                <span style="font-size: 15px; font-weight: 500; flex: 1;">{{ f.p }}</span>
+                <span style="font-size: 15px; color: #98A2B3;">{{ f.sinal }}</span>
+              </div>
+              <sc-if value="{{ f.aberto }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size: 14px; color: #475467; line-height: 1.7; margin-top: 12px; max-width: 700px;">{{ f.r }}</div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CTA FINAL + FOOTER ===================== -->
+  <div style="background: #101828; color: #fff;">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 24px 40px;">
+      <div style="display: flex; align-items: center; gap: 40px;">
+        <div>
+          <h2 style="font-size: 38px; line-height: 1.12; letter-spacing: -.03em; font-weight: 600; margin: 0;">From expense to insight.</h2>
+          <p style="font-size: 16px; color: #98A2B3; margin: 14px 0 0; max-width: 520px; line-height: 1.6;">Comece pela sessão de descoberta: mapeamos o seu fluxo actual e definimos por escrito o que o piloto tem de provar.</p>
+        </div>
+        <div style="margin-left: auto; display: flex; gap: 12px;">
+          <span onClick="{{ irParaDemo }}" style="height: 48px; padding: 0 24px; display: flex; align-items: center; background: #fff; color: #101828; border-radius: 9px; font-size: 14.5px; font-weight: 600; cursor: pointer; white-space: nowrap;" style-hover="background: #EAECF0;">Agendar demonstração</span>
+          <span onClick="{{ verProduto }}" style="height: 48px; padding: 0 22px; display: flex; align-items: center; border: 1px solid #475467; border-radius: 9px; font-size: 14.5px; font-weight: 500; cursor: pointer; white-space: nowrap;" style-hover="border-color: #98A2B3;">Ver o produto</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 30px; margin-top: 60px; padding-top: 34px; border-top: 1px solid #1D2939;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg viewBox="0 0 40 40" style="width: 29px; height: 29px; display: block;">
+              <path d="M8 32 H10.8 V8 H8 Z" fill="#FFFFFF"></path>
+              <path d="M8 8 H12.2 L32 32 H27.6 Z" fill="#FFFFFF"></path>
+              <path d="M27.4 32 H32 V11.5 H27.4 Z" fill="#FFFFFF"></path>
+              <path d="M27.4 11.5 H32 V5.6 H27.4 Z" fill="#84A9FF"></path>
+            </svg>
+            <span style="font-size: 15.5px; font-weight: 500; letter-spacing: .105em;">NEXORA</span>
+          </div>
+          <div style="font-size: 12.5px; color: #667085; margin-top: 12px; line-height: 1.6;">Financial Operations Intelligence<br />Maputo, Moçambique · 2026</div>
+        </div>
+        <sc-for list="{{ footer }}" as="f" hint-placeholder-count="3">
+          <div>
+            <div style="font-size: 12px; font-weight: 600; color: #fff;">{{ f.titulo }}</div>
+            <div style="display: flex; flex-direction: column; gap: 9px; margin-top: 12px;">
+              <sc-for list="{{ f.itens }}" as="i" hint-placeholder-count="4">
+                <span style="font-size: 12.5px; color: #98A2B3; cursor: pointer;" style-hover="color: #fff;">{{ i }}</span>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-size: 11.5px; color: #475467; margin-top: 34px;">© 2026 NEXORA · Documento de apresentação v1.0</div>
+    </div>
+  </div>
+
+  <sc-if value="{{ toastMsg }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; bottom: 24px; left: 50%; background: #101828; color: #fff; padding: 12px 20px; border-radius: 9px; font-size: 13px; font-weight: 500; box-shadow: 0 12px 30px rgba(16,24,40,.28); animation: nx-toast .18s ease both; z-index: 80;">{{ toastMsg }}</div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1440, &quot;height&quot;: 1000}}">
+class Component extends DCLogic {
+  state = {
+    cicloAberto: 4, modFiltro: 'todos', faqAberta: 0,
+    dia: 2, hora: '10:00', formato: 'Videochamada',
+    nome: '', org: '', email: '', papel: 'Direcção Financeira',
+    confirmado: false, toastMsg: null
+  };
+
+  flash(msg) {
+    this.setState({ toastMsg: msg });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toastMsg: null }), 2600);
+  }
+
+  scrollTo(id) {
+    const el = document.getElementById(id);
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' });
+  }
+
+  renderVals() {
+    const RED = '#B42318', AMB = '#B54708', GRN = '#067647', BLUE = '#2C5FF6', MUT = '#667085';
+
+    const heroProof = [
+      { n: '6 semanas', label: 'da assinatura ao ciclo completo em produção' },
+      { n: '96%', label: 'do extrato reconciliado automaticamente' },
+      { n: '1,4 dias', label: 'tempo médio de aprovação, era 3,2' }
+    ];
+    const mockTiles = [
+      { label: 'Saldo', v: '4,81 M', d: '+6,2%', cor: GRN },
+      { label: 'Comprometido', v: '1,29 M', d: '48 despesas', cor: AMB },
+      { label: 'A pagar 7d', v: '742 300', d: '2 vencem hoje', cor: RED }
+    ];
+    const mockAcoes = [
+      { cor: '#F04438', t: '2 pagamentos vencem hoje sem confirmação', v: '186 400', b: 'Confirmar' },
+      { cor: '#F04438', t: 'Projecto Zambeze passou 80% do orçamento', v: '387 500', b: 'Ver' },
+      { cor: '#F79009', t: '4 despesas à espera há mais de 3 dias', v: '512 900', b: 'Aprovar' }
+    ];
+    const perfis = ['Empresas privadas', 'Organizações financiadas por doadores', 'Instituições públicas', 'Grupos multi-entidade'];
+
+    const problema = [
+      { n: '01', etapa: 'Factura', onde: 'e-mail, WhatsApp, papel', mal: 'Perde-se; é registada tarde ou nunca' },
+      { n: '02', etapa: 'Aprovação', onde: 'conversas, e-mails, assinaturas', mal: 'Sem rasto de quem aprovou o quê e quando' },
+      { n: '03', etapa: 'Pagamento', onde: 'folha de cálculo paralela', mal: 'Ninguém sabe o que está aprovado mas por pagar' },
+      { n: '04', etapa: 'Banco', onde: 'extrato mensal do banco', mal: 'Segunda fonte de verdade que nunca bate certo' },
+      { n: '05', etapa: 'Reconciliação', onde: 'trabalho manual, linha a linha', mal: 'Consome dias; erros passam despercebidos' },
+      { n: '06', etapa: 'Relatório', onde: 'reconstruído do zero todos os meses', mal: 'Chega tarde e já não serve para decidir' }
+    ];
+
+    const promessas = [
+      { t: 'Um único fluxo', d: 'Cada despesa é registada uma vez e segue um percurso visível até ao extrato bancário. Ninguém volta a juntar informação que já existe.' },
+      { t: 'Menos digitação', d: 'Facturas em PDF são lidas automaticamente e os movimentos bancários são associados por correspondência. A pessoa confirma, não digita.' },
+      { t: 'Vigilância activa', d: 'O sistema observa a operação em permanência e comunica, todas as manhãs, apenas o que precisa de atenção — filtrado pelo papel de cada um.' }
+    ];
+
+    const cicloDef = [
+      ['1', 'Despesa', 'obrigatório', 'A factura entra no sistema e é lida automaticamente: fornecedor, número, valor, datas. Ao utilizador cabe confirmar.'],
+      ['2', 'Aprovação', 'obrigatório', 'A matriz combina valor, tipo, projecto, fonte de financiamento e centro de custo — e encaminha para quem tem competência para decidir.'],
+      ['3', 'Pagamento', 'obrigatório', 'A despesa aprovada entra na fila, muda de estado e a conta de origem é determinada pela fonte de financiamento.'],
+      ['4', 'Banco', 'obrigatório', 'O extrato é importado em CSV, Excel ou OFX e comparado com o que foi registado.'],
+      ['5', 'Reconciliação', 'obrigatório', 'As correspondências são propostas com grau de confiança. Confirma em bloco e trata só das excepções — deixa de ser tarefa de fecho de mês.'],
+      ['6', 'Reporting', 'obrigatório', 'O relatório do período existe a qualquer momento, sem preparação, com exportação para PDF, Excel e CSV.'],
+      ['7', 'Intelligence', 'a partir do histórico', 'O histórico acumulado antecipa riscos: pressão de tesouraria, concentração de fornecedores, orçamentos a esgotar.']
+    ];
+    const ciclo = cicloDef.map(([n, nome, tag, desc], i) => {
+      const aberto = this.state.cicloAberto === i;
+      return {
+        n, nome, tag, desc, aberto,
+        borda: aberto ? 'rgba(255,255,255,.22)' : 'rgba(255,255,255,.08)',
+        fundo: aberto ? 'rgba(255,255,255,.06)' : 'transparent',
+        numFg: aberto ? '#fff' : '#667085',
+        pick: () => this.setState({ cicloAberto: aberto ? -1 : i })
+      };
+    });
+
+    const antes = [
+      { o: 'Registar uma despesa', antes: 'digitar 10 campos à mão', depois: 'carregar o PDF e confirmar' },
+      { o: 'Aprovar', antes: 'e-mails e assinaturas dispersas', depois: 'caixa de entrada com rasto auditável' },
+      { o: 'Saber o que falta pagar', antes: 'meio dia a cruzar ficheiros', depois: 'um filtro, resultado imediato' },
+      { o: 'Reconciliação bancária', antes: 'dias de trabalho manual', depois: 'correspondência automática + excepções' },
+      { o: 'Relatório mensal', antes: 'reconstruído do zero', depois: 'seleccionar o período e exportar' },
+      { o: 'Detectar problemas', antes: 'quando alguém repara', depois: 'todas as manhãs, automaticamente' }
+    ];
+
+    const modDef = [
+      ['nucleo', 'Controlo de Despesas', '', 'Fornecedor, valor, rubrica, fonte, projecto, centro de custo e documento de suporte — com os campos e obrigatoriedades que a sua organização definir.'],
+      ['nucleo', 'Aprovações multidimensionais', '', 'Matriz por valor, tipo, projecto, fonte e centro de custo, com substitutos por ausência e histórico das próprias alterações.'],
+      ['nucleo', 'Controlo de Pagamentos', '', 'Estados explícitos entre aprovada e reconciliada. "Mostra tudo o que foi aprovado e não pago" passa a ser um filtro.'],
+      ['nucleo', 'Reconciliação Bancária', '', 'Importação CSV, Excel ou OFX, correspondência automática com grau de confiança e confirmação em bloco.'],
+      ['nucleo', 'Centro de Excepções', '', 'Movimentos sem despesa, aprovadas sem pagamento, despesas sem documento, duplicações e adiantamentos por regularizar.'],
+      ['nucleo', 'NEXORA WATCH', '', 'Resumo diário por papel, com a acção ao lado de cada alerta, e um indicador único de saúde operacional acompanhado no tempo.'],
+      ['config', 'Documento de autorização', 'configurável', 'Memorando, nota ou ficha de pagamento: define se existe, como se chama, que campos tem e quem prepara, verifica e autoriza.'],
+      ['config', 'Verificação financeira', 'configurável', 'A lista de confirmações antes da aprovação — saldo, documentação, retenções, elegibilidade — cada uma registada com autor e data.'],
+      ['config', 'Fontes e contas bancárias', 'configurável', 'Cada fonte de financiamento ligada à sua conta. Deixa de ser uma convenção que as pessoas conhecem e passa a ser uma regra que o sistema aplica.'],
+      ['opcional', 'Requisições e aquisição', 'opcional', 'Necessidade, cotações e justificação da escolha do fornecedor. Quando aprovada, converte-se em despesa sem nova digitação.'],
+      ['opcional', 'Adiantamentos', 'opcional', 'Saldo próprio por beneficiário, abatido nas despesas seguintes, com alerta para o que fica demasiado tempo por regularizar.'],
+      ['opcional', 'Projectos, Orçamentos e Grants', 'opcional', 'Orçamento, executado, comprometido e disponível em permanência — e a cadeia rastreável de financiamento até ao relatório do doador.'],
+      ['nucleo', 'Previsão de Tesouraria', '', 'Posição de caixa a 30, 60 e 90 dias a partir de dados confirmados, com sinalização antecipada dos períodos de pressão.'],
+      ['nucleo', 'Inteligência de Fornecedores', '', 'Número de transacções, valor acumulado e médio, evolução — e o que estava escondido nos dados, como uma subida de 38% em três meses.'],
+      ['nucleo', 'Relatórios e contabilidade', '', 'O lote mensal sai classificado por rubrica, com documentos de suporte e comprovativos bancários, no formato acordado com o contabilista.']
+    ];
+    const mf = this.state.modFiltro;
+    const modulos = modDef.filter(m => mf === 'todos' || m[0] === mf).map(m => ({
+      nome: m[1], tag: m[2] || null, desc: m[3],
+      tagBg: m[2] === 'opcional' ? '#F2F4F7' : '#F0F4FF',
+      tagFg: m[2] === 'opcional' ? '#475467' : BLUE
+    }));
+    const modFiltros = [['todos', 'Todos'], ['nucleo', 'Núcleo'], ['config', 'Configuráveis'], ['opcional', 'Opcionais']]
+      .map(([k, label]) => ({
+        label, set: () => this.setState({ modFiltro: k }),
+        bg: mf === k ? '#101828' : '#fff', fg: mf === k ? '#fff' : '#475467',
+        borda: mf === k ? '#101828' : '#E4E7EC'
+      }));
+
+    const auditoria = [
+      { p: 'Foi autorizada por quem tinha competência?', r: 'Matriz de aprovação vigente à data, com o percurso seguido e o autor de cada decisão.' },
+      { p: 'Está documentada?', r: 'Factura, documento de autorização e comprovativo bancário associados ao mesmo processo.' },
+      { p: 'Foi paga da conta correcta?', r: 'Fonte de financiamento e conta ligadas por regra, com registo das excepções autorizadas.' },
+      { p: 'A despesa era elegível?', r: 'Estado de elegibilidade com autor e fundamento, ligado à rubrica e ao financiador.' },
+      { p: 'A separação de funções foi respeitada?', r: 'Verificação, aprovação e pagamento em pessoas distintas, com bloqueio configurável e registo das tentativas.' }
+    ];
+
+    const semanas = [
+      { n: '1', ambito: 'Estrutura, acessos, papéis', resultado: 'Acesso operacional', cor: '#D0D5DD' },
+      { n: '2', ambito: 'Fornecedores, categorias, despesas', resultado: 'Registo de despesas reais', cor: '#B9C6FC' },
+      { n: '3', ambito: 'Motor de aprovações e notificações', resultado: 'Despesa → Aprovação', cor: '#8FA4FA' },
+      { n: '4', ambito: 'Fila de pagamentos, estados e lotes', resultado: 'Aprovação → Pagamento', cor: '#5E7BF7' },
+      { n: '5', ambito: 'Contas, extratos e correspondência', resultado: 'Pagamento → Banco', cor: BLUE },
+      { n: '6', ambito: 'Dashboard, relatórios e alertas', resultado: 'Ciclo completo em produção', cor: '#101828' }
+    ];
+
+    const item = (t, on) => ({ t, marca: on ? '✓' : '—', cor: on ? GRN : '#98A2B3', fg: on ? '#344054' : '#98A2B3' });
+    const itemDark = (t, on) => ({ t, marca: on ? '✓' : '—', cor: on ? '#6CE9A6' : '#667085', fg: on ? '#EAECF0' : '#667085' });
+    const planos = [
+      {
+        nome: 'Starter', perfil: 'Organização pequena, um único fluxo de aprovação.', preco: 'Até 150', unidade: 'despesas / mês',
+        fundo: '#fff', texto: '#101828', mutado: MUT, borda: '#EAECF0', linha: '#F2F4F7',
+        btnBg: '#fff', btnFg: '#101828', btnBorda: '#D0D5DD', cta: 'Pedir proposta', destaque: false,
+        itens: [item('Utilizadores ilimitados', true), item('1 entidade', true), item('Aprovação de um nível', true), item('Reconciliação manual', true), item('WATCH · alertas essenciais', true), item('Projectos e orçamentos', false), item('Previsão de tesouraria', false), item('Suporte por e-mail', true)]
+      },
+      {
+        nome: 'Professional', perfil: 'Organização média que gere projectos e mais de uma fonte de fundos.', preco: 'Até 600', unidade: 'despesas / mês',
+        fundo: '#101828', texto: '#fff', mutado: '#98A2B3', borda: '#101828', linha: '#1D2939',
+        btnBg: '#fff', btnFg: '#101828', btnBorda: '#fff', cta: 'Agendar demonstração', destaque: true,
+        itens: [itemDark('Utilizadores ilimitados', true), itemDark('Até 3 entidades', true), itemDark('Multi-nível por limiar', true), itemDark('Reconciliação automática + excepções', true), itemDark('WATCH · catálogo completo', true), itemDark('Projectos e orçamentos', true), itemDark('Previsão de tesouraria', true), itemDark('API de leitura · suporte prioritário', true)]
+      },
+      {
+        nome: 'Enterprise', perfil: 'Multi-entidade ou financiada por doadores, com regras próprias.', preco: 'Ilimitado', unidade: 'volume e entidades',
+        fundo: '#fff', texto: '#101828', mutado: MUT, borda: '#EAECF0', linha: '#F2F4F7',
+        btnBg: '#101828', btnFg: '#fff', btnBorda: '#101828', cta: 'Falar com a equipa', destaque: false,
+        itens: [item('Entidades ilimitadas', true), item('Fluxos condicionais', true), item('Reconciliação com regras próprias', true), item('WATCH com regras personalizadas', true), item('Grant Control', true), item('Cenários de tesouraria', true), item('API completa e integrações', true), item('SLA e gestor de conta', true)]
+      }
+    ];
+
+    const passos = [
+      { n: '1', t: 'Sessão de descoberta para mapear o fluxo actual de despesas, verificações e aprovações' },
+      { n: '2', t: 'Definição da matriz de aprovação e do documento de autorização, se aplicável' },
+      { n: '3', t: 'Recolha de uma amostra real de extrato bancário e de facturas típicas' },
+      { n: '4', t: 'Definição conjunta do protocolo de medição e dos objectivos do piloto' },
+      { n: '5', t: 'Arranque da implementação, com entregas semanais' },
+      { n: '6', t: 'Avaliação de resultados aos 30, 60 e 90 dias' }
+    ];
+
+    const demoInclui = [
+      'Mapa do seu fluxo actual, etapa por etapa, com os pontos onde a informação se perde',
+      'A sua matriz de aprovação desenhada ao vivo dentro do sistema',
+      'Uma factura sua lida automaticamente e um extrato seu reconciliado',
+      'Estimativa de horas eliminadas por mês, com o protocolo de medição proposto'
+    ];
+
+    const diasDef = [
+      ['Qua', '13', 'Ago'], ['Qui', '14', 'Ago'], ['Sex', '15', 'Ago'],
+      ['Seg', '18', 'Ago'], ['Ter', '19', 'Ago'], ['Qua', '20', 'Ago']
+    ];
+    const dias = diasDef.map(([dow, dia, mes], i) => {
+      const on = this.state.dia === i;
+      return {
+        dow, dia, mes, pick: () => this.setState({ dia: i }),
+        bg: on ? '#101828' : '#fff', fg: on ? '#fff' : '#101828',
+        borda: on ? '#101828' : '#E4E7EC', mut: on ? '#98A2B3' : '#98A2B3'
+      };
+    });
+
+    const horasDef = [['08:30', true], ['10:00', true], ['11:30', false], ['14:00', true], ['16:00', true]];
+    const horas = horasDef.map(([label, livre]) => {
+      const on = this.state.hora === label && livre;
+      return {
+        label, cursor: livre ? 'pointer' : 'not-allowed', risco: livre ? 'none' : 'line-through',
+        bg: on ? '#101828' : livre ? '#fff' : '#F9FAFB',
+        fg: on ? '#fff' : livre ? '#101828' : '#C4CBD6',
+        borda: on ? '#101828' : '#E4E7EC',
+        pick: () => { if (livre) this.setState({ hora: label }); else this.flash('Esse horário já está ocupado.'); }
+      };
+    });
+
+    const papeis = ['Direcção Financeira', 'Direcção Geral', 'Administração', 'Gestão de Projecto', 'Contabilidade'];
+    const formatos = ['Videochamada', 'Presencial em Maputo'];
+    const setter = key => e => this.setState({ [key]: e.target.value });
+    const campos = [
+      { label: 'Nome', valor: this.state.nome, placeholder: 'Como se chama', isInput: true, isSelect: false, span: 'auto', set: setter('nome') },
+      { label: 'Organização', valor: this.state.org, placeholder: 'Nome da organização', isInput: true, isSelect: false, span: 'auto', set: setter('org') },
+      { label: 'E-mail de trabalho', valor: this.state.email, placeholder: 'nome@organizacao.co.mz', isInput: true, isSelect: false, span: 'span 2', set: setter('email') },
+      { label: 'O seu papel', valor: this.state.papel, isInput: false, isSelect: true, span: 'auto', cycle: () => this.setState({ papel: papeis[(papeis.indexOf(this.state.papel) + 1) % papeis.length] }) },
+      { label: 'Formato', valor: this.state.formato, isInput: false, isSelect: true, span: 'auto', cycle: () => this.setState({ formato: formatos[(formatos.indexOf(this.state.formato) + 1) % formatos.length] }) }
+    ];
+
+    const diaSel = diasDef[this.state.dia];
+    const dataTexto = diaSel[0] + ', ' + diaSel[1] + ' de Agosto às ' + this.state.hora;
+    const pronto = this.state.nome.trim() && this.state.email.trim();
+    const resumoDemo = pronto
+      ? dataTexto + ' · 45 min · ' + this.state.formato
+      : 'Preencha nome e e-mail para confirmar · ' + dataTexto;
+
+    const confirmacaoLinhas = [
+      { label: 'Quando', valor: dataTexto + ' (CAT)' },
+      { label: 'Duração', valor: '45 minutos' },
+      { label: 'Formato', valor: this.state.formato },
+      { label: 'Com', valor: 'Alcino Maido Nelson · NEXORA' }
+    ];
+
+    const faqDef = [
+      ['O NEXORA substitui o nosso ERP ou o contabilista?', 'Não. Ocupa a camada que hoje fica espalhada entre Finanças, Administração e Gestão: o espaço entre "temos uma factura" e "a despesa está contabilizada". Ao contabilista entrega trabalho organizado — o lote mensal classificado por rubrica, com documentos de suporte e comprovativos bancários associados a cada movimento.'],
+      ['Temos um processo próprio de autorização. Vamos ter de o mudar?', 'Não. Cada organização define as etapas activas, se emite um documento formal de autorização e como se chama, por que critérios se decide quem aprova, o que a verificação financeira confirma e como se designam as suas rubricas. O que é obrigatório no NEXORA é o rasto: quem fez, o quê, quando e com que fundamento.'],
+      ['Como é o preço, exactamente?', 'Não é por utilizador — queremos Finanças, Direcção e Administração todos dentro do sistema. O valor resulta do escalão, do volume processado e dos módulos activos. A implementação inicial é orçamentada separadamente e o pagamento anual antecipado tem desconto.'],
+      ['O nosso banco tem um formato de extrato invulgar. Funciona?', 'A adaptação ao formato do seu extrato faz parte da implementação. Suportamos CSV, Excel e OFX; na sessão de descoberta pedimos uma amostra real para confirmar antes de qualquer compromisso.'],
+      ['Quem pode ver o quê?', 'Permissões por papel, com separação estrita entre entidades. Registos financeiros imutáveis, eliminação apenas lógica, registo de auditoria de todas as acções com autor, data e hora, e autenticação em dois factores. Nenhum utilizador cria, aprova e paga a mesma despesa sem uma regra explícita que o permita.'],
+      ['E se o piloto não correr bem?', 'Os objectivos do piloto são acordados por escrito antes do arranque e a conversão em contrato fica condicionada ao seu cumprimento. Se não entregarmos os resultados, não há contrato.']
+    ];
+    const faq = faqDef.map(([p, r], i) => {
+      const aberto = this.state.faqAberta === i;
+      return { p, r, aberto, sinal: aberto ? '−' : '+', toggle: () => this.setState({ faqAberta: aberto ? -1 : i }) };
+    });
+
+    const footer = [
+      { titulo: 'Produto', itens: ['Ciclo da despesa', 'Aprovações e políticas', 'Reconciliação bancária', 'NEXORA WATCH', 'Grant Control'] },
+      { titulo: 'Empresa', itens: ['Sobre', 'Programa Design Partner', 'Segurança', 'Contactos'] },
+      { titulo: 'Recursos', itens: ['Documento de apresentação', 'Guia de implementação', 'Preparação para auditoria', 'Estado do serviço'] }
+    ];
+
+    return {
+      heroProof, mockTiles, mockAcoes, perfis, problema, promessas, ciclo, antes,
+      modulos, modFiltros, auditoria, semanas, planos, passos, demoInclui,
+      dias, horas, campos, resumoDemo, faq, footer,
+      btnDemoBg: pronto ? '#101828' : '#475467',
+      demoPendente: !this.state.confirmado,
+      demoConfirmada: this.state.confirmado,
+      confirmacaoTexto: (this.state.nome ? this.state.nome.split(' ')[0] + ', ' : '') + 'está marcado para ' + dataTexto + '. Enviámos a confirmação para ' + (this.state.email || 'o seu e-mail') + '.',
+      confirmacaoLinhas,
+      confirmarDemo: () => {
+        if (!pronto) { this.flash('Falta o nome e o e-mail de trabalho.'); return; }
+        this.setState({ confirmado: true });
+      },
+      reagendar: () => this.setState({ confirmado: false }),
+      irParaDemo: () => this.scrollTo('demo'),
+      verProduto: () => this.scrollTo('produto'),
+      toastMsg: this.state.toastMsg
+    };
+  }
+}
+
+</script>
+</body>
+</html>

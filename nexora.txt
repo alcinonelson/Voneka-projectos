@@ -1,0 +1,356 @@
+
+NEXORA
+Financial Operations Intelligence
+
+From expense to insight.
+A plataforma que acompanha cada unidade monetária desde a factura até ao banco — e transforma esse percurso em inteligência para a gestão.
+Documento de Apresentação de Produto
+Versão 1.0  ·  Agosto de 2026
+Preparado por Alcino Maido Nelson  ·  Maputo, Moçambique
+
+1. Sumário executivo
+Toda a organização que movimenta dinheiro enfrenta o mesmo problema silencioso: a informação financeira existe, mas está dispersa. As facturas estão numa pasta, as aprovações estão em e-mails ou em conversas de corredor, os pagamentos estão numa folha de cálculo, os extratos estão no banco e o relatório mensal nasce de um exercício manual de juntar tudo outra vez, mês após mês.
+O NEXORA existe para eliminar esse trabalho de reconstrução. É uma plataforma de controlo financeiro operacional que automatiza o ciclo completo das despesas — desde a factura e a aprovação até ao pagamento, à reconciliação bancária e ao reporting — e que, a partir desse histórico, produz inteligência financeira para quem decide.
+O NEXORA não substitui o contabilista nem compete com o ERP. Ocupa a camada que hoje fica espalhada entre Finanças, Administração e Gestão: o espaço entre “temos uma factura” e “a despesa está contabilizada”.
+A diferença central em relação às ferramentas existentes está numa mudança de postura. A maioria dos sistemas mostra informação e espera que alguém procure os problemas. O NEXORA procura os problemas e apresenta-os. É a passagem de dashboard para torre de controlo.
+2. O problema que resolvemos
+Numa organização típica, o percurso de uma despesa atravessa seis mundos separados, e nenhum deles conversa com o seguinte:
+
+Etapa
+Onde vive hoje
+O que corre mal
+Factura
+E-mail, WhatsApp, papel
+Perde-se; é registada tarde ou nunca
+Aprovação
+Conversas, e-mails, assinaturas
+Sem rasto de quem aprovou o quê e quando
+Pagamento
+Folha de cálculo paralela
+Ninguém sabe o que está aprovado mas por pagar
+Banco
+Extrato mensal do banco
+Segunda fonte de verdade que nunca bate certo
+Reconciliação
+Trabalho manual, linha a linha
+Consome dias; erros passam despercebidos
+Relatório
+Reconstruído do zero todos os meses
+Chega tarde e já não serve para decidir
+
+O verdadeiro problema não é nenhuma destas etapas isoladamente. É a falta de sincronização entre elas. É por isso que a pergunta mais simples que uma direcção pode fazer — “quanto é que temos comprometido e ainda não pago?” — costuma exigir meio dia de trabalho para ser respondida.
+3. O que é o NEXORA
+O NEXORA é uma plataforma de controlo financeiro operacional que automatiza o ciclo completo das despesas — desde a factura e aprovação até ao pagamento, reconciliação bancária e reporting.
+A plataforma organiza-se em torno de três promessas:
+Um único fluxo. Cada despesa é registada uma única vez e segue um percurso visível até ao extrato bancário. Ninguém volta a juntar informação que já existe.
+Menos digitação. Facturas em PDF são lidas automaticamente; movimentos bancários são associados às despesas por correspondência automática. A pessoa confirma, não digita.
+Vigilância activa. O sistema vigia permanentemente a operação e comunica, todas as manhãs, o que precisa de atenção.
+
+O ciclo NEXORA
+1
+DESPESA
+A factura entra no sistema e é lida automaticamente.
+2
+APROVAÇÃO
+O sistema encaminha para quem tem competência para decidir.
+3
+PAGAMENTO
+A despesa aprovada entra na fila de pagamento e muda de estado.
+4
+BANCO
+O extrato bancário é importado e comparado com o que foi registado.
+5
+RECONCILIAÇÃO
+As correspondências são propostas; só as excepções exigem atenção.
+6
+REPORTING
+O relatório do período existe a qualquer momento, sem preparação.
+7
+INTELLIGENCE
+O histórico acumulado passa a antecipar riscos e a sinalizar padrões.
+
+Cada etapa alimenta a seguinte automaticamente. O estado de qualquer despesa é conhecido a qualquer momento, por qualquer pessoa autorizada, sem perguntar a ninguém.
+
+4. Princípio de desenho: configurável, não prescritivo
+Nenhuma organização deve ter de alterar o seu processo financeiro para caber no NEXORA. Duas organizações com a mesma dimensão podem ter percursos legítimos e diferentes: uma exige um documento formal de autorização antes de qualquer pagamento; outra aprova directamente sobre a despesa. Uma decide por valor; outra decide por natureza da despesa; uma terceira por projecto e por fonte de financiamento.
+O NEXORA parte por isso de um modelo de configuração, não de um processo fixo. Cada organização define:
+As etapas — quais as etapas activas do seu ciclo, entre requisição, despesa, verificação, autorização formal, aprovação, pagamento, registo e reconciliação;
+O documento de autorização — se emite um documento formal de autorização antes do pagamento, como se chama e que campos contém;
+As dimensões de aprovação — por que critérios se decide quem aprova: valor, tipo de despesa, projecto, centro de custo, fonte de financiamento, ou combinação destes;
+A lista de verificação — o que o responsável financeiro tem de confirmar antes de a despesa avançar;
+A nomenclatura — como se designam as suas rubricas, fontes de financiamento e tipos de despesa.
+
+Aquilo que é obrigatório no NEXORA é o rasto: quem fez, o quê, quando e com que fundamento. Tudo o resto é configuração da organização.
+Esta separação entre o que é estrutura e o que é convenção é o que permite que a mesma plataforma sirva uma empresa privada, uma organização financiada por doadores e uma instituição pública — sem que nenhuma delas sinta que está a usar o sistema de outra pessoa.
+
+5. Os módulos
+Os módulos abaixo cobrem o ciclo completo. Nem todos são obrigatórios: cada organização activa os que correspondem ao seu processo.
+5.1 Requisições e aquisição  ·  opcional
+Para organizações cujo processo começa antes da factura, o ciclo pode abrir numa requisição: a necessidade identificada, a rubrica orçamental prevista, as cotações recebidas e a justificação da escolha do fornecedor.
+Quando a requisição é aprovada, converte-se automaticamente em despesa, sem nova digitação. A vantagem não é apenas de comodidade: fica registado no sistema porque é que aquele fornecedor foi escolhido — uma pergunta que qualquer auditoria acaba por fazer.
+Organizações que dispensem esta fase simplesmente não a activam, e o ciclo começa na despesa.
+5.2 Controlo de Despesas
+O núcleo do sistema. Uma despesa carrega fornecedor, descrição, valor, data, tipo, rubrica orçamental, fonte de financiamento, projecto, centro de custo, documento de suporte, data de vencimento, forma de pagamento e solicitante. Os campos disponíveis e a sua obrigatoriedade são definidos por cada organização.
+Para reduzir o preenchimento manual, o utilizador carrega a factura em PDF e o NEXORA extrai automaticamente o fornecedor, o número da factura, o valor, a data de emissão e a data de vencimento. Ao utilizador cabe confirmar — não transcrever.
+5.3 Documento de autorização  ·  configurável
+Muitas organizações formalizam a autorização de pagamento num documento próprio — memorando, nota de autorização, requisição interna, ficha de pagamento. O nome muda, a função é a mesma: reunir num único papel a finalidade da despesa, o beneficiário, o valor, a rubrica, a fonte de financiamento, os documentos de suporte e a forma de pagamento, para assinatura de quem verifica e de quem autoriza.
+O NEXORA permite que cada organização defina o seu. Concretamente, pode configurar:
+se este documento existe no seu processo, ou se a aprovação se faz directamente sobre a despesa;
+como se designa e como é numerado;
+que campos apresenta e quais são obrigatórios;
+em que momento do ciclo é gerado;
+quem o prepara, quem o verifica e quem o autoriza.
+
+O ponto essencial é que o documento é gerado pelo sistema a partir da despesa já registada, e não redigido à parte e depois anexado. As assinaturas de verificação e de autorização são capturadas electronicamente, com autor, data e hora.
+Se a organização continuar a escrever o documento fora do sistema para depois o anexar, o sistema falhou no seu propósito. O documento não é um anexo do processo — é uma vista do processo.
+Organizações que não usem qualquer documento formal desactivam o módulo e nada no ciclo se altera.
+5.4 Verificação financeira  ·  configurável
+Antes de seguir para aprovação, a despesa pode passar por uma verificação formal, com uma lista de confirmações definida pela organização. Exemplos comuns:
+existência de saldo na rubrica orçamental;
+completude da documentação de suporte;
+cálculo de valores e retenções fiscais aplicáveis;
+elegibilidade da despesa face ao projecto ou ao financiamento;
+correcção da fonte de financiamento e da conta bancária associada;
+existência de adiantamentos ou saldos anteriores a abater.
+
+Cada confirmação fica registada com autor e data. A verificação e a aprovação são passos distintos e podem — devem, em regra — pertencer a pessoas diferentes.
+5.5 Aprovações multidimensionais
+A regra de aprovação mais comum é por escalão de valor, mas raramente é a única que interessa. Um pagamento de salários e uma consultoria do mesmo montante não devem, em geral, seguir o mesmo caminho.
+No NEXORA, a matriz de aprovação pode combinar várias dimensões:
+
+Dimensão
+Exemplos de utilização
+Valor
+Escalões com número crescente de aprovadores
+Tipo de despesa
+Salários, compras, viagens, serviços, adiantamentos
+Projecto
+Despesas de projecto exigem o gestor responsável
+Fonte de financiamento
+Fundos de doador com aprovador dedicado
+Centro de custo
+Cada área aprova o que lhe pertence
+Excepção
+Despesas fora de orçamento sobem um nível
+
+A matriz é definida na configuração da organização, sem desenvolvimento adicional, e pode ser alterada à medida que a estrutura evolui. Prevê substitutos por ausência — para que o processo não pare em período de férias — e o histórico de alterações à própria matriz fica registado.
+5.6 Controlo de Pagamentos
+Depois da aprovação, cada despesa percorre estados explícitos: aprovada, pronta para pagamento, pagamento iniciado, paga, correspondida no banco, reconciliada.
+Perguntas antes difíceis passam a ser um filtro. “Mostra tudo o que foi aprovado mas ainda não foi pago” devolve, em segundos, a lista e o total comprometido.
+5.7 Fontes de financiamento e contas bancárias
+Organizações que gerem mais do que uma fonte de fundos enfrentam um risco específico: pagar a partir da conta errada. É um erro fácil de cometer e caro de corrigir, sobretudo quando há financiamento externo envolvido.
+O NEXORA permite associar cada fonte de financiamento à conta bancária correspondente. Seleccionada a fonte, a conta de pagamento fica determinada, e o sistema recusa combinações não previstas — ou exige uma autorização explícita, conforme a organização preferir.
+Deixa assim de ser uma convenção que as pessoas conhecem e passa a ser uma regra que o sistema aplica.
+5.8 Adiantamentos  ·  opcional
+Adiantamentos a fornecedores e a colaboradores costumam viver numa folha de cálculo paralela, justamente aquilo que o NEXORA existe para eliminar.
+Quando o módulo está activo, cada adiantamento mantém saldo próprio, é abatido nas despesas subsequentes e aparece automaticamente na verificação financeira das despesas do mesmo beneficiário. Saldos por regularizar há demasiado tempo geram alerta.
+5.9 Reconciliação Bancária
+O extrato bancário é importado em CSV, Excel ou OFX. O NEXORA compara automaticamente cada movimento com as despesas registadas e propõe correspondências com um grau de confiança. O utilizador confirma em bloco e concentra-se apenas no que não bateu certo.
+Há aqui uma alteração de processo que convém antecipar: a reconciliação deixa de ser uma tarefa mensal em lote e passa a ser contínua. O fecho do mês encontra o trabalho praticamente feito.
+5.10 Centro de Excepções
+Aquilo que não bate certo não desaparece — passa a ter um lugar próprio, com valor associado e antiguidade:
+Movimento bancário sem despesa correspondente.
+Despesa aprovada há vários dias sem pagamento identificado.
+Despesa sem documento de suporte.
+Pagamento próximo do vencimento ou já vencido.
+Despesa potencialmente duplicada.
+Adiantamento por regularizar.
+
+O NEXORA não mostra apenas informação. O NEXORA encontra problemas.
+5.11 NEXORA WATCH
+O WATCH é o motor que fica permanentemente a observar a operação. Todas as manhãs, cada responsável recebe um resumo com aquilo que exige a sua atenção — e apenas isso, filtrado pelo seu papel na organização.
+
+🔴 Crítico
+2 pagamentos vencem hoje.
+🟠 Risco
+O Projecto X ultrapassou 80% do orçamento.
+🟡 Pendente
+4 despesas aguardam aprovação há mais de 3 dias.
+🟢 Saudável
+96% das transacções bancárias estão reconciliadas.
+
+Cada alerta traz consigo a acção correspondente: marcar como pago, aprovar, anexar documento, adiar com justificação. O resumo deixa de ser um aviso e passa a ser uma superfície de trabalho.
+O sistema sabe quando detectou cada problema e quando ele deixou de existir. Daqui nasce um indicador único de saúde operacional, o NEXORA Score, acompanhado ao longo do tempo.
+
+A organização deixa de dizer “vamos procurar problemas” e passa a dizer “o sistema diz-nos quais são os problemas”.
+5.12 Dashboard da Direcção
+Não são quarenta gráficos. São os números que permitem decidir: caixa actual, valor comprometido, valor a receber, despesas do mês, aprovações pendentes e transacções por reconciliar — acompanhados de um bloco de situações que exigem atenção.
+5.13 Previsão de Tesouraria
+A partir do saldo actual, dos pagamentos aprovados, das despesas recorrentes, das receitas esperadas e do histórico, o NEXORA projecta a posição de caixa dos próximos 30, 60 e 90 dias — e sinaliza antecipadamente períodos de pressão.
+5.14 Relatórios e entrega à contabilidade
+O relatório do período deixa de ser produzido: passa a ser seleccionado. Total, decomposição por categoria, fornecedor, projecto, centro de custo, rubrica e estado, com exportação para PDF, Excel e CSV.
+O NEXORA não substitui a contabilidade — entrega-lhe trabalho organizado. O lote mensal sai classificado por rubrica, com documentos de suporte e comprovativos bancários associados a cada movimento, no formato acordado com o contabilista ou com o gabinete externo.
+5.15 Inteligência de Fornecedores
+Ao fim de alguns meses, o sistema conhece o comportamento de cada fornecedor: número de transacções, valor acumulado, valor médio, evolução. E sinaliza o que estava escondido nos dados — uma subida de 38% em três meses, ou um fornecedor que representa 21% de toda a despesa operacional.
+5.16 Projectos, Orçamentos e Grants
+Cada despesa pode pertencer a um projecto com orçamento próprio. O sistema mantém, em permanência, o orçamento total, o executado, o comprometido e o disponível — e alerta antes de o limite ser atingido, não depois.
+Para organizações financiadas por projectos ou por doadores, esta camada estende-se ao controlo de grants, ligando financiamento, orçamento, despesa, pagamento, banco e relatório numa única cadeia rastreável, com registo da elegibilidade de cada despesa face às regras do financiador.
+6. Vantagens por perfil
+O NEXORA não serve uma função. Serve três, e é essa sobreposição que cria o seu valor.
+
+Perfil
+O que ganha
+Finanças
+Fim da digitação de facturas e da reconciliação linha a linha; visibilidade imediata do que está por pagar; relatórios que deixam de ser preparados manualmente.
+Direcção
+Posição de caixa e compromissos em tempo real; aprovações a partir do telemóvel; alertas antes de o problema se tornar caro.
+Administração
+Rasto auditável completo; segregação de funções garantida por regra; documentação de suporte sempre associada à despesa.
+Gestão de Projecto
+Execução orçamental por projecto actualizada em permanência; alerta antes de o orçamento ser ultrapassado; relatórios por financiador.
+
+
+7. O que muda na prática
+
+
+Antes
+Com o NEXORA
+Registo de uma despesa
+Digitação manual de 10 campos
+Carregar o PDF e confirmar
+Aprovação
+E-mails e assinaturas dispersas
+Caixa de entrada com rasto auditável
+Saber o que falta pagar
+Meio dia a cruzar ficheiros
+Um filtro, resultado imediato
+Reconciliação bancária
+Dias de trabalho manual
+Correspondência automática + excepções
+Relatório mensal
+Reconstruído do zero
+Seleccionar o período e exportar
+Detecção de problemas
+Quando alguém repara
+Todas as manhãs, automaticamente
+Orçamento de projecto
+Conhecido no fecho
+Conhecido em permanência
+
+O indicador que resume tudo isto é um só: horas eliminadas das operações financeiras. É esse o número que propomos medir, com uma linha de base recolhida antes do arranque e comparação ao fim de 30, 60 e 90 dias.
+8. Preparação para auditoria
+Qualquer auditoria, interna ou externa, faz no fundo quatro perguntas sobre cada despesa. O NEXORA responde às quatro por construção, e não por esforço de preparação.
+
+O que a auditoria pergunta
+O que o NEXORA apresenta
+Foi autorizada por quem tinha competência?
+Matriz de aprovação vigente à data, com o percurso seguido e o autor de cada decisão
+Está documentada?
+Documentos de suporte, documento de autorização e comprovativo bancário associados ao processo
+Foi paga da conta correcta?
+Fonte de financiamento e conta bancária associadas por regra, com registo de excepções autorizadas
+Existe rasto de quem fez o quê?
+Registo de auditoria completo, com autor, data e hora, sobre registos imutáveis
+A despesa era elegível?
+Estado de elegibilidade com autor e fundamento, ligado à rubrica e ao financiador
+A separação de funções foi respeitada?
+Verificação, aprovação e pagamento atribuídos a pessoas distintas, com bloqueio configurável
+
+Para organizações que gerem fundos de terceiros, esta é frequentemente a razão mais forte para adoptar a plataforma. A poupança de horas é o benefício visível; chegar à auditoria com o processo já defensável é o que evita o custo que ninguém orçamenta.
+9. Segurança e controlo interno
+Como a plataforma lida com dinheiro, a segurança não é uma funcionalidade acessória:
+Permissões por papel, com separação estrita entre organizações.
+Registos financeiros imutáveis e histórico completo de aprovações.
+Registo de auditoria de todas as acções, com autor, data e hora.
+Eliminação lógica: nada desaparece definitivamente.
+Cópias de segurança e gestão de sessões; autenticação em dois factores.
+
+Regra fundamental: nenhum utilizador pode criar, aprovar e pagar a mesma despesa sem uma regra explícita que o permita. O sistema recusa e regista a tentativa.
+10. Implementação
+A implementação decorre em seis semanas, com entregas funcionais em cada uma delas — não há um período longo sem nada visível.
+
+Semana
+Âmbito
+Resultado
+1
+Estrutura, autenticação, organização, utilizadores e papéis
+Acesso operacional
+2
+Fornecedores, categorias, despesas e documentos
+Registo de despesas reais
+3
+Motor de aprovações, comentários e notificações
+Despesa → Aprovação
+4
+Fila de pagamentos, estados, referências e lotes
+Aprovação → Pagamento
+5
+Contas bancárias, importação de extratos e correspondência
+Pagamento → Banco
+6
+Dashboard, relatórios, excepções e primeiros alertas
+Ciclo completo em produção
+
+11. Planos
+O NEXORA não é vendido por utilizador. Queremos que Finanças, Direcção e Administração estejam todos dentro da plataforma — cobrar por cada pessoa penalizaria exactamente aquilo que gera valor. O preço resulta do escalão, do volume processado e dos módulos activos.
+
+
+Starter
+Professional
+Enterprise
+Perfil
+Organização pequena
+Organização média com projectos
+Multi-entidade / financiada
+Utilizadores
+Ilimitados
+Ilimitados
+Ilimitados
+Despesas por mês
+Até 150
+Até 600
+Ilimitado
+Entidades
+1
+3
+Ilimitado
+Aprovações
+Um nível
+Multi-nível por limiar
+Fluxos condicionais
+Reconciliação
+Manual
+Automática + excepções
+Automática + regras próprias
+NEXORA WATCH
+Alertas essenciais
+Catálogo completo
+Regras personalizadas
+Projectos e orçamentos
+—
+Incluído
+Incluído
+Previsão de tesouraria
+—
+Incluído
+Com cenários
+Grant Control
+—
+—
+Incluído
+API e integrações
+—
+Leitura
+Completa
+Suporte
+E-mail
+Prioritário
+SLA e gestor de conta
+
+A implementação inicial — configuração de fluxos, importação de fornecedores e histórico, adaptação ao formato do extrato bancário e formação das equipas — é orçamentada separadamente. O pagamento anual antecipado tem desconto e encaixa melhor no ciclo orçamental de organizações que planeiam por exercício ou por projecto.
+12. Programa de Design Partner
+As primeiras organizações a adoptar o NEXORA entram como parceiras de desenho, não como clientes comuns. Isso significa condições comerciais próprias durante o primeiro ano e influência directa sobre as prioridades de desenvolvimento.
+Em contrapartida, pedimos trinta minutos por semana de acompanhamento e autorização para partilhar os resultados obtidos.
+
+Propomos ainda algo que raramente se propõe: os objectivos do piloto são acordados por escrito antes do arranque, e a conversão em contrato fica condicionada ao seu cumprimento. Se não entregarmos os resultados, não há contrato.
+13. Próximos passos
+Sessão de descoberta para mapear o fluxo actual de despesas, verificações e aprovações.
+Definição da matriz de aprovação e do documento de autorização, se aplicável.
+Recolha de uma amostra real de extrato bancário e de facturas típicas.
+Definição conjunta do protocolo de medição e dos objectivos do piloto.
+Arranque da implementação, com entregas semanais.
+Avaliação de resultados aos 30, 60 e 90 dias.
+
+
+NEXORA
+From expense to insight.
