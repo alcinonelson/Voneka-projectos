@@ -17,6 +17,13 @@ const Contexto = createContext<Toast | null>(null);
 
 const DURACAO_MS = 2600;
 
+/** Relato fora do React: o QueryClient e o cliente HTTP nao vivem dentro do contexto. */
+let relatoExterno: ((mensagem: string) => void) | null = null;
+
+export function relatarErro(mensagem: string): void {
+  relatoExterno?.(mensagem);
+}
+
 export function ProvedorToast({ children }: { children: ReactNode }) {
   const [mensagem, setMensagem] = useState('');
   const temporizador = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -27,12 +34,13 @@ export function ProvedorToast({ children }: { children: ReactNode }) {
     temporizador.current = setTimeout(() => setMensagem(''), DURACAO_MS);
   }, []);
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    relatoExterno = mostrar;
+    return () => {
+      if (relatoExterno === mostrar) relatoExterno = null;
       if (temporizador.current) clearTimeout(temporizador.current);
-    },
-    [],
-  );
+    };
+  }, [mostrar]);
 
   return (
     <Contexto.Provider value={{ mostrar }}>

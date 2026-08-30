@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { ESTADO_TAREFA, alertaPrazo, corEstado, dataLonga, formatarData, hoje, lerData, paraIso, somarDias } from '@nexora/shared';
+import { ESTADO_TAREFA, alertaPrazo, corEstado, dataLonga, lerData, paraIso, somarDias } from '@nexora/shared';
 import { COR, FONTE, PESO, RAIO, botaoPrincipal, botaoSecundario, campo, cartao, numerico, rotuloCampo } from '../design/tokens';
 import { Carregando, Etiqueta, PastilhaAlerta, Semaforo, Vazio } from '../components/base';
+import { CampoData } from '../components/CampoData';
 import { Pagina } from '../components/Layout';
 import { Modal } from '../components/Modal';
 import { ModalRelatorio } from '../components/ModalRelatorio';
@@ -172,23 +173,21 @@ function ModalProrrogacao({ tarefa, onFechar }: { tarefa: Tarefa | null; onFecha
       }}
     >
       <div style={{ marginBottom: 16 }}>
-        <label style={rotuloCampo} htmlFor="nova-data">
-          Nova deadline
-        </label>
-        <input
+        <CampoData
           id="nova-data"
-          value={dataTexto}
-          onChange={(e) => setDataTexto(e.target.value)}
-          placeholder={formatarData(somarDias(hoje(), 7))}
-          style={{ ...campo, ...numerico }}
+          rotulo="Nova deadline"
+          valor={dataTexto}
+          onChange={setDataTexto}
+          minimo={paraIso(somarDias(tarefa.deadline, 1))}
+          ajuda={
+            data === null
+              ? 'Use o formato dd/mm/aaaa.'
+              : posterior
+                ? `Passa a vencer ${dataLonga(data)}`
+                : 'A nova data tem de ser posterior à actual.'
+          }
+          erro={dataTexto.length > 0 && data !== null && !posterior ? 'A nova data tem de ser posterior à actual.' : undefined}
         />
-        <div style={{ fontSize: FONTE.nota, color: COR.suave, marginTop: 6 }}>
-          {data === null
-            ? 'Use o formato dd/mm/aaaa.'
-            : posterior
-              ? `Passa a vencer ${dataLonga(data)}`
-              : 'A nova data tem de ser posterior à actual.'}
-        </div>
       </div>
 
       <div>

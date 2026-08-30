@@ -8,7 +8,8 @@ import {
   type ReactNode,
 } from 'react';
 import type { NivelAcesso } from '@nexora/shared';
-import { api, definirToken, retomarSessao } from './api';
+import { useQueryClient } from '@tanstack/react-query';
+import { api, definirAoSessaoExpirada, definirToken, retomarSessao } from './api';
 import type { Empresa, Utilizador } from './tipos';
 
 /**
@@ -48,6 +49,16 @@ interface RespostaAuth {
 export function ProvedorSessao({ children }: { children: ReactNode }) {
   const [utilizador, setUtilizador] = useState<Utilizador | null>(null);
   const [aCarregar, setACarregar] = useState(true);
+  const consultas = useQueryClient();
+
+  useEffect(() => {
+    definirAoSessaoExpirada(() => {
+      definirToken(null);
+      setUtilizador(null);
+      consultas.clear();
+    });
+    return () => definirAoSessaoExpirada(null);
+  }, [consultas]);
 
   useEffect(() => {
     let activo = true;
@@ -86,8 +97,9 @@ export function ProvedorSessao({ children }: { children: ReactNode }) {
     } finally {
       definirToken(null);
       setUtilizador(null);
+      consultas.clear();
     }
-  }, []);
+  }, [consultas]);
 
   const valor = useMemo<Sessao>(() => {
     const nivel = utilizador?.nivelAcesso ?? 'colaborador';

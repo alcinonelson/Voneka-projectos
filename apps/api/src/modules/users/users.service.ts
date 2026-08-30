@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { and, asc, eq, ne, sql } from 'drizzle-orm';
+import { and, asc, eq, inArray, ne, sql } from 'drizzle-orm';
 import {
   type ActualizarMembroInput,
   type CriarMembroInput,
@@ -17,6 +17,7 @@ import { logModulo, logger } from '../../utils/logger';
 import { enviarEmail, textoConvite } from '../../utils/mailer';
 import { gerarTokenConvite } from '../../utils/tokens';
 import type { Sessao } from '../../utils/tokens';
+import { exigirProjectosDaEmpresa, exigirTaxonomia } from '../access';
 import { registar } from '../audit.service';
 
 /**
@@ -41,6 +42,9 @@ export interface LinhaEquipa {
   carga: number;
   /** Percentagem de tarefas concluidas dentro do prazo. `null` sem historico. */
   cumprimento: number | null;
+  activo: boolean;
+  telefone: string | null;
+  projectos: string[];
 }
 
 /**
@@ -64,11 +68,14 @@ export async function listarEquipa(sessao: Sessao): Promise<LinhaEquipa[]> {
       alocacao: users.alocacao,
       nivelAcesso: users.nivelAcesso,
       estado: users.estado,
+      activo: users.activo,
+      telefone: users.telefone,
     })
     .from(users)
     .leftJoin(orgTaxonomies, eq(orgTaxonomies.id, users.departamentoId))
     .where(eq(users.organizationId, sessao.org))
-    .orderBy(asc(users.nome));
+    .orderBy(asc(users.nome))
+    .limit(200);
 
   const abertas = await db
     .select({
@@ -92,6 +99,19 @@ export async function listarEquipa(sessao: Sessao): Promise<LinhaEquipa[]> {
 
   const porAberta = new Map(abertas.map((a) => [a.responsavelId, a]));
   const porCumprida = new Map(cumpridas.map((c) => [c.responsavelId, c]));
+
+  const alocacoes = pessoas.length
+    ? await db
+        .select({ userId: projectMembers.userId, projectId: projectMembers.projectId })
+        .from(projectMembers)
+        .where(inArray(projectMembers.userId, pessoas.map((p) => p.id)))
+    : [];
+  const projectosPorPessoa = new Map<string, string[]>();
+  for (const a of alocacoes) {
+    const lista = projectosPorPessoa.get(a.userId) ?? [];
+    lista.push(a.projectId);
+    projectosPorPessoa.set(a.userId, lista);
+  }
 
   return pessoas.map((p) => {
     const a = porAberta.get(p.id);
@@ -118,6 +138,9 @@ export async function listarEquipa(sessao: Sessao): Promise<LinhaEquipa[]> {
       tarefasAbertas: Number(a?.n ?? 0),
       carga,
       cumprimento,
+      activo: p.activo,
+      telefone: p.telefone,
+      projectos: projectosPorPessoa.get(p.id) ?? [],
     };
   });
 }
@@ -133,7 +156,8 @@ export async function listarParaSelector(sessao: Sessao) {
     })
     .from(users)
     .where(and(eq(users.organizationId, sessao.org), eq(users.activo, true)))
-    .orderBy(asc(users.nome));
+    .orderBy(asc(users.nome))
+    .limit(200);
 
   const abertas = await db
     .select({ responsavelId: tasks.responsavelId, n: sql<number>`count(*)` })
@@ -174,6 +198,11 @@ async function enviarConvite(
  * atribuicao e de historico, mas ninguem consegue entrar nela ate a Direccao enviar o convite.
  */
 export async function criarMembro(sessao: Sessao, dados: CriarMembroInput) {
+  if (dados.departamentoId) {
+    await exigirTaxonomia(sessao, dados.departamentoId, 'departamento');
+  }
+  await exigirProjectosDaEmpresa(sessao, dados.projectos);
+
   const [existente] = await db
     .select({ id: users.id })
     .from(users)
@@ -229,7 +258,11 @@ export async function criarMembro(sessao: Sessao, dados: CriarMembroInput) {
 
 /** Reenvia o convite, renovando o token e o prazo. */
 export async function reenviarConvite(sessao: Sessao, userId: string) {
-  const [utilizador] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  const [utilizador] = await db
+    .select()
+    .from(users)
+    .where(and(eq(users.id, userId), eq(users.organizationId, sessao.org)))
+    .limit(1);
   if (!utilizador) throw erros.naoEncontrado('Esta conta');
 
   if (utilizador.estado === 'activo') {
@@ -254,6 +287,51 @@ export async function actualizarMembro(
   userId: string,
   dados: ActualizarMembroInput,
 ) {
+  const [alvo] = await db
+    .select({
+      id: users.id,
+      nivelAcesso: users.nivelAcesso,
+      activo: users.activo,
+    })
+    .from(users)
+    .where(and(eq(users.id, userId), eq(users.organizationId, sessao.org)))
+    .limit(1);
+
+  if (!alvo) throw erros.naoEncontrado('Esta conta');
+
+  if (dados.departamentoId) {
+    await exigirTaxonomia(sessao, dados.departamentoId, 'departamento');
+  }
+  if (dados.projectos) {
+    await exigirProjectosDaEmpresa(sessao, dados.projectos);
+  }
+
+  // Uma Direccao que se despromova a si propria ficaria sem forma de voltar atras.
+  if (dados.nivelAcesso && dados.nivelAcesso !== 'administrador' && userId === sessao.sub) {
+    throw erros.conflito('Não pode retirar o seu próprio nível de Administrador.');
+  }
+
+  const tiraAdministrador =
+    alvo.nivelAcesso === 'administrador' &&
+    ((dados.nivelAcesso !== undefined && dados.nivelAcesso !== 'administrador') ||
+      dados.activo === false);
+  if (tiraAdministrador) {
+    const [contagem] = await db
+      .select({ n: sql<number>`count(*)` })
+      .from(users)
+      .where(
+        and(
+          eq(users.organizationId, sessao.org),
+          eq(users.nivelAcesso, 'administrador'),
+          eq(users.activo, true),
+          ne(users.id, userId),
+        ),
+      );
+    if (Number(contagem?.n ?? 0) === 0) {
+      throw erros.conflito('A empresa precisa de pelo menos um Administrador activo.');
+    }
+  }
+
   const alteracoes: Record<string, unknown> = { updatedAt: new Date() };
   if (dados.nome !== undefined) alteracoes.nome = dados.nome;
   if (dados.telefone !== undefined) alteracoes.telefone = dados.telefone || null;
@@ -262,27 +340,36 @@ export async function actualizarMembro(
   if (dados.dataEntrada !== undefined) alteracoes.dataEntrada = deIso(dados.dataEntrada);
   if (dados.alocacao !== undefined) alteracoes.alocacao = dados.alocacao;
   if (dados.nivelAcesso !== undefined) alteracoes.nivelAcesso = dados.nivelAcesso;
+  if (dados.activo !== undefined) alteracoes.activo = dados.activo;
 
-  // Uma Direccao que se despromova a si propria ficaria sem forma de voltar atras.
-  if (dados.nivelAcesso && dados.nivelAcesso !== 'administrador' && userId === sessao.sub) {
-    throw erros.conflito('Não pode retirar o seu próprio nível de Administrador.');
-  }
+  const actualizado = await db.transaction(async (tx) => {
+    const [linha] = await tx
+      .update(users)
+      .set(alteracoes)
+      .where(and(eq(users.id, userId), eq(users.organizationId, sessao.org)))
+      .returning();
 
-  const [actualizado] = await db
-    .update(users)
-    .set(alteracoes)
-    .where(eq(users.id, userId))
-    .returning();
+    if (!linha) throw erros.naoEncontrado('Esta conta');
 
-  if (!actualizado) throw erros.naoEncontrado('Esta conta');
+    if (dados.projectos) {
+      await tx.delete(projectMembers).where(eq(projectMembers.userId, userId));
+      if (dados.projectos.length) {
+        await tx.insert(projectMembers).values(
+          dados.projectos.map((projectId) => ({ projectId, userId })),
+        );
+      }
+    }
 
-  await registar(db, {
-    organizationId: sessao.org,
-    actorId: sessao.sub,
-    accao: 'membro.actualizado',
-    entidade: 'utilizador',
-    entidadeId: userId,
-    detalhe: { campos: Object.keys(alteracoes).filter((c) => c !== 'updatedAt') },
+    await registar(tx, {
+      organizationId: sessao.org,
+      actorId: sessao.sub,
+      accao: 'membro.actualizado',
+      entidade: 'utilizador',
+      entidadeId: userId,
+      detalhe: { campos: Object.keys(alteracoes).filter((c) => c !== 'updatedAt') },
+    });
+
+    return linha;
   });
 
   return actualizado;

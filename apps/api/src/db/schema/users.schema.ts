@@ -53,6 +53,12 @@ export const users = pgTable(
      */
     conviteTokenHash: text('convite_token_hash'),
     conviteExpiraEm: timestamp('convite_expira_em', { withTimezone: true }),
+    /**
+     * Recuperacao de palavra-passe. Colunas proprias para nao colidir com o convite:
+     * um pedido de recuperacao nao pode invalidar o convite de quem ainda nao entrou.
+     */
+    recuperacaoTokenHash: text('recuperacao_token_hash'),
+    recuperacaoExpiraEm: timestamp('recuperacao_expira_em', { withTimezone: true }),
     /** Conta desactivada mantem o historico mas deixa de poder entrar. */
     activo: boolean('activo').notNull().default(true),
     ultimoLoginEm: timestamp('ultimo_login_em', { withTimezone: true }),

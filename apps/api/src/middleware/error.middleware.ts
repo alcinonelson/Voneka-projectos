@@ -40,13 +40,19 @@ export function tratarErros(
 
   if (erro instanceof AppError) {
     if (erro.status >= 500) {
-      logger.error(logModulo('http', `${req.method} ${req.path}: ${erro.message}`));
+      logger.error(
+        { requestId: req.requestId },
+        logModulo('http', `${req.method} ${req.path}: ${erro.message}`),
+      );
     }
     falha(res, erro);
     return;
   }
 
   const mensagem = erro instanceof Error ? erro.message : String(erro);
-  logger.error(logModulo('http', `${req.method} ${req.path} falhou: ${mensagem}`));
+  logger.error(
+    { requestId: req.requestId },
+    logModulo('http', `${req.method} ${req.path} falhou: ${mensagem}`),
+  );
   falha(res, erros.interno(ehProducao ? 'Ocorreu um erro inesperado.' : mensagem));
 }

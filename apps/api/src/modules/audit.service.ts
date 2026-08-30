@@ -1,4 +1,4 @@
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, lt } from 'drizzle-orm';
 import { db } from '../db/db';
 import { auditLog } from '../db/schema/ops.schema';
 import { users } from '../db/schema/users.schema';
@@ -66,4 +66,22 @@ export async function historicoDoProjecto(
     .where(and(eq(auditLog.organizationId, organizationId), eq(auditLog.projectId, projectId)))
     .orderBy(desc(auditLog.createdAt))
     .limit(limite);
+}
+
+/**
+ * Retencao do historico: 24 meses.
+ *
+ * O audit_log cresce com cada escrita. Sem tecto, uma casa com anos de operacao pagaria
+ * armazenamento por decisoes que ja nao servem a ninguem. Vinte e quatro meses cobrem um ciclo
+ * fiscal e o ano seguinte, que e o que uma auditoria desta natureza costuma pedir.
+ */
+const MESES_RETENCAO = 24;
+
+export async function limparAuditoriaAntiga(): Promise<number> {
+  const corte = new Date();
+  corte.setMonth(corte.getMonth() - MESES_RETENCAO);
+  const apagados = await db.delete(auditLog).where(lt(auditLog.createdAt, corte)).returning({
+    id: auditLog.id,
+  });
+  return apagados.length;
 }

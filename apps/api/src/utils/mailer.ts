@@ -63,6 +63,22 @@ export function textoConvite(nome: string, ligacao: string, dias: number): strin
   ].join('\n');
 }
 
+/** Corpo do pedido de recuperacao de palavra-passe. */
+export function textoRecuperacao(nome: string, ligacao: string): string {
+  return [
+    `Bom dia ${nome},`,
+    '',
+    'Recebemos um pedido para definir uma nova palavra-passe da sua conta no Voneka Projectos.',
+    'Se foi você, use a ligação abaixo. Expira dentro de uma hora.',
+    '',
+    ligacao,
+    '',
+    'Se não pediu isto, ignore esta mensagem. A palavra-passe actual continua a servir.',
+    '',
+    'Voneka Projectos',
+  ].join('\n');
+}
+
 /** Corpo de um alerta de prazo. */
 export function textoAlerta(
   nome: string,

@@ -19,6 +19,11 @@ projectsRouter.get('/', validar(listarProjectosSchema, 'query'), assincrono(cont
 // O roteiro carrega o plano de toda a carteira num pedido so. Antes de '/:id' de proposito, para
 // 'phases' nao ser lido como um identificador de projecto.
 projectsRouter.get('/phases', assincrono(fases.listarDaCarteira));
+projectsRouter.get(
+  '/export',
+  exigirNivel('administrador', 'gestor'),
+  assincrono(controlador.exportar),
+);
 projectsRouter.get('/:id', assincrono(controlador.detalhe));
 
 projectsRouter.post(

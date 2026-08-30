@@ -4,7 +4,7 @@ import { logModulo, logger } from '../utils/logger';
 
 /**
  * Aplica as migracoes pendentes.
- * Corre a partir de `pnpm tables`, depois de `drizzle-kit generate` escrever o SQL versionado.
+ * Corre a partir de `pnpm tables`. `pnpm --filter api generate` e que escreve SQL novo.
  */
 async function main(): Promise<void> {
   await migrate(db, { migrationsFolder: './drizzle' });

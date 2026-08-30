@@ -3,6 +3,7 @@ import type {
   ActualizarTarefaInput,
   ConcluirTarefaInput,
   CriarTarefaInput,
+  DecidirProrrogacaoInput,
   ListarTarefasInput,
   PedirProrrogacaoInput,
 } from '@nexora/shared';
@@ -48,11 +49,11 @@ export async function pedirProrrogacao(req: Request, res: Response): Promise<Res
 }
 
 export async function decidirProrrogacao(req: Request, res: Response): Promise<Response> {
-  const corpo = req.body as { aceitar?: boolean };
+  const corpo = req.body as DecidirProrrogacaoInput;
   const resultado = await servico.decidirProrrogacao(
     sessaoDe(req),
     String(req.params.extensionId),
-    corpo.aceitar === true,
+    corpo.aceitar,
   );
   return sucesso(res, resultado, resultado.aceite ? 'Prazo alargado' : 'Pedido recusado');
 }

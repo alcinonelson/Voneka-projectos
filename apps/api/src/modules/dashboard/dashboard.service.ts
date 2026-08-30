@@ -1,4 +1,4 @@
-import { and, asc, eq, ne } from 'drizzle-orm';
+import { and, asc, eq, inArray, ne } from 'drizzle-orm';
 import {
   type Alerta,
   type Situacao,
@@ -6,11 +6,12 @@ import {
   dataExtensa,
   diferencaEmDias,
   hoje,
+  paraIso,
 } from '@nexora/shared';
 import { db } from '../../db/db';
 import { orgTaxonomies } from '../../db/schema/organizations.schema';
 import { phases, projects } from '../../db/schema/projects.schema';
-import { reports, tasks } from '../../db/schema/tasks.schema';
+import { reports, taskExtensions, tasks } from '../../db/schema/tasks.schema';
 import { users } from '../../db/schema/users.schema';
 import type { Sessao } from '../../utils/tokens';
 import { projectosVisiveis, tarefasVisiveis } from '../access';
@@ -32,7 +33,7 @@ export interface ItemDecisao {
   accao: 'Escalar' | 'Decidir' | 'Responder';
   projectoId: string;
   projectoNome: string;
-  origem: 'tarefa' | 'relatorio';
+  origem: 'tarefa' | 'relatorio' | 'prorrogacao';
 }
 
 /**
@@ -141,10 +142,47 @@ async function decisoesPendentes(sessao: Sessao, referencia: Date): Promise<Item
     .innerJoin(tasks, eq(tasks.id, reports.taskId))
     .innerJoin(projects, eq(projects.id, tasks.projectId))
     .innerJoin(users, eq(users.id, reports.autorId))
-    .where(and(ne(reports.situacao, 'sem_obstaculos'), projectosVisiveis(sessao)))
+    .where(
+      and(
+        ne(reports.situacao, 'sem_obstaculos'),
+        inArray(reports.validacao, ['a_espera', 'escalado']),
+        projectosVisiveis(sessao),
+      ),
+    )
     .orderBy(asc(reports.createdAt));
 
+  const pedidos = await db
+    .select({
+      id: taskExtensions.id,
+      novaDeadline: taskExtensions.novaDeadline,
+      motivo: taskExtensions.motivo,
+      titulo: tasks.titulo,
+      deadline: tasks.deadline,
+      projectoId: projects.id,
+      cliente: projects.cliente,
+      solicitante: users.nome,
+    })
+    .from(taskExtensions)
+    .innerJoin(tasks, eq(tasks.id, taskExtensions.taskId))
+    .innerJoin(projects, eq(projects.id, tasks.projectId))
+    .innerJoin(users, eq(users.id, taskExtensions.solicitanteId))
+    .where(and(eq(taskExtensions.estado, 'pendente'), tarefasVisiveis(sessao)))
+    .orderBy(asc(taskExtensions.createdAt));
+
   const itens: ItemDecisao[] = [];
+
+  for (const p of pedidos) {
+    itens.push({
+      id: p.id,
+      titulo: p.titulo,
+      detalhe: `${p.cliente} · ${p.solicitante} pede prazo até ${paraIso(p.novaDeadline)}`,
+      alerta: alertaPrazo(p.deadline, false, referencia),
+      accao: 'Decidir',
+      projectoId: p.projectoId,
+      projectoNome: p.cliente,
+      origem: 'prorrogacao',
+    });
+  }
 
   for (const r of bloqueados) {
     const situacao = r.situacao as Situacao;
@@ -176,7 +214,8 @@ async function decisoesPendentes(sessao: Sessao, referencia: Date): Promise<Item
     });
   }
 
-  const peso = (i: ItemDecisao) => (i.accao === 'Escalar' ? 0 : i.origem === 'relatorio' ? 1 : 2);
+  const peso = (i: ItemDecisao) =>
+    i.origem === 'prorrogacao' ? 0 : i.accao === 'Escalar' ? 1 : i.origem === 'relatorio' ? 2 : 3;
   itens.sort((a, b) => peso(a) - peso(b) || a.alerta.dias - b.alerta.dias);
 
   return itens.slice(0, 3);
@@ -201,9 +240,13 @@ export async function painel(sessao: Sessao) {
     .where(and(eq(projects.arquivado, false), projectosVisiveis(sessao)))
     .orderBy(asc(projects.deadline));
 
-  const todasFases = await db
-    .select({ projectId: phases.projectId, startsOn: phases.startsOn, endsOn: phases.endsOn })
-    .from(phases);
+  const idsCarteira = carteira.map((p) => p.id);
+  const todasFases = idsCarteira.length
+    ? await db
+        .select({ projectId: phases.projectId, startsOn: phases.startsOn, endsOn: phases.endsOn })
+        .from(phases)
+        .where(inArray(phases.projectId, idsCarteira))
+    : [];
 
   const fasesPorProjecto = new Map<string, { startsOn: Date; endsOn: Date }[]>();
   for (const f of todasFases) {

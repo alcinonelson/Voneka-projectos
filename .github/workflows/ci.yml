@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: nexora
+          POSTGRES_PASSWORD: nexora
+          POSTGRES_DB: nexora_projectos
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U nexora -d nexora_projectos"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://nexora:nexora@localhost:5432/nexora_projectos
+      JWT_ACCESS_SECRET: ci-access-secret-com-pelo-menos-32-caracteres
+      JWT_REFRESH_SECRET: ci-refresh-secret-com-pelo-menos-32-caracteres
+      WEB_ORIGIN: http://localhost:5173
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Instalar
+        run: pnpm install --frozen-lockfile
+
+      - name: Aplicar migracoes
+        run: pnpm --filter @nexora/api migrate
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Testes do dominio partilhado
+        run: pnpm --filter @nexora/shared test
+
+      - name: Isolamento e palavra-passe
+        run: pnpm --filter @nexora/api exec vitest run tests/isolamento.test.ts tests/password.test.ts

@@ -42,9 +42,19 @@ export const listarRelatoriosSchema = z.object({
 });
 export type ListarRelatoriosInput = z.infer<typeof listarRelatoriosSchema>;
 
-export const validarRelatorioSchema = z.object({
-  /** Validar aceita a entrega; escalar leva o obstaculo a Direccao. */
-  decisao: z.enum(['validar', 'escalar']),
-  observacao: zTextoOpcional(1000),
-});
+export const validarRelatorioSchema = z
+  .object({
+    /** Validar aceita a entrega; escalar leva o obstaculo a Direccao. */
+    decisao: z.enum(['validar', 'escalar']),
+    observacao: zTextoOpcional(1000),
+  })
+  .superRefine((v, ctx) => {
+    if (v.decisao === 'escalar' && !v.observacao.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['observacao'],
+        message: 'Ao escalar, escreva o que precisa da Direcção.',
+      });
+    }
+  });
 export type ValidarRelatorioInput = z.infer<typeof validarRelatorioSchema>;

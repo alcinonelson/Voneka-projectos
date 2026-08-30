@@ -3,6 +3,7 @@ import type {
   ActualizarTaxonomiaInput,
   CriarTaxonomiaInput,
   ListarTaxonomiasInput,
+  ReordenarTaxonomiasInput,
   TaxonomiaRef,
   TipoTaxonomia,
 } from '@nexora/shared';
@@ -221,6 +222,58 @@ export async function actualizar(
   });
 
   return paraRef(linha);
+}
+
+/**
+ * Grava a ordem de uma familia do vocabulario.
+ *
+ * A lista tem de ser exactamente as entradas activas daquele tipo na empresa: nem falta uma, nem
+ * entra uma de outra casa. Sem isso, um arrasto a meio podia apagar uma natureza da vista ou
+ * promover uma entrada de outra empresa.
+ */
+export async function reordenar(
+  sessao: Sessao,
+  dados: ReordenarTaxonomiasInput,
+): Promise<TaxonomiaRef[]> {
+  const unicos = [...new Set(dados.ids)];
+  if (unicos.length !== dados.ids.length) {
+    throw erros.validacao('A ordem não pode repetir a mesma entrada.');
+  }
+
+  const existentes = await db
+    .select({ id: orgTaxonomies.id })
+    .from(orgTaxonomies)
+    .where(
+      and(
+        eq(orgTaxonomies.organizationId, sessao.org),
+        eq(orgTaxonomies.tipo, dados.tipo),
+        eq(orgTaxonomies.arquivado, false),
+      ),
+    );
+
+  const esperados = new Set(existentes.map((e) => e.id));
+  if (esperados.size !== unicos.length || unicos.some((id) => !esperados.has(id))) {
+    throw erros.validacao('A ordem tem de incluir todas as entradas desta família, e só essas.');
+  }
+
+  await db.transaction(async (tx) => {
+    for (const [indice, id] of unicos.entries()) {
+      await tx
+        .update(orgTaxonomies)
+        .set({ ordem: indice, updatedAt: new Date() })
+        .where(and(eq(orgTaxonomies.id, id), eq(orgTaxonomies.organizationId, sessao.org)));
+    }
+  });
+
+  await registar(db, {
+    organizationId: sessao.org,
+    actorId: sessao.sub,
+    accao: 'vocabulario.reordenado',
+    entidade: 'taxonomia',
+    detalhe: { tipo: dados.tipo, ids: unicos },
+  });
+
+  return listar(sessao, { tipo: dados.tipo, incluirArquivadas: false });
 }
 
 /**

@@ -15,7 +15,9 @@ import {
 import { corBarraAvanco, corSaude, dataCurta } from '@nexora/shared';
 import { BarraAvanco, Carregando, CartaoNumero, PastilhaAlerta, Ponto, Semaforo, Vazio } from '../components/base';
 import { Pagina } from '../components/Layout';
-import { usePainel } from '../lib/queries';
+import { useDecidirProrrogacao, usePainel } from '../lib/queries';
+import { useToast } from '../components/Toast';
+import { ErroApi } from '../lib/api';
 import { botaoSecundario } from '../design/tokens';
 
 /**
@@ -31,8 +33,19 @@ import { botaoSecundario } from '../design/tokens';
  * verde, porque o verde e do que ja esta cumprido.
  */
 export function Painel() {
-  const { data, isLoading } = usePainel();
+  const { data, isLoading, isError } = usePainel();
   const navegar = useNavigate();
+  const decidirPrazo = useDecidirProrrogacao();
+  const toast = useToast();
+
+  async function decidirProrrogacao(id: string, aceitar: boolean) {
+    try {
+      await decidirPrazo.mutateAsync({ extensionId: id, aceitar });
+      toast.mostrar(aceitar ? 'Prazo alargado' : 'Pedido de prorrogação recusado');
+    } catch (e) {
+      toast.mostrar(e instanceof ErroApi ? e.message : 'Não foi possível decidir o pedido.');
+    }
+  }
 
   return (
     <Pagina
@@ -45,7 +58,9 @@ export function Painel() {
       }
       accaoPrincipal={{ rotulo: 'Registar projecto', onClick: () => navegar('/projectos?novo=1') }}
     >
-      {isLoading || !data ? (
+      {isError ? (
+        <Vazio style={{ ...cartao, padding: 40 }}>Não foi possível carregar o painel. Tente de novo.</Vazio>
+      ) : isLoading || !data ? (
         <Carregando />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: ESPACO.seccao }}>
@@ -188,15 +203,36 @@ export function Painel() {
                       </div>
                     </div>
                     <PastilhaAlerta alerta={item.alerta} />
-                    <button
-                      type="button"
-                      style={{ ...botaoSecundario, borderColor: COR.bordaForte }}
-                      onClick={() => {
-                        navegar(item.origem === 'relatorio' ? '/relatorios' : '/tarefas');
-                      }}
-                    >
-                      {item.accao}
-                    </button>
+                    {item.origem === 'prorrogacao' ? (
+                      <span style={{ display: 'flex', gap: 8 }}>
+                        <button
+                          type="button"
+                          style={botaoSecundario}
+                          disabled={decidirPrazo.isPending}
+                          onClick={() => void decidirProrrogacao(item.id, false)}
+                        >
+                          Recusar
+                        </button>
+                        <button
+                          type="button"
+                          style={{ ...botaoSecundario, borderColor: COR.bordaForte }}
+                          disabled={decidirPrazo.isPending}
+                          onClick={() => void decidirProrrogacao(item.id, true)}
+                        >
+                          Aceitar
+                        </button>
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        style={{ ...botaoSecundario, borderColor: COR.bordaForte }}
+                        onClick={() => {
+                          navegar(item.origem === 'relatorio' ? '/relatorios' : '/tarefas');
+                        }}
+                      >
+                        {item.accao}
+                      </button>
+                    )}
                   </div>
                 ))
               )}

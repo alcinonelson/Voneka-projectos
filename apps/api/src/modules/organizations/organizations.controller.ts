@@ -6,6 +6,7 @@ import type {
   CriarTaxonomiasEmLoteInput,
   ListarTaxonomiasInput,
   RegistarEmpresaInput,
+  ReordenarTaxonomiasInput,
 } from '@nexora/shared';
 import { ehProducao, env } from '../../config/env';
 import { sessaoDe } from '../../middleware/auth.middleware';
@@ -93,6 +94,14 @@ export async function actualizarEntrada(req: Request, res: Response): Promise<Re
     req.body as ActualizarTaxonomiaInput,
   );
   return sucesso(res, entrada, `"${entrada.rotulo}" actualizado`);
+}
+
+export async function reordenarVocabulario(req: Request, res: Response): Promise<Response> {
+  const entradas = await vocabulario.reordenar(
+    sessaoDe(req),
+    req.body as ReordenarTaxonomiasInput,
+  );
+  return sucesso(res, entradas, 'Ordem do vocabulário gravada');
 }
 
 export async function removerEntrada(req: Request, res: Response): Promise<Response> {

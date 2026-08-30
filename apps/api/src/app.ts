@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { env } from './config/env';
 import { naoEncontrado, tratarErros } from './middleware/error.middleware';
+import { requestId } from './middleware/request-id.middleware';
 import { apiRouter } from './routes';
 
 export function criarApp(): Express {
@@ -22,6 +23,7 @@ export function criarApp(): Express {
       credentials: true,
     }),
   );
+  app.use(requestId);
   app.use(express.json({ limit: '1mb' }));
   app.use(cookieParser());
 

@@ -6,6 +6,7 @@ import { Pagina } from '../components/Layout';
 import { ModalMembro } from '../components/ModalMembro';
 import { useToast } from '../components/Toast';
 import { useEquipa, useReenviarConvite } from '../lib/queries';
+import type { MembroEquipa } from '../lib/tipos';
 
 /**
  * Equipa e acessos.
@@ -18,6 +19,7 @@ import { useEquipa, useReenviarConvite } from '../lib/queries';
 export function Equipa() {
   const { data: equipa, isLoading } = useEquipa();
   const [modalAberto, setModalAberto] = useState(false);
+  const [aEditar, setAEditar] = useState<MembroEquipa | null>(null);
   const reenviar = useReenviarConvite();
   const toast = useToast();
 
@@ -40,7 +42,13 @@ export function Equipa() {
       acento={'#C3B5FD'}
       titulo="Equipa e acessos"
       subtitulo="Registo de pessoas, contas de utilizador e níveis de acesso"
-      accaoPrincipal={{ rotulo: 'Registar membro', onClick: () => setModalAberto(true) }}
+      accaoPrincipal={{
+        rotulo: 'Registar membro',
+        onClick: () => {
+          setAEditar(null);
+          setModalAberto(true);
+        },
+      }}
     >
       <div style={{ fontSize: FONTE.pequena, color: COR.textoSuave, marginBottom: 14 }}>
         {equipa?.length ?? 0} pessoas
@@ -161,7 +169,8 @@ export function Equipa() {
                         const r = await reenviar.mutateAsync(p.id);
                         toast.mostrar(`Convite reenviado a ${r.email}`);
                       } else {
-                        toast.mostrar(`Ficha de ${p.nome}`);
+                        setAEditar(p);
+                        setModalAberto(true);
                       }
                     }}
                   >
@@ -174,7 +183,14 @@ export function Equipa() {
         )}
       </div>
 
-      <ModalMembro aberto={modalAberto} onFechar={() => setModalAberto(false)} />
+      <ModalMembro
+        aberto={modalAberto}
+        membro={aEditar}
+        onFechar={() => {
+          setModalAberto(false);
+          setAEditar(null);
+        }}
+      />
     </Pagina>
   );
 }

@@ -54,7 +54,7 @@ export function ModalRelatorio({
 
   const limpo = texto.trim();
   const faltam = Math.max(0, MIN_CARACTERES_RELATORIO - limpo.length);
-  const valido = limpo.length >= MIN_CARACTERES_RELATORIO || !tarefa.exigeRelatorio;
+  const valido = limpo.length >= MIN_CARACTERES_RELATORIO;
 
   async function submeter() {
     if (!valido) {

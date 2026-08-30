@@ -1,13 +1,26 @@
 import bcrypt from 'bcryptjs';
 import { and, eq, isNull, lt, or } from 'drizzle-orm';
-import type { AceitarConviteInput, AlterarPasswordInput, LoginInput } from '@nexora/shared';
+import type {
+  AceitarConviteInput,
+  AlterarPasswordInput,
+  LoginInput,
+  PedirRecuperacaoInput,
+  ReporPasswordInput,
+} from '@nexora/shared';
 import { BCRYPT_ROUNDS, env } from '../../config/env';
 import { db } from '../../db/db';
 import { organizations } from '../../db/schema/organizations.schema';
 import { refreshTokens, users } from '../../db/schema/users.schema';
 import { erros } from '../../utils/errors';
 import { logModulo, logger } from '../../utils/logger';
-import { assinarAccessToken, gerarRefreshToken, hashOpaco, type Sessao } from '../../utils/tokens';
+import { enviarEmail, textoRecuperacao } from '../../utils/mailer';
+import {
+  assinarAccessToken,
+  gerarRefreshToken,
+  gerarTokenConvite,
+  hashOpaco,
+  type Sessao,
+} from '../../utils/tokens';
 
 export interface UtilizadorSessao {
   id: string;
@@ -299,6 +312,91 @@ export async function alterarPassword(
   );
 
   return emitirSessao(await comEmpresa(utilizador), userAgent);
+}
+
+export const MENSAGEM_RECUPERACAO =
+  'Se existir uma conta activa com este email, enviámos uma ligação. Expira dentro de uma hora.';
+
+/**
+ * Pede uma ligacao para definir palavra-passe nova.
+ *
+ * A resposta e sempre a mesma, exista ou nao a conta: dizer "esse email nao esta registado"
+ * denunciaria quem tem conta. So contas activas recebem a mensagem; um convite pendente continua
+ * a resolver-se pelo convite, nao por aqui.
+ */
+export async function pedirRecuperacao(dados: PedirRecuperacaoInput): Promise<void> {
+  const [utilizador] = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, dados.email))
+    .limit(1);
+
+  if (utilizador && utilizador.activo && utilizador.estado === 'activo' && utilizador.passwordHash) {
+    const { token, hash } = gerarTokenConvite();
+    const expiraEm = new Date(Date.now() + 60 * 60 * 1000);
+
+    await db
+      .update(users)
+      .set({
+        recuperacaoTokenHash: hash,
+        recuperacaoExpiraEm: expiraEm,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, utilizador.id));
+
+    const ligacao = `${env.WEB_ORIGIN}/recuperar?token=${token}`;
+    await enviarEmail({
+      para: utilizador.email,
+      assunto: 'Nova palavra-passe no Voneka Projectos',
+      texto: textoRecuperacao(utilizador.nome, ligacao),
+    });
+  }
+
+  logger.info(logModulo('auth', `Pedido de recuperacao para ${dados.email}`));
+}
+
+/**
+ * Define uma palavra-passe nova a partir da ligacao de recuperacao.
+ *
+ * Termina as sessoes antigas: se a pessoa pediu recuperacao, as sessoes que ainda andavam
+ * por ai deixam de ser de confianca.
+ */
+export async function reporPassword(
+  dados: ReporPasswordInput,
+  userAgent?: string,
+): Promise<ResultadoAutenticacao> {
+  const [utilizador] = await db
+    .select()
+    .from(users)
+    .where(eq(users.recuperacaoTokenHash, hashOpaco(dados.token)))
+    .limit(1);
+
+  if (!utilizador || !utilizador.activo) {
+    throw erros.conviteInvalido('Esta ligação já não serve. Peça outra a partir da página de entrada.');
+  }
+  if (!utilizador.recuperacaoExpiraEm || utilizador.recuperacaoExpiraEm.getTime() < Date.now()) {
+    throw erros.conviteInvalido('A ligação expirou. Peça outra a partir da página de entrada.');
+  }
+
+  const passwordHash = await bcrypt.hash(dados.password, BCRYPT_ROUNDS);
+
+  const [actualizado] = await db
+    .update(users)
+    .set({
+      passwordHash,
+      recuperacaoTokenHash: null,
+      recuperacaoExpiraEm: null,
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, utilizador.id))
+    .returning();
+
+  if (!actualizado) throw erros.interno();
+
+  await removerSessoes(utilizador.id);
+  logger.info(logModulo('auth', `Palavra-passe reposta por ${utilizador.id}`));
+
+  return emitirSessao(await comEmpresa(actualizado), userAgent);
 }
 
 /** Perfil da sessao actual. */

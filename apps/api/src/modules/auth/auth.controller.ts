@@ -1,5 +1,11 @@
 import type { CookieOptions, Request, Response } from 'express';
-import type { AceitarConviteInput, AlterarPasswordInput, LoginInput } from '@nexora/shared';
+import type {
+  AceitarConviteInput,
+  AlterarPasswordInput,
+  LoginInput,
+  PedirRecuperacaoInput,
+  ReporPasswordInput,
+} from '@nexora/shared';
 import { ehProducao, env } from '../../config/env';
 import { erros } from '../../utils/errors';
 import { sucesso } from '../../utils/response';
@@ -77,6 +83,19 @@ export async function alterarPassword(req: Request, res: Response): Promise<Resp
     resultado,
     'Palavra-passe alterada. As sessões abertas noutros dispositivos foram terminadas.',
   );
+}
+
+export async function pedirRecuperacao(req: Request, res: Response): Promise<Response> {
+  await servico.pedirRecuperacao(req.body as PedirRecuperacaoInput);
+  return sucesso(res, null, servico.MENSAGEM_RECUPERACAO);
+}
+
+export async function reporPassword(req: Request, res: Response): Promise<Response> {
+  const resultado = await servico.reporPassword(
+    req.body as ReporPasswordInput,
+    req.headers['user-agent'],
+  );
+  return responder(res, resultado, 'Palavra-passe definida. Já pode entrar.');
 }
 
 export async function me(req: Request, res: Response): Promise<Response> {

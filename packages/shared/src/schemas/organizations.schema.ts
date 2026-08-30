@@ -94,6 +94,13 @@ export const criarTaxonomiasEmLoteSchema = z.object({
 });
 export type CriarTaxonomiasEmLoteInput = z.infer<typeof criarTaxonomiasEmLoteSchema>;
 
+/** Nova ordem de uma familia do vocabulario. Os ids tem de ser todos da mesma empresa e tipo. */
+export const reordenarTaxonomiasSchema = z.object({
+  tipo: zTipoTaxonomia,
+  ids: z.array(zId).min(1).max(80),
+});
+export type ReordenarTaxonomiasInput = z.infer<typeof reordenarTaxonomiasSchema>;
+
 /** Referência a uma entrada do vocabulário, tal como a API a devolve. */
 export interface TaxonomiaRef {
   id: string;

@@ -4,7 +4,9 @@ import {
   aceitarConviteSchema,
   alterarPasswordSchema,
   loginSchema,
+  pedirRecuperacaoSchema,
   registarEmpresaSchema,
+  reporPasswordSchema,
 } from '@nexora/shared';
 import { autenticar } from '../../middleware/auth.middleware';
 import { validar } from '../../middleware/validate.middleware';
@@ -35,7 +37,19 @@ const limiteCredenciais = rateLimit({
 export const authRouter: Router = Router();
 
 authRouter.post('/login', limiteCredenciais, validar(loginSchema), assincrono(controlador.login));
-authRouter.post('/refresh', assincrono(controlador.refresh));
+authRouter.post(
+  '/forgot-password',
+  limiteCredenciais,
+  validar(pedirRecuperacaoSchema),
+  assincrono(controlador.pedirRecuperacao),
+);
+authRouter.post(
+  '/reset-password',
+  limiteCredenciais,
+  validar(reporPasswordSchema),
+  assincrono(controlador.reporPassword),
+);
+authRouter.post('/refresh', limiteCredenciais, assincrono(controlador.refresh));
 authRouter.post('/logout', assincrono(controlador.logout));
 authRouter.post(
   '/accept-invite',

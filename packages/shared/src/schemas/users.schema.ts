@@ -34,6 +34,7 @@ export type CriarMembroInput = z.infer<typeof criarMembroSchema>;
 
 export const actualizarMembroSchema = criarMembroSchema
   .omit({ email: true, enviarConvite: true })
+  .extend({ activo: z.boolean() })
   .partial();
 export type ActualizarMembroInput = z.infer<typeof actualizarMembroSchema>;
 

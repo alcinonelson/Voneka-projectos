@@ -71,5 +71,13 @@ export const pedirProrrogacaoSchema = z.object({
 });
 export type PedirProrrogacaoInput = z.infer<typeof pedirProrrogacaoSchema>;
 
+export const decidirProrrogacaoSchema = z.object({
+  aceitar: z.boolean({
+    required_error: 'Indique se aceita ou recusa o pedido.',
+    invalid_type_error: 'Indique se aceita ou recusa o pedido.',
+  }),
+});
+export type DecidirProrrogacaoInput = z.infer<typeof decidirProrrogacaoSchema>;
+
 /** Estados em que uma tarefa ainda conta como aberta. */
 export const ESTADOS_ABERTOS = ESTADOS_TAREFA.filter((e) => e !== 'concluida');

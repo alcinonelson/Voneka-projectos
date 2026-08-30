@@ -13,7 +13,9 @@ import {
 } from '@nexora/shared';
 import { COR, FONTE, PESO, RAIO, campo, erroCampo, numerico, pastilha, rotuloCampo } from '../design/tokens';
 import { ErroApi } from '../lib/api';
-import { useCarteira, useCriarMembro, useVocabulario } from '../lib/queries';
+import { useActualizarMembro, useCarteira, useCriarMembro, useVocabulario } from '../lib/queries';
+import type { MembroEquipa } from '../lib/tipos';
+import { CampoData } from './CampoData';
 import { Modal } from './Modal';
 import { useToast } from './Toast';
 
@@ -24,10 +26,20 @@ import { useToast } from './Toast';
  * sem saber o que cada uma abre e como assinar sem ler; a nota diz exactamente o que a pessoa
  * passa a poder fazer.
  */
-export function ModalMembro({ aberto, onFechar }: { aberto: boolean; onFechar: () => void }) {
+export function ModalMembro({
+  aberto,
+  onFechar,
+  membro,
+}: {
+  aberto: boolean;
+  onFechar: () => void;
+  membro?: MembroEquipa | null;
+}) {
+  const aEditar = Boolean(membro);
   const { data: carteira } = useCarteira('todos');
   const { data: departamentos } = useVocabulario('departamento');
   const criar = useCriarMembro();
+  const actualizar = useActualizarMembro();
   const toast = useToast();
 
   const [nome, setNome] = useState('');
@@ -46,20 +58,20 @@ export function ModalMembro({ aberto, onFechar }: { aberto: boolean; onFechar: (
 
   useEffect(() => {
     if (!aberto) return;
-    setNome('');
-    setEmail('');
-    setTelefone('');
-    setFuncao('');
-    setDepartamentoId(null);
-    setEntrada(formatarData(hoje()));
-    setAlocacao(100);
-    setNivelAcesso('colaborador');
-    setProjectos([]);
+    setNome(membro?.nome ?? '');
+    setEmail(membro?.email ?? '');
+    setTelefone(membro?.telefone ?? '');
+    setFuncao(membro?.funcao ?? '');
+    setDepartamentoId(membro?.departamento?.id ?? null);
+    setEntrada(formatarData(membro?.dataEntrada ?? hoje()));
+    setAlocacao(membro?.alocacao ?? 100);
+    setNivelAcesso(membro?.nivelAcesso ?? 'colaborador');
+    setProjectos(membro?.projectos ?? []);
     setEnviarConvite(true);
     setTocado(false);
     setErroServidor(null);
     setCampos({});
-  }, [aberto]);
+  }, [aberto, membro]);
 
   const dataEntrada = lerData(entrada);
   const erroNome = tocado && nome.trim().length < 3 ? 'Indique o nome completo.' : campos.nome;
@@ -72,7 +84,11 @@ export function ModalMembro({ aberto, onFechar }: { aberto: boolean; onFechar: (
   const erroFuncao =
     tocado && !funcao.trim() ? 'Indique a função que a pessoa desempenha.' : campos.funcao;
 
-  const valido = nome.trim().length >= 3 && emailValido(email) && funcao.trim().length > 0 && dataEntrada !== null;
+  const valido =
+    nome.trim().length >= 3 &&
+    (aEditar || emailValido(email)) &&
+    funcao.trim().length > 0 &&
+    dataEntrada !== null;
 
   async function submeter() {
     if (!valido || !dataEntrada) {
@@ -82,31 +98,64 @@ export function ModalMembro({ aberto, onFechar }: { aberto: boolean; onFechar: (
     setErroServidor(null);
     setCampos({});
     try {
-      await criar.mutateAsync({
-        nome: nome.trim(),
-        email: email.trim().toLowerCase(),
-        telefone: telefone.trim(),
-        funcao: funcao.trim(),
-        departamentoId,
-        dataEntrada: paraIso(dataEntrada),
-        alocacao,
-        nivelAcesso,
-        projectos,
-        enviarConvite,
-      });
-      toast.mostrar(
-        `${nome.trim()} registado como ${NIVEL_ACESSO[nivelAcesso]}${
-          enviarConvite ? ' · convite enviado' : ' · conta sem convite'
-        }`,
-      );
+      if (membro) {
+        await actualizar.mutateAsync({
+          id: membro.id,
+          dados: {
+            nome: nome.trim(),
+            telefone: telefone.trim(),
+            funcao: funcao.trim(),
+            departamentoId,
+            dataEntrada: paraIso(dataEntrada),
+            alocacao,
+            nivelAcesso,
+            projectos,
+          },
+        });
+        toast.mostrar(`Ficha de ${nome.trim()} actualizada`);
+      } else {
+        await criar.mutateAsync({
+          nome: nome.trim(),
+          email: email.trim().toLowerCase(),
+          telefone: telefone.trim(),
+          funcao: funcao.trim(),
+          departamentoId,
+          dataEntrada: paraIso(dataEntrada),
+          alocacao,
+          nivelAcesso,
+          projectos,
+          enviarConvite,
+        });
+        toast.mostrar(
+          `${nome.trim()} registado como ${NIVEL_ACESSO[nivelAcesso]}${
+            enviarConvite ? ' · convite enviado' : ' · conta sem convite'
+          }`,
+        );
+      }
       onFechar();
     } catch (e) {
       if (e instanceof ErroApi) {
         setErroServidor(e.message);
         setCampos(e.campos);
       } else {
-        setErroServidor('Não foi possível criar a conta.');
+        setErroServidor(aEditar ? 'Não foi possível actualizar a ficha.' : 'Não foi possível criar a conta.');
       }
+    }
+  }
+
+  async function alterarActivo(activo: boolean) {
+    if (!membro) return;
+    setErroServidor(null);
+    try {
+      await actualizar.mutateAsync({ id: membro.id, dados: { activo } });
+      toast.mostrar(
+        activo
+          ? `${membro.nome} voltou a poder entrar`
+          : `${membro.nome} deixa de entrar; o histórico mantém-se`,
+      );
+      onFechar();
+    } catch (e) {
+      setErroServidor(e instanceof ErroApi ? e.message : 'Não foi possível alterar a conta.');
     }
   }
 
@@ -114,20 +163,26 @@ export function ModalMembro({ aberto, onFechar }: { aberto: boolean; onFechar: (
     <Modal
       aberto={aberto}
       onFechar={onFechar}
-      titulo="Registar membro"
-      subtitulo="Criar o membro cria a conta de utilizador. O email é a credencial de acesso."
+      titulo={aEditar ? 'Editar ficha' : 'Registar membro'}
+      subtitulo={
+        aEditar
+          ? 'Altere o que mudou. O email continua a ser a credencial e não se troca aqui.'
+          : 'Criar o membro cria a conta de utilizador. O email é a credencial de acesso.'
+      }
       largura={720}
       rodapeNota={
         valido
           ? `Acesso ${NIVEL_ACESSO[nivelAcesso]} · ${projectos.length} ${projectos.length === 1 ? 'projecto atribuído' : 'projectos atribuídos'}`
-          : 'Nome, email válido e função são obrigatórios'
+          : aEditar
+            ? 'Nome e função são obrigatórios'
+            : 'Nome, email válido e função são obrigatórios'
       }
       rodapeErro={!valido && tocado}
       accao={{
-        rotulo: enviarConvite ? 'Criar conta e convidar' : 'Criar conta',
+        rotulo: aEditar ? 'Gravar ficha' : enviarConvite ? 'Criar conta e convidar' : 'Criar conta',
         onClick: () => void submeter(),
         desactivada: !valido,
-        aCarregar: criar.isPending,
+        aCarregar: criar.isPending || actualizar.isPending,
       }}
     >
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 18 }}>
@@ -154,8 +209,13 @@ export function ModalMembro({ aberto, onFechar }: { aberto: boolean; onFechar: (
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onBlur={() => setTocado(true)}
-            placeholder="nome.apelido@nexora.co.mz"
-            style={{ ...campo, borderColor: erroEmail ? COR.vermelhoBorda : COR.bordaForte }}
+            placeholder="nome.apelido@empresa.co.mz"
+            disabled={aEditar}
+            style={{
+              ...campo,
+              borderColor: erroEmail ? COR.vermelhoBorda : COR.bordaForte,
+              color: aEditar ? COR.suave : COR.tinta,
+            }}
           />
           {erroEmail ? <div style={erroCampo}>{erroEmail}</div> : null}
         </div>
@@ -188,21 +248,13 @@ export function ModalMembro({ aberto, onFechar }: { aberto: boolean; onFechar: (
             style={{ ...campo, ...numerico }}
           />
         </div>
-        <div>
-          <label style={rotuloCampo} htmlFor="mb-entrada">
-            Data de entrada
-          </label>
-          <input
-            id="mb-entrada"
-            value={entrada}
-            onChange={(e) => setEntrada(e.target.value)}
-            style={{
-              ...campo,
-              ...numerico,
-              borderColor: dataEntrada === null ? COR.vermelhoBorda : COR.bordaForte,
-            }}
-          />
-        </div>
+        <CampoData
+          id="mb-entrada"
+          rotulo="Data de entrada"
+          valor={entrada}
+          onChange={setEntrada}
+          erro={tocado && dataEntrada === null ? 'Indique a data de entrada.' : undefined}
+        />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 18 }}>
@@ -319,7 +371,7 @@ export function ModalMembro({ aberto, onFechar }: { aberto: boolean; onFechar: (
       </div>
 
       <div style={{ marginBottom: 18 }}>
-        <span style={rotuloCampo}>Projectos iniciais</span>
+        <span style={rotuloCampo}>{aEditar ? 'Projectos' : 'Projectos iniciais'}</span>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {carteira?.projectos.slice(0, 8).map((p) => {
             const activo = projectos.includes(p.id);
@@ -347,6 +399,7 @@ export function ModalMembro({ aberto, onFechar }: { aberto: boolean; onFechar: (
         </div>
       </div>
 
+      {aEditar ? null : (
       <button
         type="button"
         onClick={() => setEnviarConvite((v) => !v)}
@@ -392,6 +445,33 @@ export function ModalMembro({ aberto, onFechar }: { aberto: boolean; onFechar: (
           </span>
         </span>
       </button>
+      )}
+
+      {aEditar && membro ? (
+        <button
+          type="button"
+          onClick={() => void alterarActivo(!membro.activo)}
+          disabled={actualizar.isPending}
+          style={{
+            display: 'block',
+            width: '100%',
+            marginTop: 14,
+            padding: '12px 14px',
+            border: `1px solid ${membro.activo ? COR.vermelhoBorda : COR.borda}`,
+            borderRadius: RAIO.medio,
+            background: membro.activo ? COR.vermelhoFundo : COR.fundoCampo,
+            color: membro.activo ? COR.vermelho : COR.tinta,
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+            textAlign: 'left',
+            fontSize: FONTE.corpo,
+          }}
+        >
+          {membro.activo
+            ? 'Desactivar conta — deixa de entrar; o histórico mantém-se'
+            : 'Reactivar conta — volta a poder entrar com a palavra-passe que já tinha'}
+        </button>
+      ) : null}
 
       {erroServidor ? (
         <div

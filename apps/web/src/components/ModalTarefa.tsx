@@ -68,7 +68,6 @@ export function ModalTarefa({
   const [esforco, setEsforco] = useState<number>(8);
   const [prioridade, setPrioridade] = useState<Prioridade>('normal');
   const [antecedencia, setAntecedencia] = useState<number>(3);
-  const [exigeRelatorio, setExigeRelatorio] = useState(true);
   const [tocado, setTocado] = useState(false);
   const [erroServidor, setErroServidor] = useState<string | null>(null);
 
@@ -86,7 +85,6 @@ export function ModalTarefa({
     setEsforco(8);
     setPrioridade('normal');
     setAntecedencia(3);
-    setExigeRelatorio(true);
     setTocado(false);
     setErroServidor(null);
   }, [aberto, projectoInicial, carteira, pessoas]);
@@ -122,10 +120,7 @@ export function ModalTarefa({
 
     const quem = responsavel?.nome ?? 'A pessoa escolhida';
     const onde = nomeFase ? `${nomeProjecto}, fase ${nomeFase}` : nomeProjecto;
-    const fecho = exigeRelatorio
-      ? 'Ao dar isto por cumprido, tem de escrever um mini relatório.'
-      : 'Pode dar isto por cumprido sem escrever relatório.';
-    return `${quem} entrega "${titulo.trim()}" em ${onde} até ${dataLonga(data as Date)}. ${fecho}`;
+    return `${quem} entrega "${titulo.trim()}" em ${onde} até ${dataLonga(data as Date)}. Ao dar isto por cumprido, tem de escrever um mini relatório.`;
   }
 
   async function submeter() {
@@ -145,7 +140,7 @@ export function ModalTarefa({
         esforcoEstimadoHoras: esforco,
         prioridade,
         antecedenciaAlerta: antecedencia as 0 | 1 | 3 | 7,
-        exigeRelatorio,
+        exigeRelatorio: true,
       });
       toast.mostrar(
         `Tarefa atribuída a ${responsavel?.nome ?? 'equipa'} · entrega ${dataCurta(data)}`,
@@ -413,62 +408,21 @@ export function ModalTarefa({
             </div>
           </div>
 
-          <button
-            type="button"
-            role="switch"
-            aria-checked={exigeRelatorio}
-            onClick={() => setExigeRelatorio((v) => !v)}
+          <p
             style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 12,
-              width: '100%',
+              margin: 0,
               padding: '14px 16px',
-              border: `1px solid ${exigeRelatorio ? COR.tinta : COR.borda}`,
-              background: exigeRelatorio ? COR.fundoCampo : COR.branco,
+              border: `1px solid ${COR.borda}`,
+              background: COR.fundoCampo,
               borderRadius: RAIO.campo,
-              cursor: 'pointer',
-              textAlign: 'left',
-              fontFamily: 'inherit',
+              fontSize: FONTE.corpo,
+              color: COR.textoSuave,
+              lineHeight: 1.6,
             }}
           >
-            <span
-              aria-hidden="true"
-              style={{
-                width: 18,
-                height: 18,
-                flex: '0 0 18px',
-                marginTop: 1,
-                borderRadius: 5,
-                border: `1px solid ${exigeRelatorio ? COR.tinta : COR.bordaForte}`,
-                background: exigeRelatorio ? COR.tinta : COR.branco,
-                color: COR.branco,
-                display: 'grid',
-                placeItems: 'center',
-                fontSize: 11,
-              }}
-            >
-              {exigeRelatorio ? '✓' : ''}
-            </span>
-            <span style={{ minWidth: 0 }}>
-              <span style={{ display: 'block', fontSize: FONTE.base, fontWeight: PESO.medio, color: COR.tinta }}>
-                Fechar esta tarefa exige um mini relatório
-              </span>
-              <span
-                style={{
-                  display: 'block',
-                  fontSize: FONTE.corpo,
-                  color: COR.textoSuave,
-                  marginTop: 5,
-                  lineHeight: 1.6,
-                }}
-              >
-                {exigeRelatorio
-                  ? 'Quem a receber só a consegue dar por cumprida depois de escrever o que ficou feito e o que ficou por fazer. É este texto que chega à Direcção.'
-                  : 'A tarefa fecha com um clique, sem explicação. Escolha isto apenas para trabalho rotineiro que não precisa de acompanhamento.'}
-              </span>
-            </span>
-          </button>
+            Fechar a tarefa exige sempre um mini relatório. Quem a receber só a dá por cumprida
+            depois de escrever o que ficou feito — é este texto que chega à Direcção.
+          </p>
         </>
       ) : null}
 

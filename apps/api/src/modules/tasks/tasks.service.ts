@@ -20,7 +20,7 @@ import { users } from '../../db/schema/users.schema';
 import { erros } from '../../utils/errors';
 import { logModulo, logger } from '../../utils/logger';
 import type { Sessao } from '../../utils/tokens';
-import { ehAdministrador, exigirGestaoProjecto, tarefasVisiveis } from '../access';
+import { exigirGestaoProjecto, exigirMembroDaEmpresa, tarefasVisiveis } from '../access';
 import { registar } from '../audit.service';
 
 /**
@@ -99,7 +99,8 @@ export async function listar(sessao: Sessao, filtros: ListarTarefasInput): Promi
     .innerJoin(atribuidor, eq(atribuidor.id, tasks.atribuidoPorId))
     .leftJoin(phases, eq(phases.id, tasks.phaseId))
     .where(and(...condicoes))
-    .orderBy(asc(tasks.deadline));
+    .orderBy(asc(tasks.deadline))
+    .limit(200);
 
   const comEstado = linhas.map((l) => ({
     id: l.id,
@@ -169,7 +170,7 @@ export async function criar(sessao: Sessao, dados: CriarTarefaInput) {
       esforcoEstimadoHoras: dados.esforcoEstimadoHoras,
       prioridade: dados.prioridade,
       antecedenciaAlerta: dados.antecedenciaAlerta,
-      exigeRelatorio: dados.exigeRelatorio,
+      exigeRelatorio: true,
       estado: 'pendente',
     })
     .returning();
@@ -224,6 +225,10 @@ export async function actualizar(sessao: Sessao, taskId: string, dados: Actualiz
     await exigirGestaoProjecto(sessao, tarefa.projectId);
   }
 
+  if (dados.responsavelId !== undefined) {
+    await exigirMembroDaEmpresa(sessao, [dados.responsavelId]);
+  }
+
   const alteracoes: Record<string, unknown> = { updatedAt: new Date() };
   if (dados.titulo !== undefined) alteracoes.titulo = dados.titulo;
   if (dados.descricao !== undefined) alteracoes.descricao = dados.descricao || null;
@@ -237,7 +242,6 @@ export async function actualizar(sessao: Sessao, taskId: string, dados: Actualiz
   if (dados.antecedenciaAlerta !== undefined) {
     alteracoes.antecedenciaAlerta = dados.antecedenciaAlerta;
   }
-  if (dados.exigeRelatorio !== undefined) alteracoes.exigeRelatorio = dados.exigeRelatorio;
   if (dados.estado !== undefined) alteracoes.estado = dados.estado;
 
   const [actualizada] = await db
@@ -274,7 +278,7 @@ export async function concluir(sessao: Sessao, taskId: string, dados: ConcluirTa
   }
 
   const texto = dados.texto.trim();
-  if (tarefa.exigeRelatorio && texto.length < MIN_CARACTERES_RELATORIO) {
+  if (texto.length < MIN_CARACTERES_RELATORIO) {
     throw erros.relatorioObrigatorio(MENSAGEM_RELATORIO_CURTO, { texto: MENSAGEM_RELATORIO_CURTO });
   }
 
@@ -417,20 +421,6 @@ export async function decidirProrrogacao(
 
     return { aceite: aceitar };
   });
-}
-
-/** Contagem de tarefas abertas por pessoa. Alimenta a carga mostrada no modal de atribuicao. */
-export async function tarefasAbertasPorPessoa(): Promise<Map<string, number>> {
-  const linhas = await db
-    .select({ responsavelId: tasks.responsavelId, id: tasks.id })
-    .from(tasks)
-    .where(ne(tasks.estado, 'concluida'));
-
-  const contagem = new Map<string, number>();
-  for (const l of linhas) {
-    contagem.set(l.responsavelId, (contagem.get(l.responsavelId) ?? 0) + 1);
-  }
-  return contagem;
 }
 
 /** Tarefas de um projecto, para a gaveta. */

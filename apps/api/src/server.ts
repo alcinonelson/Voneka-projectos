@@ -2,6 +2,7 @@ import cron from 'node-cron';
 import { criarApp } from './app';
 import { env } from './config/env';
 import { fecharLigacao } from './db/db';
+import { limparAuditoriaAntiga } from './modules/audit.service';
 import { limparSessoes } from './modules/auth/auth.service';
 import { correrAlertas } from './modules/notifications/notifications.service';
 import { logModulo, logger } from './utils/logger';
@@ -27,7 +28,7 @@ const tarefaAlertas = cron.schedule(
   { timezone: 'Africa/Maputo' },
 );
 
-/** Limpeza de sessoes expiradas, de madrugada. */
+/** Limpeza de sessoes expiradas e de auditoria com mais de 24 meses, de madrugada. */
 const tarefaSessoes = cron.schedule(
   '30 3 * * *',
   () => {
@@ -35,6 +36,11 @@ const tarefaSessoes = cron.schedule(
       .then((n) => logger.info(logModulo('auth', `${n} sessões expiradas removidas`)))
       .catch((erro: unknown) => {
         logger.error(logModulo('auth', `Limpeza falhou: ${(erro as Error).message}`));
+      });
+    limparAuditoriaAntiga()
+      .then((n) => logger.info(logModulo('auditoria', `${n} registos com mais de 24 meses removidos`)))
+      .catch((erro: unknown) => {
+        logger.error(logModulo('auditoria', `Retenção falhou: ${(erro as Error).message}`));
       });
   },
   { timezone: 'Africa/Maputo' },

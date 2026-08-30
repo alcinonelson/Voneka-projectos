@@ -3,6 +3,7 @@ import { db } from '../db/db';
 import { orgTaxonomies } from '../db/schema/organizations.schema';
 import { projectMembers, projects } from '../db/schema/projects.schema';
 import { tasks } from '../db/schema/tasks.schema';
+import { users } from '../db/schema/users.schema';
 import { erros } from '../utils/errors';
 import type { Sessao } from '../utils/tokens';
 
@@ -164,4 +165,44 @@ export async function exigirTaxonomia(
     throw erros.validacao(`${nome} não existe no vocabulário da sua empresa.`);
   }
   return linha;
+}
+
+/**
+ * Garante que todas as pessoas indicadas pertencem a empresa da sessao.
+ *
+ * Sem isto, um pedido forjado podia nomear alguem de outra empresa como responsavel e, a partir
+ * dai, essa pessoa passaria a ver projectos que nao sao da sua casa.
+ */
+export async function exigirMembroDaEmpresa(sessao: Sessao, ids: string[]): Promise<void> {
+  const unicos = [...new Set(ids)].filter(Boolean);
+  if (!unicos.length) return;
+
+  const encontrados = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(and(eq(users.organizationId, sessao.org), inArray(users.id, unicos)));
+
+  if (encontrados.length !== unicos.length) {
+    throw erros.validacao('Uma das pessoas indicadas não pertence a esta empresa.');
+  }
+}
+
+/**
+ * Garante que os projectos indicados existem dentro da empresa da sessao.
+ *
+ * Usado ao alocar um membro: sem isto, um identificador forjado ligava a pessoa a um projecto
+ * vizinho e, no dia seguinte, ela via a carteira da outra casa.
+ */
+export async function exigirProjectosDaEmpresa(sessao: Sessao, ids: string[]): Promise<void> {
+  const unicos = [...new Set(ids)].filter(Boolean);
+  if (!unicos.length) return;
+
+  const encontrados = await db
+    .select({ id: projects.id })
+    .from(projects)
+    .where(and(eq(projects.organizationId, sessao.org), inArray(projects.id, unicos)));
+
+  if (encontrados.length !== unicos.length) {
+    throw erros.validacao('Um dos projectos indicados não pertence a esta empresa.');
+  }
 }

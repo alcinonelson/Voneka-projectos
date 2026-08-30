@@ -3,6 +3,7 @@ import {
   actualizarTarefaSchema,
   concluirTarefaSchema,
   criarTarefaSchema,
+  decidirProrrogacaoSchema,
   listarTarefasSchema,
   pedirProrrogacaoSchema,
 } from '@nexora/shared';
@@ -40,5 +41,6 @@ tasksRouter.post(
 tasksRouter.post(
   '/extensions/:extensionId/decide',
   exigirNivel('administrador', 'gestor'),
+  validar(decidirProrrogacaoSchema),
   assincrono(controlador.decidirProrrogacao),
 );

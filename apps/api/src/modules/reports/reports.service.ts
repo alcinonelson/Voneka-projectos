@@ -13,7 +13,7 @@ import { reports, tasks } from '../../db/schema/tasks.schema';
 import { users } from '../../db/schema/users.schema';
 import { erros } from '../../utils/errors';
 import type { Sessao } from '../../utils/tokens';
-import { ehAdministrador, projectosVisiveis } from '../access';
+import { ehAdministrador, exigirGestaoProjecto, projectosVisiveis } from '../access';
 import { registar } from '../audit.service';
 
 /** Alias para quem validou o relatorio, separado do autor. */
@@ -82,7 +82,8 @@ export async function listar(
     .innerJoin(users, eq(users.id, reports.autorId))
     .leftJoin(validador, eq(validador.id, reports.validadoPorId))
     .where(and(...condicoes))
-    .orderBy(desc(reports.createdAt));
+    .orderBy(desc(reports.createdAt))
+    .limit(200);
 
   return linhas.map((l) => ({
     id: l.id,
@@ -152,7 +153,11 @@ export async function decidir(
     throw erros.semPermissao('Só a Direcção ou um gestor validam relatórios.');
   }
 
-  const [relatorio] = await db.select().from(reports).where(eq(reports.id, reportId)).limit(1);
+  const [relatorio] = await db
+    .select()
+    .from(reports)
+    .where(and(eq(reports.id, reportId), eq(reports.organizationId, sessao.org)))
+    .limit(1);
   if (!relatorio) throw erros.naoEncontrado('Este relatório');
 
   if (relatorio.autorId === sessao.sub && !ehAdministrador(sessao)) {
@@ -162,8 +167,11 @@ export async function decidir(
   const [tarefa] = await db
     .select({ projectId: tasks.projectId })
     .from(tasks)
-    .where(eq(tasks.id, relatorio.taskId))
+    .where(and(eq(tasks.id, relatorio.taskId), eq(tasks.organizationId, sessao.org)))
     .limit(1);
+  if (!tarefa) throw erros.naoEncontrado('Este relatório');
+
+  await exigirGestaoProjecto(sessao, tarefa.projectId);
 
   const [actualizado] = await db
     .update(reports)
@@ -173,7 +181,7 @@ export async function decidir(
       validadoEm: new Date(),
       observacao: dados.observacao || null,
     })
-    .where(eq(reports.id, reportId))
+    .where(and(eq(reports.id, reportId), eq(reports.organizationId, sessao.org)))
     .returning();
 
   await registar(db, {

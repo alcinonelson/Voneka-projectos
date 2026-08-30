@@ -156,7 +156,7 @@ export interface ItemDecisao {
   accao: 'Escalar' | 'Decidir' | 'Responder';
   projectoId: string;
   projectoNome: string;
-  origem: 'tarefa' | 'relatorio';
+  origem: 'tarefa' | 'relatorio' | 'prorrogacao';
 }
 
 export interface Painel {
@@ -200,6 +200,9 @@ export interface MembroEquipa {
   tarefasAbertas: number;
   carga: number;
   cumprimento: number | null;
+  activo: boolean;
+  telefone: string | null;
+  projectos: string[];
 }
 
 export interface PessoaSelector {

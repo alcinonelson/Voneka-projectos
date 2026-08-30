@@ -8,6 +8,7 @@ declare global {
   namespace Express {
     interface Request {
       sessao?: Sessao;
+      requestId?: string;
     }
   }
 }

@@ -35,6 +35,19 @@ if (!resultado.success) {
 
 export const env = resultado.data;
 
+const SEGREDOS_DE_EXEMPLO = new Set([
+  'troque-este-segredo-em-producao-com-32-caracteres',
+  'troque-tambem-este-segredo-em-producao-32-car',
+]);
+
+if (env.NODE_ENV === 'production') {
+  if (SEGREDOS_DE_EXEMPLO.has(env.JWT_ACCESS_SECRET) || SEGREDOS_DE_EXEMPLO.has(env.JWT_REFRESH_SECRET)) {
+    throw new Error(
+      'Configuracao invalida:\n  - JWT_ACCESS_SECRET / JWT_REFRESH_SECRET: recusados em producao. Gere segredos proprios.',
+    );
+  }
+}
+
 export const ehProducao = env.NODE_ENV === 'production';
 export const ehTeste = env.NODE_ENV === 'test';
 

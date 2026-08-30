@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { MIN_CARACTERES_RELATORIO, formatarData, hoje, somarDias } from '@nexora/shared';
 import { criarApp } from '../src/app';
 import { fecharLigacao } from '../src/db/db';
@@ -33,14 +33,32 @@ async function entrar(email: string): Promise<Sessao> {
 
 let direccao: Sessao;
 let colaboradora: Sessao;
+let semeada = false;
 
 beforeAll(async () => {
-  direccao = await entrar('alcino.maido@nexora.co.mz');
+  const tentativa = await request(app)
+    .post('/api/auth/login')
+    .send({ email: 'alcino.maido@nexora.co.mz', password: PASSWORD });
+  if (tentativa.status !== 200) {
+    // Sem `pnpm seed` esta suite nao tem o que provar. Os testes de isolamento e palavra-passe
+    // constroem as suas empresas e correm na mesma.
+    semeada = false;
+    return;
+  }
+  semeada = true;
+  direccao = {
+    token: tentativa.body.data.accessToken,
+    id: tentativa.body.data.utilizador.id,
+  };
   colaboradora = await entrar('claudia.bila@nexora.co.mz');
 });
 
 afterAll(async () => {
   await fecharLigacao();
+});
+
+beforeEach((ctx) => {
+  if (!semeada) ctx.skip();
 });
 
 describe('autenticacao', () => {

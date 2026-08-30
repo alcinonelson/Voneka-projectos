@@ -13,6 +13,9 @@ import { Pagina } from '../components/Layout';
 import { ModalProjecto } from '../components/ModalProjecto';
 import { ModalRoteiro } from '../components/ModalRoteiro';
 import { ModalTarefa } from '../components/ModalTarefa';
+import { useToast } from '../components/Toast';
+import { pt } from '../i18n/pt';
+import { ErroApi, descarregar } from '../lib/api';
 import { useCarteira, useVocabulario, type FiltroCarteira } from '../lib/queries';
 
 /**
@@ -31,6 +34,20 @@ export function Projectos() {
 
   const { data, isLoading } = useCarteira(filtro);
   const { data: naturezas } = useVocabulario('natureza');
+  const toast = useToast();
+  const [aExportar, setAExportar] = useState(false);
+
+  async function exportar() {
+    setAExportar(true);
+    try {
+      await descarregar('/projects/export', 'carteira.csv');
+      toast.mostrar(pt.carteira.exportada);
+    } catch (e) {
+      toast.mostrar(e instanceof ErroApi ? e.message : pt.carteira.falhouExportar);
+    } finally {
+      setAExportar(false);
+    }
+  }
 
   const seleccionado = parametros.get('id');
 
@@ -73,6 +90,10 @@ export function Projectos() {
       titulo="Carteira de projectos"
       subtitulo="Estágio, responsável, avanço e deadline de entrega"
       accaoPrincipal={{ rotulo: 'Registar projecto', onClick: () => setNovoAberto(true) }}
+      accaoSecundaria={{
+        rotulo: aExportar ? pt.carteira.aExportar : pt.carteira.exportar,
+        onClick: () => void exportar(),
+      }}
     >
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
         {filtros.map((f) => (

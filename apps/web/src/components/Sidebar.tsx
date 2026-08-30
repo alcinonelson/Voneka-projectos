@@ -6,6 +6,7 @@ import { useNotificacoes, useTarefas } from '../lib/queries';
 import { COR, FONTE, LARGURA, MARCA, PESO, RAIO, numerico, textoTruncado } from '../design/tokens';
 import { Avatar, Marca, MarcaCompleta } from './base';
 import { Icone, type NomeIcone } from './icones';
+import { InboxAvisos } from './InboxAvisos';
 import { ModalPassword } from './ModalPassword';
 
 /**
@@ -304,6 +305,7 @@ export function Sidebar() {
       </nav>
 
       <div style={{ borderTop: `1px solid rgba(255,255,255,.10)`, padding: recolhido ? '8px' : '8px 12px' }}>
+        <InboxAvisos recolhido={recolhido} />
         <button
           type="button"
           onClick={alternar}

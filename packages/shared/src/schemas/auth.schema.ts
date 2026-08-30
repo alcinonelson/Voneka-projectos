@@ -39,3 +39,20 @@ export const alterarPasswordSchema = z
     message: 'As palavras-passe não coincidem.',
   });
 export type AlterarPasswordInput = z.infer<typeof alterarPasswordSchema>;
+
+export const pedirRecuperacaoSchema = z.object({
+  email: zEmail,
+});
+export type PedirRecuperacaoInput = z.infer<typeof pedirRecuperacaoSchema>;
+
+export const reporPasswordSchema = z
+  .object({
+    token: z.string().min(1, { message: 'Ligação inválida.' }),
+    password: zPassword,
+    confirmacao: z.string(),
+  })
+  .refine((v) => v.password === v.confirmacao, {
+    path: ['confirmacao'],
+    message: 'As palavras-passe não coincidem.',
+  });
+export type ReporPasswordInput = z.infer<typeof reporPasswordSchema>;

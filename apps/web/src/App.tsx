@@ -10,6 +10,7 @@ import { Empresa } from './screens/Empresa';
 import { Equipa } from './screens/Equipa';
 import { Landing } from './screens/Landing';
 import { Login } from './screens/Login';
+import { Recuperar } from './screens/Recuperar';
 import { MeusProjectos } from './screens/MeusProjectos';
 import { MeusRelatorios } from './screens/MeusRelatorios';
 import { MinhasTarefas } from './screens/MinhasTarefas';
@@ -51,6 +52,7 @@ export function App() {
         <Route path="/entrar" element={<Login />} />
         <Route path="/criar-empresa" element={<CriarEmpresa />} />
         <Route path="/convite" element={<AceitarConvite />} />
+        <Route path="/recuperar" element={<Recuperar />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );

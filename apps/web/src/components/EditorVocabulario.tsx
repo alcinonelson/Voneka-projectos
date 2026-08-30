@@ -1,3 +1,7 @@
+import { DndContext, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
+import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { useState } from 'react';
 import {
   MAX_SEMANAS_FASE,
@@ -6,13 +10,16 @@ import {
   type TaxonomiaRef,
   type TipoTaxonomia,
   chip,
+  reordenar,
 } from '@nexora/shared';
 import { COR, FONTE, PESO, RAIO, botaoPrincipal, botaoSecundario, campo, cartao, rotuloCampo } from '../design/tokens';
+import { pt } from '../i18n/pt';
 import { ErroApi } from '../lib/api';
 import {
   useActualizarEntradaVocabulario,
   useCriarEntradaVocabulario,
   useRemoverEntradaVocabulario,
+  useReordenarVocabulario,
 } from '../lib/queries';
 import { useToast } from './Toast';
 
@@ -50,7 +57,9 @@ export function EditorVocabulario({
   const criar = useCriarEntradaVocabulario();
   const actualizar = useActualizarEntradaVocabulario();
   const remover = useRemoverEntradaVocabulario();
+  const reordenarVoc = useReordenarVocabulario();
   const toast = useToast();
+  const sensores = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
   const [rascunho, setRascunho] = useState<Rascunho>(VAZIO);
   const [aAbrir, setAAbrir] = useState(false);
@@ -58,6 +67,23 @@ export function EditorVocabulario({
 
   const ehNatureza = tipo === 'natureza';
   const lista = entradas ?? [];
+  const activas = lista.filter((e) => !e.arquivado);
+  const arquivadas = lista.filter((e) => e.arquivado);
+
+  async function aoLargar(evento: DragEndEvent) {
+    const { active, over } = evento;
+    if (!over || active.id === over.id) return;
+    const de = activas.findIndex((e) => e.id === active.id);
+    const para = activas.findIndex((e) => e.id === over.id);
+    if (de < 0 || para < 0) return;
+    const nova = reordenar(activas, de, para);
+    try {
+      await reordenarVoc.mutateAsync({ tipo, ids: nova.map((e) => e.id) });
+      toast.mostrar(pt.vocabulario.ordemGravada);
+    } catch (e) {
+      setErro(e instanceof ErroApi ? e.message : pt.vocabulario.falhouOrdem);
+    }
+  }
 
   async function gravar() {
     if (rascunho.rotulo.trim().length < 2) return;
@@ -107,79 +133,34 @@ export function EditorVocabulario({
       </p>
 
       {lista.length ? (
-        <ul style={{ listStyle: 'none', margin: '0 0 18px', padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {lista.map((e) => {
-            const cores = chip(e.cor);
-            const emUso = e.emUso ?? 0;
-            return (
-              <li
-                key={e.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '10px 12px',
-                  border: `1px solid ${COR.borda}`,
-                  borderRadius: RAIO.campo,
-                  background: e.arquivado ? COR.fundoCampo : COR.branco,
-                }}
-              >
-                <span
-                  style={{ width: 10, height: 10, borderRadius: 5, background: cores.ponto, flex: '0 0 10px' }}
-                  aria-hidden="true"
+        <DndContext
+          sensors={sensores}
+          collisionDetection={closestCenter}
+          modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+          onDragEnd={(evento) => void aoLargar(evento)}
+        >
+          <SortableContext items={activas.map((e) => e.id)} strategy={verticalListSortingStrategy}>
+            <ul style={{ listStyle: 'none', margin: '0 0 18px', padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {activas.map((e) => (
+                <LinhaVocabulario
+                  key={e.id}
+                  entrada={e}
+                  ehNatureza={ehNatureza}
+                  onApagar={() => void apagar(e)}
                 />
-                <span style={{ fontSize: FONTE.base, fontWeight: PESO.medio, color: e.arquivado ? COR.suave : COR.tinta }}>
-                  {e.rotulo}
-                  {e.arquivado ? ' · arquivado' : ''}
-                </span>
-                {ehNatureza && e.prefixo ? (
-                  <span
-                    style={{
-                      fontSize: FONTE.minima,
-                      color: COR.textoSuave,
-                      background: COR.linha,
-                      padding: '3px 7px',
-                      borderRadius: RAIO.pequeno + 1,
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    {e.prefixo}-001
-                  </span>
-                ) : null}
-                {ehNatureza && e.fasesModelo.length ? (
-                  <span style={{ fontSize: FONTE.nota, color: COR.suave }}>
-                    {e.fasesModelo.length} fases de modelo
-                  </span>
-                ) : null}
-
-                <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
-                  {emUso ? (
-                    <span style={{ fontSize: FONTE.nota, color: COR.suave }}>
-                      em uso em {emUso} registo{emUso === 1 ? '' : 's'}
-                    </span>
-                  ) : null}
-                  {e.arquivado ? (
-                    <button
-                      type="button"
-                      onClick={() => void actualizar.mutateAsync({ id: e.id, dados: { arquivado: false } })}
-                      style={{ ...botaoSecundario, height: 28, padding: '0 10px' }}
-                    >
-                      Repor
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => void apagar(e)}
-                      style={{ ...botaoSecundario, height: 28, padding: '0 10px' }}
-                    >
-                      {emUso ? 'Arquivar' : 'Remover'}
-                    </button>
-                  )}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
+              ))}
+              {arquivadas.map((e) => (
+                <LinhaVocabulario
+                  key={e.id}
+                  entrada={e}
+                  ehNatureza={ehNatureza}
+                  arrastavel={false}
+                  onRepor={() => void actualizar.mutateAsync({ id: e.id, dados: { arquivado: false } })}
+                />
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
       ) : null}
 
       {erro ? (
@@ -379,5 +360,119 @@ export function EditorVocabulario({
         </div>
       )}
     </section>
+  );
+}
+
+function LinhaVocabulario({
+  entrada,
+  ehNatureza,
+  arrastavel = true,
+  onApagar,
+  onRepor,
+}: {
+  entrada: TaxonomiaRef;
+  ehNatureza: boolean;
+  arrastavel?: boolean;
+  onApagar?: () => void;
+  onRepor?: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: entrada.id,
+    disabled: !arrastavel,
+  });
+  const cores = chip(entrada.cor);
+  const emUso = entrada.emUso ?? 0;
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: '10px 12px',
+        border: `1px solid ${COR.borda}`,
+        borderRadius: RAIO.campo,
+        background: entrada.arquivado ? COR.fundoCampo : COR.branco,
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.72 : 1,
+        zIndex: isDragging ? 2 : undefined,
+      }}
+    >
+      {arrastavel ? (
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          aria-label={pt.vocabulario.arrastar}
+          title={pt.vocabulario.arrastar}
+          style={{
+            border: 'none',
+            background: 'transparent',
+            color: COR.suave,
+            cursor: 'grab',
+            padding: 0,
+            width: 16,
+            fontFamily: 'inherit',
+            lineHeight: 1,
+          }}
+        >
+          ::
+        </button>
+      ) : (
+        <span style={{ width: 16 }} />
+      )}
+      <span
+        style={{ width: 10, height: 10, borderRadius: 5, background: cores.ponto, flex: '0 0 10px' }}
+        aria-hidden="true"
+      />
+      <span
+        style={{
+          fontSize: FONTE.base,
+          fontWeight: PESO.medio,
+          color: entrada.arquivado ? COR.suave : COR.tinta,
+        }}
+      >
+        {entrada.rotulo}
+        {entrada.arquivado ? ' · arquivado' : ''}
+      </span>
+      {ehNatureza && entrada.prefixo ? (
+        <span
+          style={{
+            fontSize: FONTE.minima,
+            color: COR.textoSuave,
+            background: COR.linha,
+            padding: '3px 7px',
+            borderRadius: RAIO.pequeno + 1,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {entrada.prefixo}-001
+        </span>
+      ) : null}
+      {ehNatureza && entrada.fasesModelo.length ? (
+        <span style={{ fontSize: FONTE.nota, color: COR.suave }}>
+          {entrada.fasesModelo.length} fases de modelo
+        </span>
+      ) : null}
+
+      <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
+        {emUso ? (
+          <span style={{ fontSize: FONTE.nota, color: COR.suave }}>
+            em uso em {emUso} registo{emUso === 1 ? '' : 's'}
+          </span>
+        ) : null}
+        {entrada.arquivado ? (
+          <button type="button" onClick={onRepor} style={{ ...botaoSecundario, height: 28, padding: '0 10px' }}>
+            Repor
+          </button>
+        ) : (
+          <button type="button" onClick={onApagar} style={{ ...botaoSecundario, height: 28, padding: '0 10px' }}>
+            {emUso ? 'Arquivar' : 'Remover'}
+          </button>
+        )}
+      </span>
+    </li>
   );
 }

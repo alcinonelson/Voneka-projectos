@@ -5,6 +5,7 @@ import {
   criarTaxonomiaSchema,
   criarTaxonomiasEmLoteSchema,
   listarTaxonomiasSchema,
+  reordenarTaxonomiasSchema,
 } from '@nexora/shared';
 import { autenticar, exigirNivel } from '../../middleware/auth.middleware';
 import { validar } from '../../middleware/validate.middleware';
@@ -48,6 +49,12 @@ organizationsRouter.post(
   exigirNivel('administrador'),
   validar(criarTaxonomiasEmLoteSchema),
   assincrono(controlador.criarEntradasEmLote),
+);
+organizationsRouter.patch(
+  '/me/taxonomies/ordem',
+  exigirNivel('administrador'),
+  validar(reordenarTaxonomiasSchema),
+  assincrono(controlador.reordenarVocabulario),
 );
 organizationsRouter.patch(
   '/me/taxonomies/:id',

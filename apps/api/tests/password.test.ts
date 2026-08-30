@@ -130,3 +130,56 @@ describe('alterar a palavra-passe', () => {
     expect(nova.body.data.utilizador.email).toBe(email);
   });
 });
+
+describe('recuperar a palavra-passe', () => {
+  const REPOSTA = 'Reposta#Teste2026';
+
+  it('aceita um email inexistente sem o denunciar', async () => {
+    const resposta = await request(app)
+      .post('/api/auth/forgot-password')
+      .send({ email: `nao.existe.${Date.now()}@exemplo.co.mz` });
+
+    expect(resposta.status).toBe(200);
+    expect(resposta.body.message).toContain('Se existir uma conta');
+  });
+
+  it('recusa uma ligacao invalida', async () => {
+    const resposta = await request(app)
+      .post('/api/auth/reset-password')
+      .send({ token: 'nao-e-um-token', password: REPOSTA, confirmacao: REPOSTA });
+
+    expect(resposta.status).toBe(400);
+  });
+
+  it('redefine a palavra-passe a partir da ligacao e derruba a sessao antiga', async () => {
+    const { db } = await import('../src/db/db');
+    const { users } = await import('../src/db/schema/users.schema');
+    const { hashOpaco } = await import('../src/utils/tokens');
+    const { eq } = await import('drizzle-orm');
+
+    const pedido = await request(app).post('/api/auth/forgot-password').send({ email });
+    expect(pedido.status).toBe(200);
+
+    const tokenClaro = `teste-recuperacao-${Date.now()}`;
+    await db
+      .update(users)
+      .set({
+        recuperacaoTokenHash: hashOpaco(tokenClaro),
+        recuperacaoExpiraEm: new Date(Date.now() + 60 * 60 * 1000),
+      })
+      .where(eq(users.email, email));
+
+    const resposta = await request(app)
+      .post('/api/auth/reset-password')
+      .send({ token: tokenClaro, password: REPOSTA, confirmacao: REPOSTA });
+
+    expect(resposta.status, JSON.stringify(resposta.body)).toBe(200);
+    expect(resposta.body.data.accessToken).toBeTruthy();
+
+    const antiga = await request(app).post('/api/auth/login').send({ email, password: NOVA });
+    expect(antiga.status).toBe(401);
+
+    const nova = await request(app).post('/api/auth/login').send({ email, password: REPOSTA });
+    expect(nova.status).toBe(200);
+  });
+});

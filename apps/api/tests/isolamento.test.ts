@@ -312,6 +312,73 @@ describe('escrita entre empresas', () => {
     expect([403, 404]).toContain(resposta.status);
   });
 
+  it('nao se altera o membro de outra empresa', async () => {
+    const resposta = await request(app)
+      .patch(`/api/users/${b.adminId}`)
+      .set('Authorization', `Bearer ${a.token}`)
+      .send({ funcao: 'Intruso' });
+
+    expect(resposta.status).toBe(404);
+  });
+
+  it('nao se reenvia o convite de uma conta de outra empresa', async () => {
+    const resposta = await request(app)
+      .post(`/api/users/${b.adminId}/resend-invite`)
+      .set('Authorization', `Bearer ${a.token}`);
+
+    expect(resposta.status).toBe(404);
+  });
+
+  it('nao se aloca um membro a um projecto de outra empresa', async () => {
+    const resposta = await request(app)
+      .post('/api/users')
+      .set('Authorization', `Bearer ${a.token}`)
+      .send({
+        nome: 'Pessoa com projecto alheio',
+        email: `alheio.${Date.now()}@exemplo.co.mz`,
+        telefone: '',
+        funcao: 'Analista',
+        departamentoId: null,
+        dataEntrada: paraIso(hoje()),
+        alocacao: 100,
+        nivelAcesso: 'colaborador',
+        projectos: [b.projectoId],
+        enviarConvite: false,
+      });
+
+    expect(resposta.status).toBe(422);
+  });
+
+  it('nao se atribui um responsavel de outra empresa ao actualizar a tarefa', async () => {
+    const resposta = await request(app)
+      .patch(`/api/tasks/${a.tarefaId}`)
+      .set('Authorization', `Bearer ${a.token}`)
+      .send({ responsavelId: b.adminId });
+
+    expect(resposta.status).toBe(422);
+  });
+
+  it('nao se valida o relatorio de outra empresa', async () => {
+    const fechada = await request(app)
+      .post(`/api/tasks/${b.tarefaId}/complete`)
+      .set('Authorization', `Bearer ${b.token}`)
+      .send({
+        situacao: 'com_obstaculo',
+        texto: 'Texto com substancia suficiente para fechar a tarefa da empresa vizinha.',
+        esforcoRealHoras: 4,
+        provaExecucao: '',
+      });
+    expect(fechada.status, JSON.stringify(fechada.body)).toBe(200);
+    const relatorioId = fechada.body.data.relatorio.id as string;
+
+    const resposta = await request(app)
+      .post(`/api/reports/${relatorioId}/validate`)
+      .set('Authorization', `Bearer ${a.token}`)
+      .send({ decisao: 'validar', observacao: '' });
+
+    expect(resposta.status).toBe(404);
+  });
+
   it('nao se arquiva uma entrada do vocabulario de outra empresa', async () => {
     const resposta = await request(app)
       .patch(`/api/organizations/me/taxonomies/${b.naturezaId}`)

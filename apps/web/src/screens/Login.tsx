@@ -55,6 +55,8 @@ export function Login() {
           Ainda não tem empresa no Voneka?{' '}
           <Link to="/criar-empresa">Criar a minha empresa</Link>.
           <br />
+          Perdeu a palavra-passe? <Link to="/recuperar">Pedir uma ligação nova</Link>.
+          <br />
           Se foi convidado por email, abra a ligação do convite para definir a sua palavra-passe.
         </>
       }
@@ -110,8 +112,7 @@ export function Login() {
         </button>
 
         <p style={{ margin: '14px 0 0', fontSize: FONTE.nota, color: COR.suave, lineHeight: 1.6 }}>
-          Perdeu a palavra-passe? Peça ao Administrador da sua empresa que reenvie o convite —
-          a ligação deixa-o definir uma nova.
+          <Link to="/recuperar">Esqueci-me da palavra-passe</Link>
         </p>
       </form>
     </CascaPublica>

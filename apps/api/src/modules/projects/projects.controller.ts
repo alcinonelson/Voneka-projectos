@@ -44,3 +44,11 @@ export async function actualizar(req: Request, res: Response): Promise<Response>
   );
   return sucesso(res, projecto, 'Projecto actualizado');
 }
+
+/** CSV da carteira visivel. Sai como ficheiro, nao como JSON. */
+export async function exportar(req: Request, res: Response): Promise<void> {
+  const csv = await servico.exportarCsv(sessaoDe(req));
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="carteira.csv"');
+  res.status(200).send(csv);
+}

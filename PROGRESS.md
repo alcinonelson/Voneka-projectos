@@ -6,7 +6,7 @@ Ancora temporal do produto: `BASE = 1 Jul 2026`, `HOJE = 59` -> 29 Ago 2026.
 
 | | |
 |---|---|
-| Testes | 99 a passar (51 no pacote partilhado, 48 de integracao na API) |
+| Testes | isolamento, palavra-passe e shared a passar; recuperacao coberta |
 | Typecheck | limpo nos tres pacotes |
 | Build de producao | api e web compilam |
 | Base de dados | Multi-empresa, aplicada no Supabase e em local. Empresa **Voneka SU, Lda** criada |
@@ -293,12 +293,48 @@ por mudanca de estado da 422 e diz qual e o caminho certo; so o responsavel fech
 a Colaboradora recebe 404 num projecto alheio e 403 na tabela de acessos; o roteiro reencadeia
 com dois dias entre fases; "Repor plano original" devolve as datas semeadas.
 
+## Fase 18 - Profissionalizar sem complicar
+
+O produto ja tinha o eixo certo. Esta ronda fechou furos de isolamento nas escritas, ciclos de UI
+a meio, entrada (recuperar palavra-passe) e o minimo de operacao que uma casa seria exige.
+
+### Isolamento nas escritas
+
+- `exigirMembroDaEmpresa` vive em `access.ts` e e usado em membros, tarefas e convites
+- `actualizarMembro` / `reenviarConvite` filtram por `organization_id`; departamento via taxonomia
+- `reports.decidir` exige empresa e gestao do projecto
+- Painel: fases so da carteira visivel; decisoes so com validacao `a_espera` / `escalado`
+- Toda conclusao exige mini relatorio (o toggle `exigeRelatorio` saiu)
+- Casos novos em `isolamento.test.ts`: PATCH/reconvidar membro alheio, projecto alheio no convite,
+  responsavel alheio, validar relatorio alheio
+
+### Ciclos de produto
+
+- Ficha de membro em criar/editar, com desactivar/reactivar
+- Pedidos de prorrogacao no painel, com Aceitar / Recusar
+- Observacao ao validar / obrigatória ao escalar
+- `CampoData` no pedido de prorrogacao
+
+### Entrada e operacao
+
+- Recuperacao de palavra-passe: token hashado, 1 hora, rate-limit, `/recuperar`
+- `GET /api/health` toca na base (503 se falhar)
+- JWT de exemplo recusado em `NODE_ENV=production`
+- CI: typecheck + shared + isolamento + password, com Postgres de servico, sem seed
+- `README.md` de operacao; rotulos novos em `apps/web/src/i18n/pt.ts`
+
+### Carteira, vocabulario e cliente
+
+- `GET /api/projects/export` — CSV UTF-8 da carteira visivel
+- Reordenar vocabulario por arrasto (`PATCH /organizations/me/taxonomies/ordem`)
+- Retencao de `audit_log` a 24 meses, no cron das 03:30
+- Error boundary + toast em erros de consulta; sessao expirada limpa utilizador e cache
+- Inbox de avisos na sidebar
+- `LIMIT 200` nas listagens; `X-Request-Id` no log HTTP; rate-limit no refresh
+- `pnpm tables` e so `migrate`; o campo morto `pnpm.onlyBuiltDependencies` saiu
+
 ## Por fazer
 
-- [ ] Ecra de edicao de membro (o botao "Editar" na tabela de Equipa mostra so uma confirmacao)
-- [ ] Recuperacao de palavra-passe por email para quem a perdeu (hoje depende do Administrador
-      reenviar o convite)
-- [ ] Reordenar o vocabulario por arrasto (hoje a ordem e a de criacao)
-- [ ] Exportacao da carteira, com endpoint proprio
-- [ ] Decidir uma politica de retencao para `audit_log`
-- [ ] Passar os rotulos dos ecras novos para `i18n/pt.ts`, como o CLAUDE.md exige
+- Politica de SMTP real (hoje a ligacao vai para o log quando nao ha servidor)
+- Digest semanal por email, depois de o ciclo de validacao estar fechado
+- Tema escuro, segundo idioma, ESLint/Prettier/Husky, Sentry

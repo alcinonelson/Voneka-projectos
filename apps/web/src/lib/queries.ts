@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
   ActualizarEmpresaInput,
+  ActualizarMembroInput,
   ConcluirTarefaInput,
   CriarMembroInput,
   CriarProjectoInput,
@@ -212,7 +213,16 @@ export function usePedirProrrogacao() {
   return useMutation({
     mutationFn: ({ id, novaDeadline, motivo }: { id: string; novaDeadline: string; motivo: string }) =>
       api.post(`/tasks/${id}/extension`, { novaDeadline, motivo }),
-    onSuccess: () => invalidar([chaves.tarefas]),
+    onSuccess: () => invalidar([chaves.tarefas, chaves.painel]),
+  });
+}
+
+export function useDecidirProrrogacao() {
+  const invalidar = useInvalidar();
+  return useMutation({
+    mutationFn: ({ extensionId, aceitar }: { extensionId: string; aceitar: boolean }) =>
+      api.post<{ aceite: boolean }>(`/tasks/extensions/${extensionId}/decide`, { aceitar }),
+    onSuccess: () => invalidar([chaves.tarefas, chaves.painel, chaves.projectos]),
   });
 }
 
@@ -301,6 +311,15 @@ export function useCriarMembro() {
   });
 }
 
+export function useActualizarMembro() {
+  const invalidar = useInvalidar();
+  return useMutation({
+    mutationFn: ({ id, dados }: { id: string; dados: ActualizarMembroInput }) =>
+      api.patch<MembroEquipa>(`/users/${id}`, dados),
+    onSuccess: () => invalidar([chaves.equipa, chaves.pessoas]),
+  });
+}
+
 export function useReenviarConvite() {
   const invalidar = useInvalidar();
   return useMutation({
@@ -358,5 +377,22 @@ export function useRemoverEntradaVocabulario() {
     mutationFn: (id: string) =>
       api.delete<{ apagada: boolean; emUso: number }>(`/organizations/me/taxonomies/${id}`),
     onSuccess: () => invalidar([chaves.vocabulario, chaves.arranque]),
+  });
+}
+
+export function useReordenarVocabulario() {
+  const invalidar = useInvalidar();
+  return useMutation({
+    mutationFn: (dados: { tipo: TipoTaxonomia; ids: string[] }) =>
+      api.patch<TaxonomiaRef[]>('/organizations/me/taxonomies/ordem', dados),
+    onSuccess: () => invalidar([chaves.vocabulario]),
+  });
+}
+
+export function useMarcarTodasNotificacoesLidas() {
+  const invalidar = useInvalidar();
+  return useMutation({
+    mutationFn: () => api.post<{ lidas: number }>('/notifications/read-all'),
+    onSuccess: () => invalidar([chaves.notificacoes]),
   });
 }

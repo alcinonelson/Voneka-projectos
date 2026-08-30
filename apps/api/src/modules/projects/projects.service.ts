@@ -1,4 +1,4 @@
-import { and, asc, count, eq, inArray, ne, sql } from 'drizzle-orm';
+import { and, asc, count, eq, ne, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import {
   type ActualizarProjectoInput,
@@ -6,6 +6,7 @@ import {
   type ListarProjectosInput,
   deIso,
   encadearFases,
+  paraIso,
   percentagemConsumida,
 } from '@nexora/shared';
 import { db } from '../../db/db';
@@ -19,6 +20,7 @@ import { registar } from '../audit.service';
 import {
   exigirGestaoProjecto,
   exigirLeituraProjecto,
+  exigirMembroDaEmpresa,
   exigirTaxonomia,
   projectosVisiveis,
 } from '../access';
@@ -105,7 +107,8 @@ export async function listar(
     .innerJoin(natureza, eq(natureza.id, projects.naturezaId))
     .innerJoin(estagio, eq(estagio.id, projects.estagioId))
     .where(and(...condicoes))
-    .orderBy(asc(projects.deadline));
+    .orderBy(asc(projects.deadline))
+    .limit(200);
 
   return linhas.map((l) => ({
     id: l.id,
@@ -121,6 +124,52 @@ export async function listar(
     tarefasAbertas: Number(l.tarefasAbertas),
     tarefasTotal: Number(l.tarefasTotal),
   }));
+}
+
+/**
+ * CSV da carteira visivel.
+ *
+ * O BOM UTF-8 e de proposito: o Excel em Mocambique abre o ficheiro sem perguntar a codificacao.
+ * A carteira e a mesma do ecran - filtrada pela empresa e pelo nivel - nunca a tabela inteira.
+ */
+export async function exportarCsv(sessao: Sessao): Promise<string> {
+  const carteira = await listar(sessao, { filtro: 'todos' });
+  const cabecalho = [
+    'codigo',
+    'nome',
+    'cliente',
+    'natureza',
+    'estagio',
+    'saude',
+    'avanco',
+    'deadline',
+    'responsavel',
+    'abertas',
+    'total',
+  ];
+  const linhas = carteira.map((p) =>
+    [
+      p.codigo,
+      p.nome,
+      p.cliente,
+      p.natureza.rotulo,
+      p.estagio.rotulo,
+      p.saude,
+      String(p.avancoPct),
+      paraIso(p.deadline),
+      p.responsavel.nome,
+      String(p.tarefasAbertas),
+      String(p.tarefasTotal),
+    ]
+      .map(campoCsv)
+      .join(','),
+  );
+  return ['\uFEFF' + cabecalho.join(','), ...linhas].join('\n');
+}
+
+function campoCsv(valor: string): string {
+  if (/[",\n]/.test(valor)) return `"${valor.replace(/"/g, '""')}"`;
+  return valor;
 }
 
 /**
@@ -376,24 +425,4 @@ export async function actualizar(
   });
 
   return actualizado;
-}
-
-/**
- * Garante que todas as pessoas indicadas pertencem a empresa da sessao.
- *
- * Sem isto, um pedido forjado podia nomear alguem de outra empresa como responsavel e, a partir
- * dai, essa pessoa passaria a ver projectos que nao sao da sua casa.
- */
-export async function exigirMembroDaEmpresa(sessao: Sessao, ids: string[]): Promise<void> {
-  const unicos = [...new Set(ids)].filter(Boolean);
-  if (!unicos.length) return;
-
-  const encontrados = await db
-    .select({ id: users.id })
-    .from(users)
-    .where(and(eq(users.organizationId, sessao.org), inArray(users.id, unicos)));
-
-  if (encontrados.length !== unicos.length) {
-    throw erros.validacao('Uma das pessoas indicadas não pertence a esta empresa.');
-  }
 }

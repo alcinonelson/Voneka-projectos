@@ -11,9 +11,15 @@ import { reviverDatas } from './datas';
  */
 
 let accessToken: string | null = null;
+let aoSessaoExpirada: (() => void) | null = null;
 
 export function definirToken(token: string | null): void {
   accessToken = token;
+}
+
+/** Chamado quando o refresh falha: o portal tem de sair, nao ficar "dentro" a falhar. */
+export function definirAoSessaoExpirada(fn: (() => void) | null): void {
+  aoSessaoExpirada = fn;
 }
 
 export function temToken(): boolean {
@@ -93,6 +99,7 @@ export async function pedir<T>(caminho: string, opcoes: Opcoes = {}): Promise<T>
     const renovou = await renovarSessao();
     if (renovou) return pedir<T>(caminho, { ...opcoes, jaRenovou: true });
     accessToken = null;
+    aoSessaoExpirada?.();
   }
 
   throw new ErroApi(dados.error.code, dados.error.message, resposta.status, dados.error.fields);
@@ -117,4 +124,40 @@ export const api = {
 /** Renova a sessao a partir do cookie, no arranque da aplicacao. */
 export async function retomarSessao(): Promise<boolean> {
   return renovarSessao();
+}
+
+/**
+ * Descarrega um ficheiro autenticado (CSV da carteira).
+ * Nao passa pelo `pedir` porque a resposta e texto, nao JSON.
+ */
+export async function descarregar(caminho: string, nomeFicheiro: string): Promise<void> {
+  if (!accessToken) {
+    const renovou = await renovarSessao();
+    if (!renovou) throw new ErroApi('SESSAO_EXPIRADA', 'A sessão expirou. Volte a iniciar sessão.', 401);
+  }
+
+  const resposta = await fetch(`/api${caminho}`, {
+    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+    credentials: 'include',
+  });
+
+  if (resposta.status === 401) {
+    const renovou = await renovarSessao();
+    if (renovou) return descarregar(caminho, nomeFicheiro);
+    accessToken = null;
+    aoSessaoExpirada?.();
+    throw new ErroApi('SESSAO_EXPIRADA', 'A sessão expirou. Volte a iniciar sessão.', 401);
+  }
+
+  if (!resposta.ok) {
+    throw new ErroApi('ERRO_INTERNO', 'Não foi possível descarregar o ficheiro.', resposta.status);
+  }
+
+  const blob = await resposta.blob();
+  const url = URL.createObjectURL(blob);
+  const ancora = document.createElement('a');
+  ancora.href = url;
+  ancora.download = nomeFicheiro;
+  ancora.click();
+  URL.revokeObjectURL(url);
 }

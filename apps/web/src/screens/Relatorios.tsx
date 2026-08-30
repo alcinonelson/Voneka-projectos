@@ -1,8 +1,21 @@
+import { useState } from 'react';
 import { SITUACAO, VALIDACAO, corSituacao } from '@nexora/shared';
-import { COR, ESPACO, FONTE, PESO, botaoSecundario, cartao, numerico, tituloSeccao } from '../design/tokens';
+import {
+  COR,
+  ESPACO,
+  FONTE,
+  PESO,
+  RAIO,
+  botaoSecundario,
+  campo,
+  cartao,
+  numerico,
+  tituloSeccao,
+} from '../design/tokens';
 import { Avatar, Carregando, Etiqueta, Vazio } from '../components/base';
 import { Pagina } from '../components/Layout';
 import { useToast } from '../components/Toast';
+import { ErroApi } from '../lib/api';
 import { useRelatorios, useValidarRelatorio } from '../lib/queries';
 import type { Relatorio } from '../lib/tipos';
 
@@ -17,14 +30,24 @@ export function Relatorios() {
   const { data, isLoading } = useRelatorios();
   const validar = useValidarRelatorio();
   const toast = useToast();
+  const [notas, setNotas] = useState<Record<string, string>>({});
 
   async function decidir(relatorio: Relatorio, decisao: 'validar' | 'escalar') {
-    await validar.mutateAsync({ id: relatorio.id, dados: { decisao, observacao: '' } });
-    toast.mostrar(
-      decisao === 'validar'
-        ? `Entrega de ${relatorio.autor.nome} validada`
-        : `Obstáculo de ${relatorio.autor.nome} escalado à Direcção`,
-    );
+    const observacao = (notas[relatorio.id] ?? '').trim();
+    if (decisao === 'escalar' && !observacao) {
+      toast.mostrar('Ao escalar, escreva o que precisa da Direcção.');
+      return;
+    }
+    try {
+      await validar.mutateAsync({ id: relatorio.id, dados: { decisao, observacao } });
+      toast.mostrar(
+        decisao === 'validar'
+          ? `Entrega de ${relatorio.autor.nome} validada`
+          : `Obstáculo de ${relatorio.autor.nome} escalado à Direcção`,
+      );
+    } catch (e) {
+      toast.mostrar(e instanceof ErroApi ? e.message : 'Não foi possível decidir este relatório.');
+    }
   }
 
   const tipologia = data?.tipologia;
@@ -101,7 +124,21 @@ export function Relatorios() {
                     </span>
 
                     {porValidar ? (
-                      <>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
+                        <textarea
+                          value={notas[r.id] ?? ''}
+                          onChange={(e) => setNotas((actual) => ({ ...actual, [r.id]: e.target.value }))}
+                          placeholder="Nota à Direcção (obrigatória ao escalar)"
+                          rows={2}
+                          style={{
+                            ...campo,
+                            width: 280,
+                            minHeight: 56,
+                            resize: 'vertical',
+                            borderRadius: RAIO.campo,
+                          }}
+                        />
+                        <div style={{ display: 'flex', gap: 8 }}>
                         <button
                           type="button"
                           style={botaoSecundario}
@@ -118,7 +155,8 @@ export function Relatorios() {
                         >
                           Validar entrega
                         </button>
-                      </>
+                        </div>
+                      </div>
                     ) : (
                       <span style={{ color: r.validacao === 'escalado' ? COR.ambar : COR.verde }}>
                         {VALIDACAO[r.validacao]}

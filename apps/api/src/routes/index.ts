@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { pool } from '../db/db';
 import { authRouter } from '../modules/auth/auth.routes';
 import { dashboardRouter } from '../modules/dashboard/dashboard.routes';
 import { notificationsRouter } from '../modules/notifications/notifications.routes';
@@ -8,11 +9,18 @@ import { projectsRouter } from '../modules/projects/projects.routes';
 import { reportsRouter } from '../modules/reports/reports.routes';
 import { tasksRouter } from '../modules/tasks/tasks.routes';
 import { usersRouter } from '../modules/users/users.routes';
+import { AppError } from '../utils/errors';
+import { falha, sucesso } from '../utils/response';
 
 export const apiRouter: Router = Router();
 
-apiRouter.get('/health', (_req, res) => {
-  res.json({ success: true, data: { estado: 'ok' }, message: 'API disponível' });
+apiRouter.get('/health', async (_req, res) => {
+  try {
+    await pool.query('select 1');
+    return sucesso(res, { estado: 'ok' }, 'API disponível');
+  } catch {
+    return falha(res, new AppError('ERRO_INTERNO', 'A base de dados não responde.', 503));
+  }
 });
 
 apiRouter.use('/auth', authRouter);

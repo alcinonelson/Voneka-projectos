@@ -8,7 +8,7 @@
     "start": "node dist/server.js",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "tables": "drizzle-kit generate && tsx src/db/migrate.ts",
+    "tables": "tsx src/db/migrate.ts",
     "generate": "drizzle-kit generate",
     "migrate": "tsx src/db/migrate.ts",
     "seed": "tsx src/db/seed.ts",
