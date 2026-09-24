@@ -13,20 +13,44 @@ declare global {
   }
 }
 
+function lerSessao(req: Request): Sessao | Error {
+  const cabecalho = req.headers.authorization;
+  if (!cabecalho?.startsWith('Bearer ')) return erros.naoAutenticado();
+  return lerAccessToken(cabecalho.slice(7).trim()) ?? erros.sessaoExpirada();
+}
+
 /**
  * Exige uma sessao valida.
  * Le o token do cabecalho `Authorization: Bearer`.
+ *
+ * Uma sessao aberta com palavra-passe temporaria e recusada aqui, e nao ecra a ecra: o bloqueio
+ * vale por omissao para qualquer rota, incluindo as que ainda nao existem. So a troca de
+ * palavra-passe e o perfil usam `autenticarComTemporaria`.
  */
 export const autenticar: RequestHandler = (req: Request, _res: Response, next: NextFunction) => {
-  const cabecalho = req.headers.authorization;
-  if (!cabecalho?.startsWith('Bearer ')) {
-    next(erros.naoAutenticado());
+  const sessao = lerSessao(req);
+  if (sessao instanceof Error) {
+    next(sessao);
+    return;
+  }
+  if (sessao.tmp) {
+    next(erros.passwordTemporaria());
     return;
   }
 
-  const sessao = lerAccessToken(cabecalho.slice(7).trim());
-  if (!sessao) {
-    next(erros.sessaoExpirada());
+  req.sessao = sessao;
+  next();
+};
+
+/** Como `autenticar`, mas aceita a sessao de palavra-passe temporaria. */
+export const autenticarComTemporaria: RequestHandler = (
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+) => {
+  const sessao = lerSessao(req);
+  if (sessao instanceof Error) {
+    next(sessao);
     return;
   }
 

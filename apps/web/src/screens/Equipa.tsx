@@ -1,12 +1,13 @@
 import { useState } from 'react';
+import type { AcessoEmitido } from '@nexora/shared';
 import { ESTADO_CONTA, NIVEL_ACESSO, corAcesso, corCumprimento, leituraCarga } from '@nexora/shared';
 import { COR, ESPACO, FONTE, PESO, botaoSecundario, cartao, etiquetaMaiuscula, numerico, textoTruncado } from '../design/tokens';
 import { Avatar, Carregando, Etiqueta, EtiquetaVocabulario, Vazio } from '../components/base';
 import { Pagina } from '../components/Layout';
+import { ModalAcessoCriado } from '../components/ModalAcessoCriado';
 import { ModalMembro } from '../components/ModalMembro';
-import { useToast } from '../components/Toast';
 import { useFaixaEcra } from '../lib/ecra';
-import { useEquipa, useReenviarConvite } from '../lib/queries';
+import { useEquipa } from '../lib/queries';
 import type { MembroEquipa } from '../lib/tipos';
 
 /**
@@ -30,8 +31,7 @@ export function Equipa() {
   const { data: equipa, isLoading } = useEquipa();
   const [modalAberto, setModalAberto] = useState(false);
   const [aEditar, setAEditar] = useState<MembroEquipa | null>(null);
-  const reenviar = useReenviarConvite();
-  const toast = useToast();
+  const [emitido, setEmitido] = useState<{ acesso: AcessoEmitido; nome: string } | null>(null);
   const faixa = useFaixaEcra();
 
   const pendentes = (equipa ?? []).filter((p) => p.estado === 'convite_pendente').length;
@@ -59,14 +59,10 @@ export function Equipa() {
   const grelha = colunas.map((c) => c.largura).join(' ');
   const emCartoes = faixa === 'movel';
 
-  async function accao(p: MembroEquipa) {
-    if (p.estado === 'convite_pendente') {
-      const r = await reenviar.mutateAsync(p.id);
-      toast.mostrar(`Convite reenviado a ${r.email}`);
-    } else {
-      setAEditar(p);
-      setModalAberto(true);
-    }
+  /** Pendente ou nao, a accao abre a ficha: e la que se gera a ligacao ou a palavra-passe. */
+  function abrirFicha(p: MembroEquipa) {
+    setAEditar(p);
+    setModalAberto(true);
   }
 
   /** Barra de carga, partilhada pela tabela e pelos cartoes. */
@@ -146,10 +142,9 @@ export function Equipa() {
       <button
         type="button"
         style={{ ...botaoSecundario, width: largura, justifyContent: 'center' }}
-        disabled={reenviar.isPending}
-        onClick={() => void accao(p)}
+        onClick={() => abrirFicha(p)}
       >
-        {pendente ? 'Reenviar convite' : 'Editar'}
+        {pendente ? 'Dar acesso' : 'Editar'}
       </button>
     );
   }
@@ -311,6 +306,13 @@ export function Equipa() {
           setModalAberto(false);
           setAEditar(null);
         }}
+        onAcesso={(acesso, nome) => setEmitido({ acesso, nome })}
+      />
+
+      <ModalAcessoCriado
+        acesso={emitido?.acesso ?? null}
+        nome={emitido?.nome ?? ''}
+        onFechar={() => setEmitido(null)}
       />
     </Pagina>
   );

@@ -329,6 +329,15 @@ describe('escrita entre empresas', () => {
     expect(resposta.status).toBe(404);
   });
 
+  it('nao se gera palavra-passe temporaria para uma conta de outra empresa', async () => {
+    const resposta = await request(app)
+      .post(`/api/users/${b.adminId}/temporary-password`)
+      .set('Authorization', `Bearer ${a.token}`);
+
+    expect(resposta.status).toBe(404);
+    expect(resposta.body.data).toBeUndefined();
+  });
+
   it('nao se aloca um membro a um projecto de outra empresa', async () => {
     const resposta = await request(app)
       .post('/api/users')
@@ -343,7 +352,7 @@ describe('escrita entre empresas', () => {
         alocacao: 100,
         nivelAcesso: 'colaborador',
         projectos: [b.projectoId],
-        enviarConvite: false,
+        acesso: 'nenhum',
       });
 
     expect(resposta.status).toBe(422);

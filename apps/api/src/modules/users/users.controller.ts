@@ -16,11 +16,8 @@ export async function listarParaSelector(req: Request, res: Response): Promise<R
 
 export async function criar(req: Request, res: Response): Promise<Response> {
   const dados = req.body as CriarMembroInput;
-  const membro = await servico.criarMembro(sessaoDe(req), dados);
-  const mensagem = dados.enviarConvite
-    ? `${membro.nome} registado como ${dados.nivelAcesso} · convite enviado`
-    : `${membro.nome} registado como ${dados.nivelAcesso} · conta sem convite`;
-  return sucesso(res, membro, mensagem, 201);
+  const resultado = await servico.criarMembro(sessaoDe(req), dados);
+  return sucesso(res, resultado, `${resultado.membro.nome} registado`, 201);
 }
 
 export async function actualizar(req: Request, res: Response): Promise<Response> {
@@ -34,5 +31,10 @@ export async function actualizar(req: Request, res: Response): Promise<Response>
 
 export async function reenviarConvite(req: Request, res: Response): Promise<Response> {
   const resultado = await servico.reenviarConvite(sessaoDe(req), String(req.params.id));
-  return sucesso(res, resultado, `Convite reenviado a ${resultado.email}`);
+  return sucesso(res, resultado, 'Ligação de convite gerada');
+}
+
+export async function reporAcessoTemporario(req: Request, res: Response): Promise<Response> {
+  const resultado = await servico.reporAcessoTemporario(sessaoDe(req), String(req.params.id));
+  return sucesso(res, resultado, 'Palavra-passe temporária gerada');
 }

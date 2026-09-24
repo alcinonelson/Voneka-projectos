@@ -8,7 +8,7 @@ import {
   registarEmpresaSchema,
   reporPasswordSchema,
 } from '@nexora/shared';
-import { autenticar } from '../../middleware/auth.middleware';
+import { autenticarComTemporaria } from '../../middleware/auth.middleware';
 import { validar } from '../../middleware/validate.middleware';
 import { assincrono } from '../../utils/async-handler';
 import * as controlador from './auth.controller';
@@ -67,11 +67,13 @@ authRouter.post(
 );
 // Sob o limite das credenciais como o login: quem tenta adivinhar a palavra-passe actual a
 // partir de uma sessao roubada nao pode ter mais tentativas do que quem tenta a partir da porta.
+//
+// As duas aceitam a sessao de palavra-passe temporaria: sao o caminho para sair dela.
 authRouter.post(
   '/change-password',
-  autenticar,
+  autenticarComTemporaria,
   limiteCredenciais,
   validar(alterarPasswordSchema),
   assincrono(controlador.alterarPassword),
 );
-authRouter.get('/me', autenticar, assincrono(controlador.me));
+authRouter.get('/me', autenticarComTemporaria, assincrono(controlador.me));

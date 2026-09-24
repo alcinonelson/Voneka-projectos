@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   TIPO_TAXONOMIA_NOTA,
   VOCABULARIO_SUGERIDO,
+  type AcessoEmitido,
   type CriarTaxonomiaInput,
   type TipoTaxonomia,
   chip,
@@ -10,6 +11,7 @@ import {
 import { COR, FONTE, PESO, RAIO, botaoPrincipal, botaoSecundario, cartao, campo, rotuloCampo } from '../design/tokens';
 import { MarcaCompleta } from '../components/base';
 import { EditorVocabulario } from '../components/EditorVocabulario';
+import { ModalAcessoCriado } from '../components/ModalAcessoCriado';
 import { ModalMembro } from '../components/ModalMembro';
 import { ModalProjecto } from '../components/ModalProjecto';
 import { useSessao } from '../lib/auth';
@@ -50,6 +52,7 @@ export function Arranque() {
   const [moeda, setMoeda] = useState(empresa?.moeda ?? 'MZN');
   const [corMarca, setCorMarca] = useState(empresa?.corMarca ?? 'azul');
   const [membroAberto, setMembroAberto] = useState(false);
+  const [emitido, setEmitido] = useState<{ acesso: AcessoEmitido; nome: string } | null>(null);
   const [projectoAberto, setProjectoAberto] = useState(false);
 
   const vocabularioPronto = Boolean(naturezas?.length && estagios?.length);
@@ -348,7 +351,16 @@ export function Arranque() {
         ) : null}
       </main>
 
-      <ModalMembro aberto={membroAberto} onFechar={() => setMembroAberto(false)} />
+      <ModalMembro
+        aberto={membroAberto}
+        onFechar={() => setMembroAberto(false)}
+        onAcesso={(acesso, nome) => setEmitido({ acesso, nome })}
+      />
+      <ModalAcessoCriado
+        acesso={emitido?.acesso ?? null}
+        nome={emitido?.nome ?? ''}
+        onFechar={() => setEmitido(null)}
+      />
       <ModalProjecto aberto={projectoAberto} onFechar={() => setProjectoAberto(false)} />
     </div>
   );

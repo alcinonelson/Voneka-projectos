@@ -376,6 +376,28 @@ da 19/19. `pnpm typecheck` limpo, 56 testes da API e 51 do shared a passar, web 
 API no ar em `https://voneka-projectos.onrender.com` (`/api/health` 200). `apps/web/vercel.json`
 reencaminha `/api` para la.
 
+## Fase 22 - Acesso sem email, menu e avisos
+
+Sem SMTP, "enviar convite por email" so escrevia a ligacao no log do Render: ninguem entrava.
+
+- [x] `criarMembroSchema.acesso`: `ligacao` | `password` | `nenhum` (sai `enviarConvite`)
+- [x] A ligacao de convite volta sempre ao Administrador; com SMTP segue tambem por email
+- [x] Palavra-passe temporaria gerada pelo sistema (16 caracteres, sem 0/O/1/l/I), mostrada uma vez
+- [x] `users.deve_mudar_password` (migracao 0002) e `tmp` no access token. `autenticar` recusa
+      com 403 `PASSWORD_TEMPORARIA`; so `/auth/me` e `/auth/change-password` aceitam a sessao
+- [x] `POST /api/users/:id/temporary-password`: repor acesso; apaga as sessoes do alvo; nunca
+      na propria conta
+- [x] Corrigida fuga latente: criar membro devolvia a linha inteira, com `passwordHash`
+- [x] `ModalAcessoCriado`: copiar, mensagem pronta, WhatsApp. `DefinirPassword` substitui o
+      portal ate a troca. A tabela de Equipa abre a ficha, onde vivem as accoes de acesso
+- [x] Botao de recolher na fronteira entre menu e pagina, a altura do cabecalho
+- [x] `/avisos` com pagina propria, agrupada por dia, "Por ler"/"Todos"; `InboxAvisos` saiu
+
+**Prova**: 68 testes da API (novo `tests/acesso.test.ts`, caso novo em `isolamento.test.ts`),
+typecheck e build limpos. Percurso no browser (Playwright): criar membro com temporaria, entrar
+noutra janela, troca obrigatoria, portal abre e sobrevive a recarregar; ligacao gerada; avisos
+de uma colaboradora; menu recolhido e expandido; gaveta no telemovel sem o botao da fronteira.
+
 ## Por fazer
 
 - Politica de SMTP real (hoje a ligacao vai para o log quando nao ha servidor)

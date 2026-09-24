@@ -180,3 +180,15 @@ No Render, `corepack enable` falha com `EROFS` ao tentar substituir `/usr/bin/pn
 leitura; o pnpm da imagem ja respeita o `packageManager`. Antes de fixar uma versao, procurar nos
 `.github/workflows` e na configuracao de cada alojamento quem a fixa tambem, e nao escrever comandos
 de build para uma plataforma sem confirmar na documentacao dela o que ja vem instalado.
+
+## Uma accao que depende de infraestrutura opcional nao pode fingir que correu
+"Criar conta e convidar" dizia "convite enviado" com o SMTP por configurar; o servidor escrevia a
+ligacao no log e a pessoa nunca a recebia. Quando uma accao depende de algo que pode faltar -
+email, fila, servico externo - o resultado tem de voltar a quem a pediu por um caminho que
+existe sempre (aqui, a ligacao na resposta), e o interface diz o que de facto aconteceu.
+
+## Migracao escrita a mao sem snapshot envenena o proximo `generate`
+A `0001` foi escrita a mao e nao deixou `meta/0001_snapshot.json`. O `drizzle-kit generate`
+seguinte comparou com a `0000` e voltou a criar as colunas da `0001`, o que falharia ao aplicar.
+Ler sempre o SQL gerado antes de o aceitar; ao escrever uma migracao a mao, gerar tambem o
+snapshot (ou gerar pela ferramenta e editar so o SQL).

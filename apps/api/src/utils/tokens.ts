@@ -15,6 +15,8 @@ export interface Sessao {
   nivel: NivelAcesso;
   nome: string;
   org: string;
+  /** A conta entrou com palavra-passe temporaria: so pode troca-la. Ver `autenticar`. */
+  tmp?: true;
 }
 
 export function assinarAccessToken(sessao: Sessao): string {
@@ -29,11 +31,11 @@ export function lerAccessToken(token: string): Sessao | null {
   try {
     const conteudo = jwt.verify(token, env.JWT_ACCESS_SECRET, { issuer: 'nexora-projectos' });
     if (typeof conteudo === 'string') return null;
-    const { sub, nivel, nome, org } = conteudo as jwt.JwtPayload & Partial<Sessao>;
+    const { sub, nivel, nome, org, tmp } = conteudo as jwt.JwtPayload & Partial<Sessao>;
     // Sem empresa nao ha ambito possivel: um token antigo, sem `org`, e recusado em vez de
     // correr com ambito indefinido.
     if (!sub || !nivel || !nome || !org) return null;
-    return { sub: String(sub), nivel, nome, org };
+    return { sub: String(sub), nivel, nome, org, ...(tmp === true ? { tmp } : {}) };
   } catch {
     return null;
   }
@@ -64,6 +66,22 @@ export function hashOpaco(valor: string): string {
 export function gerarTokenConvite(): { token: string; hash: string } {
   const token = crypto.randomBytes(32).toString('base64url');
   return { token, hash: hashOpaco(token) };
+}
+
+/**
+ * Alfabeto da palavra-passe temporaria: sem 0/O, 1/l/I, que se confundem quando a palavra-passe
+ * e ditada ao telefone ou copiada de uma mensagem. 55 simbolos a 16 posicoes dao ~92 bits.
+ */
+const ALFABETO_TEMPORARIA = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+const TAMANHO_TEMPORARIA = 16;
+
+/** Palavra-passe temporaria entregue pelo Administrador. `randomInt` evita o vies do modulo. */
+export function gerarPasswordTemporaria(): string {
+  let resultado = '';
+  for (let i = 0; i < TAMANHO_TEMPORARIA; i += 1) {
+    resultado += ALFABETO_TEMPORARIA[crypto.randomInt(ALFABETO_TEMPORARIA.length)];
+  }
+  return resultado;
 }
 
 /** Comparacao em tempo constante, para nao revelar o token por medicao de tempo. */

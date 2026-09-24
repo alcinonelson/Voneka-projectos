@@ -4,11 +4,10 @@ import { NavLink } from 'react-router-dom';
 import { NIVEL_ACESSO } from '@nexora/shared';
 import { useSessao } from '../lib/auth';
 import { useNotificacoes, useTarefas } from '../lib/queries';
-import { COR, FONTE, LARGURA, MARCA, PESO, RAIO, numerico, textoTruncado } from '../design/tokens';
+import { COR, FONTE, LARGURA, MARCA, PESO, RAIO, SOMBRA, numerico, textoTruncado } from '../design/tokens';
 import { Avatar, Marca, MarcaCompleta } from './base';
 import { Icone, type NomeIcone } from './icones';
 import { useNavegacao } from './Layout';
-import { InboxAvisos } from './InboxAvisos';
 import { ModalPassword } from './ModalPassword';
 
 /**
@@ -108,6 +107,7 @@ export function Sidebar() {
               alarme: true,
             },
             { para: '/relatorios', rotulo: 'Relatórios', icone: 'relatorios' },
+            { para: '/avisos', rotulo: 'Avisos', icone: 'avisos', distintivo: avisos?.porLer },
           ],
         },
         ...(ehAdministrador
@@ -137,6 +137,7 @@ export function Sidebar() {
             },
             { para: '/meus-projectos', rotulo: 'Os meus projectos', icone: 'projectos' },
             { para: '/meus-relatorios', rotulo: 'Os meus relatórios', icone: 'relatorios' },
+            { para: '/avisos', rotulo: 'Avisos', icone: 'avisos', distintivo: avisos?.porLer },
           ],
         },
         {
@@ -154,6 +155,10 @@ export function Sidebar() {
   const conteudo = (
     <aside
       style={{
+        // Relativo e acima do conteudo: o botao de recolher assenta na fronteira e tem de ficar
+        // por cima da metade que invade o cabecalho da pagina.
+        position: 'relative',
+        zIndex: 2,
         width: largura,
         flex: `0 0 ${largura}px`,
         background: MARCA.verdeEscuro,
@@ -164,6 +169,47 @@ export function Sidebar() {
         transition: 'width .16s ease',
       }}
     >
+      {emGaveta ? null : (
+        // Na fronteira entre o menu e a pagina, a altura do cabecalho: e a costura que o botao
+        // move, e e onde se procura. A area de toque tem 44px; o circulo desenhado tem 26.
+        <button
+          type="button"
+          onClick={alternar}
+          aria-expanded={!compacto}
+          aria-label={compacto ? 'Mostrar o menu' : 'Recolher o menu'}
+          title={compacto ? 'Mostrar o menu' : 'Recolher o menu'}
+          style={{
+            position: 'absolute',
+            top: LARGURA.cabecalho / 2 - 22,
+            right: -22,
+            width: 44,
+            height: 44,
+            padding: 0,
+            border: 'none',
+            background: 'transparent',
+            display: 'grid',
+            placeItems: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <span
+            style={{
+              width: 26,
+              height: 26,
+              display: 'grid',
+              placeItems: 'center',
+              borderRadius: 13,
+              background: COR.branco,
+              color: COR.tinta,
+              border: `1px solid ${COR.borda}`,
+              boxShadow: SOMBRA.pastilha,
+            }}
+          >
+            <Icone nome={compacto ? 'expandir' : 'recolher'} tamanho={14} />
+          </span>
+        </button>
+      )}
+
       <div style={{ padding: compacto ? '16px 8px 12px' : '16px 14px 12px' }}>
         <div
           style={{
@@ -311,37 +357,6 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <div style={{ borderTop: `1px solid rgba(255,255,255,.10)`, padding: compacto ? '8px' : '8px 12px' }}>
-        <InboxAvisos recolhido={compacto} />
-        {emGaveta ? null : (
-        <button
-          type="button"
-          onClick={alternar}
-          aria-expanded={!compacto}
-          title={compacto ? 'Mostrar o menu' : 'Recolher o menu'}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: compacto ? 'center' : 'flex-start',
-            gap: 11,
-            width: '100%',
-            height: 32,
-            padding: compacto ? 0 : '0 10px',
-            border: 'none',
-            background: 'transparent',
-            borderRadius: RAIO.campo,
-            color: 'rgba(255,255,255,.55)',
-            fontSize: FONTE.corpo,
-            fontFamily: 'inherit',
-            cursor: 'pointer',
-          }}
-        >
-          <Icone nome={compacto ? 'expandir' : 'recolher'} tamanho={18} />
-          {compacto ? null : <span>Recolher menu</span>}
-        </button>
-        )}
-      </div>
-
       <div
         style={{
           borderTop: `1px solid rgba(255,255,255,.10)`,
@@ -391,7 +406,6 @@ export function Sidebar() {
                 }}
               >
                 {utilizador ? NIVEL_ACESSO[utilizador.nivelAcesso] : ''}
-                {avisos?.porLer ? ` · ${avisos.porLer} por ler` : ''}
               </span>
             </button>
             <button

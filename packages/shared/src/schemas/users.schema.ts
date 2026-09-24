@@ -27,13 +27,40 @@ export const criarMembroSchema = z.object({
   nivelAcesso: zNivelAcesso,
   /** Projectos a que a pessoa fica alocada no momento do registo. */
   projectos: z.array(zId).max(50).default([]),
-  /** Sem convite a conta e criada inactiva e a pessoa nao consegue entrar. */
-  enviarConvite: z.boolean().default(true),
+  /** Como a pessoa entra. Ver `MODO_ACESSO`. */
+  acesso: z.enum(['ligacao', 'password', 'nenhum']).default('ligacao'),
 });
 export type CriarMembroInput = z.infer<typeof criarMembroSchema>;
+export type ModoAcesso = CriarMembroInput['acesso'];
+
+/**
+ * - `ligacao`: convite cuja ligacao o Administrador recebe para enviar como quiser. Com SMTP
+ *   configurado segue tambem por email - nao ha modo "so email", porque a ligacao na mao nunca
+ *   atrapalha e sem SMTP e a unica forma de a fazer chegar.
+ * - `password`: palavra-passe temporaria gerada pelo sistema, a trocar no primeiro acesso.
+ * - `nenhum`: a conta existe para atribuicao e historico, mas ninguem entra nela.
+ */
+export const MODO_ACESSO: Record<ModoAcesso, string> = {
+  ligacao: 'Ligação de convite',
+  password: 'Palavra-passe temporária',
+  nenhum: 'Sem acesso por agora',
+};
+
+/**
+ * O que o Administrador recebe depois de dar acesso a alguem. A ligacao e a palavra-passe so
+ * existem nesta resposta: na base de dados ficam apenas os hashes.
+ */
+export interface AcessoEmitido {
+  email: string;
+  ligacao?: string;
+  password?: string;
+  /** Data ISO ate quando a ligacao vale. */
+  expiraEm?: string;
+  enviadoPorEmail: boolean;
+}
 
 export const actualizarMembroSchema = criarMembroSchema
-  .omit({ email: true, enviarConvite: true })
+  .omit({ email: true, acesso: true })
   .extend({ activo: z.boolean() })
   .partial();
 export type ActualizarMembroInput = z.infer<typeof actualizarMembroSchema>;

@@ -36,6 +36,12 @@ export const users = pgTable(
     email: text('email').notNull(),
     /** Nulo enquanto o convite nao for aceite. */
     passwordHash: text('password_hash'),
+    /**
+     * A palavra-passe foi gerada pelo Administrador e entregue a pessoa. Enquanto for verdade, a
+     * sessao so serve para escolher uma palavra-passe propria: quem a gerou nao pode continuar
+     * a conhece-la.
+     */
+    deveMudarPassword: boolean('deve_mudar_password').notNull().default(false),
     telefone: text('telefone'),
     funcao: text('funcao').notNull(),
     /** Departamento do vocabulario da empresa. Nulo enquanto a empresa nao definir nenhum. */

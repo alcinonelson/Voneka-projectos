@@ -31,3 +31,8 @@ usersRouter.post(
   exigirNivel('administrador'),
   assincrono(controlador.reenviarConvite),
 );
+usersRouter.post(
+  '/:id/temporary-password',
+  exigirNivel('administrador'),
+  assincrono(controlador.reporAcessoTemporario),
+);

@@ -42,6 +42,13 @@ export const erros = {
   semPermissao: (mensagem = 'Não tem acesso a este recurso.') =>
     new AppError('SEM_PERMISSAO', mensagem, 403),
 
+  passwordTemporaria: () =>
+    new AppError(
+      'PASSWORD_TEMPORARIA',
+      'Esta conta entrou com uma palavra-passe temporária. Escolha a sua antes de continuar.',
+      403,
+    ),
+
   naoEncontrado: (recurso = 'O recurso pedido') =>
     new AppError('NAO_ENCONTRADO', `${recurso} não existe ou já foi removido.`, 404),
 

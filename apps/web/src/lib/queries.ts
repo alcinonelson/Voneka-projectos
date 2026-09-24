@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
+  AcessoEmitido,
   ActualizarEmpresaInput,
   ActualizarMembroInput,
   ConcluirTarefaInput,
@@ -306,7 +307,11 @@ export function useValidarRelatorio() {
 export function useCriarMembro() {
   const invalidar = useInvalidar();
   return useMutation({
-    mutationFn: (dados: CriarMembroInput) => api.post<MembroEquipa>('/users', dados),
+    mutationFn: (dados: CriarMembroInput) =>
+      api.post<{ membro: Pick<MembroEquipa, 'id' | 'nome' | 'email'>; acesso: AcessoEmitido | null }>(
+        '/users',
+        dados,
+      ),
     onSuccess: () => invalidar([chaves.equipa, chaves.pessoas, chaves.arranque]),
   });
 }
@@ -323,7 +328,15 @@ export function useActualizarMembro() {
 export function useReenviarConvite() {
   const invalidar = useInvalidar();
   return useMutation({
-    mutationFn: (id: string) => api.post<{ email: string }>(`/users/${id}/resend-invite`),
+    mutationFn: (id: string) => api.post<AcessoEmitido>(`/users/${id}/resend-invite`),
+    onSuccess: () => invalidar([chaves.equipa]),
+  });
+}
+
+export function useGerarPasswordTemporaria() {
+  const invalidar = useInvalidar();
+  return useMutation({
+    mutationFn: (id: string) => api.post<AcessoEmitido>(`/users/${id}/temporary-password`),
     onSuccess: () => invalidar([chaves.equipa]),
   });
 }

@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import {
   ALOCACOES_SUGERIDAS,
+  MODO_ACESSO,
   NIVEIS_ACESSO,
   NIVEL_ACESSO,
   NIVEL_ACESSO_NOTA,
+  type AcessoEmitido,
+  type ModoAcesso,
   type NivelAcesso,
   emailValido,
   formatarData,
@@ -11,9 +14,28 @@ import {
   lerData,
   paraIso,
 } from '@nexora/shared';
-import { COR, FONTE, PESO, RAIO, campo, erroCampo, numerico, pastilha, rotuloCampo } from '../design/tokens';
+import {
+  COR,
+  FONTE,
+  PESO,
+  RAIO,
+  botaoSecundario,
+  campo,
+  erroCampo,
+  numerico,
+  pastilha,
+  rotuloCampo,
+} from '../design/tokens';
 import { ErroApi } from '../lib/api';
-import { useActualizarMembro, useCarteira, useCriarMembro, useVocabulario } from '../lib/queries';
+import { useSessao } from '../lib/auth';
+import {
+  useActualizarMembro,
+  useCarteira,
+  useCriarMembro,
+  useGerarPasswordTemporaria,
+  useReenviarConvite,
+  useVocabulario,
+} from '../lib/queries';
 import type { MembroEquipa } from '../lib/tipos';
 import { CampoData } from './CampoData';
 import { Modal } from './Modal';
@@ -25,21 +47,40 @@ import { useToast } from './Toast';
  * O nivel de acesso vem com a sua consequencia escrita por baixo. Escolher entre tres palavras
  * sem saber o que cada uma abre e como assinar sem ler; a nota diz exactamente o que a pessoa
  * passa a poder fazer.
+ *
+ * O acesso e escolhido e nao presumido. Enquanto nao ha email configurado, "enviar convite por
+ * email" era uma promessa que o servidor nao cumpria; agora a ligacao ou a palavra-passe voltam
+ * para o Administrador, que as entrega pelo canal que tiver.
  */
+
+const NOTA_ACESSO: Record<ModoAcesso, string> = {
+  ligacao: 'Recebe uma ligação para definir a palavra-passe. Válida 7 dias.',
+  password: 'Entra já com uma palavra-passe gerada aqui, e troca-a no primeiro acesso.',
+  nenhum: 'A conta existe para atribuir trabalho, mas ninguém entra nela até lhe dar acesso.',
+};
+
+const MODOS: ModoAcesso[] = ['ligacao', 'password', 'nenhum'];
+
 export function ModalMembro({
   aberto,
   onFechar,
   membro,
+  onAcesso,
 }: {
   aberto: boolean;
   onFechar: () => void;
   membro?: MembroEquipa | null;
+  /** Recebe a ligacao ou a palavra-passe acabada de emitir, para a mostrar ao Administrador. */
+  onAcesso: (acesso: AcessoEmitido, nome: string) => void;
 }) {
   const aEditar = Boolean(membro);
+  const { utilizador } = useSessao();
   const { data: carteira } = useCarteira('todos');
   const { data: departamentos } = useVocabulario('departamento');
   const criar = useCriarMembro();
   const actualizar = useActualizarMembro();
+  const reenviar = useReenviarConvite();
+  const gerarPassword = useGerarPasswordTemporaria();
   const toast = useToast();
 
   const [nome, setNome] = useState('');
@@ -51,7 +92,7 @@ export function ModalMembro({
   const [alocacao, setAlocacao] = useState(100);
   const [nivelAcesso, setNivelAcesso] = useState<NivelAcesso>('colaborador');
   const [projectos, setProjectos] = useState<string[]>([]);
-  const [enviarConvite, setEnviarConvite] = useState(true);
+  const [acesso, setAcesso] = useState<ModoAcesso>('ligacao');
   const [tocado, setTocado] = useState(false);
   const [erroServidor, setErroServidor] = useState<string | null>(null);
   const [campos, setCampos] = useState<Record<string, string>>({});
@@ -67,7 +108,7 @@ export function ModalMembro({
     setAlocacao(membro?.alocacao ?? 100);
     setNivelAcesso(membro?.nivelAcesso ?? 'colaborador');
     setProjectos(membro?.projectos ?? []);
-    setEnviarConvite(true);
+    setAcesso('ligacao');
     setTocado(false);
     setErroServidor(null);
     setCampos({});
@@ -114,7 +155,7 @@ export function ModalMembro({
         });
         toast.mostrar(`Ficha de ${nome.trim()} actualizada`);
       } else {
-        await criar.mutateAsync({
+        const resultado = await criar.mutateAsync({
           nome: nome.trim(),
           email: email.trim().toLowerCase(),
           telefone: telefone.trim(),
@@ -124,13 +165,12 @@ export function ModalMembro({
           alocacao,
           nivelAcesso,
           projectos,
-          enviarConvite,
+          acesso,
         });
-        toast.mostrar(
-          `${nome.trim()} registado como ${NIVEL_ACESSO[nivelAcesso]}${
-            enviarConvite ? ' · convite enviado' : ' · conta sem convite'
-          }`,
-        );
+        toast.mostrar(`${resultado.membro.nome} registado como ${NIVEL_ACESSO[nivelAcesso]}`);
+        onFechar();
+        if (resultado.acesso) onAcesso(resultado.acesso, resultado.membro.nome);
+        return;
       }
       onFechar();
     } catch (e) {
@@ -140,6 +180,22 @@ export function ModalMembro({
       } else {
         setErroServidor(aEditar ? 'Não foi possível actualizar a ficha.' : 'Não foi possível criar a conta.');
       }
+    }
+  }
+
+  /** Nova ligacao ou nova palavra-passe temporaria para um membro ja registado. */
+  async function darAcesso(modo: 'ligacao' | 'password') {
+    if (!membro) return;
+    setErroServidor(null);
+    try {
+      const emitido =
+        modo === 'ligacao'
+          ? await reenviar.mutateAsync(membro.id)
+          : await gerarPassword.mutateAsync(membro.id);
+      onFechar();
+      onAcesso(emitido, membro.nome);
+    } catch (e) {
+      setErroServidor(e instanceof ErroApi ? e.message : 'Não foi possível gerar o acesso.');
     }
   }
 
@@ -179,7 +235,13 @@ export function ModalMembro({
       }
       rodapeErro={!valido && tocado}
       accao={{
-        rotulo: aEditar ? 'Gravar ficha' : enviarConvite ? 'Criar conta e convidar' : 'Criar conta',
+        rotulo: aEditar
+          ? 'Gravar ficha'
+          : acesso === 'ligacao'
+            ? 'Criar conta e gerar ligação'
+            : acesso === 'password'
+              ? 'Criar conta e gerar palavra-passe'
+              : 'Criar conta',
         onClick: () => void submeter(),
         desactivada: !valido,
         aCarregar: criar.isPending || actualizar.isPending,
@@ -400,52 +462,76 @@ export function ModalMembro({
       </div>
 
       {aEditar ? null : (
-      <button
-        type="button"
-        onClick={() => setEnviarConvite((v) => !v)}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          width: '100%',
-          padding: '12px 14px',
-          border: `1px solid ${COR.borda}`,
-          borderRadius: RAIO.medio,
-          background: COR.branco,
-          cursor: 'pointer',
-          fontFamily: 'inherit',
-          textAlign: 'left',
-        }}
-      >
-        <span
-          style={{
-            width: 18,
-            height: 18,
-            flex: '0 0 18px',
-            borderRadius: RAIO.pequeno + 1,
-            border: `1px solid ${enviarConvite ? COR.tinta : COR.bordaForte}`,
-            background: enviarConvite ? COR.tinta : COR.branco,
-            color: COR.branco,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 11,
-          }}
-        >
-          {enviarConvite ? '✓' : ''}
-        </span>
-        <span style={{ flex: 1 }}>
-          <span style={{ display: 'block', fontSize: FONTE.corpo, fontWeight: PESO.medio }}>
-            Enviar convite por email
-          </span>
-          <span style={{ display: 'block', fontSize: FONTE.minima, color: COR.suave, marginTop: 3 }}>
-            {enviarConvite
-              ? 'A pessoa define a palavra-passe pela ligação · expira em 7 dias'
-              : 'Conta criada inactiva — ninguém consegue entrar até o convite ser enviado.'}
-          </span>
-        </span>
-      </button>
+        <div>
+          <span style={rotuloCampo}>Como a pessoa entra</span>
+          <div role="radiogroup" className="vn-campos vn-campos-3">
+            {MODOS.map((m) => {
+              const activo = acesso === m;
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  role="radio"
+                  aria-checked={activo}
+                  onClick={() => setAcesso(m)}
+                  style={{
+                    display: 'block',
+                    padding: '12px 14px',
+                    border: `1px solid ${activo ? COR.tinta : COR.borda}`,
+                    background: activo ? COR.fundoCampo : COR.branco,
+                    borderRadius: RAIO.medio,
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    textAlign: 'left',
+                  }}
+                >
+                  <span style={{ display: 'block', fontSize: FONTE.corpo, fontWeight: PESO.forte }}>
+                    {MODO_ACESSO[m]}
+                  </span>
+                  <span
+                    style={{ display: 'block', fontSize: FONTE.minima, color: COR.suave, marginTop: 4, lineHeight: 1.5 }}
+                  >
+                    {NOTA_ACESSO[m]}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       )}
+
+      {aEditar && membro && membro.activo ? (
+        <div style={{ marginTop: 4 }}>
+          <span style={rotuloCampo}>Acesso</span>
+          <div style={{ fontSize: FONTE.nota, color: COR.suave, lineHeight: 1.5, marginBottom: 10 }}>
+            {membro.estado === 'convite_pendente'
+              ? 'Ainda não entrou. Gere uma ligação nova, ou dê-lhe já uma palavra-passe temporária.'
+              : 'Se a pessoa perdeu a palavra-passe, gere uma temporária. A actual deixa de servir e as sessões abertas terminam.'}
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {membro.estado === 'convite_pendente' ? (
+              <button
+                type="button"
+                onClick={() => void darAcesso('ligacao')}
+                disabled={reenviar.isPending}
+                style={botaoSecundario}
+              >
+                Gerar nova ligação de convite
+              </button>
+            ) : null}
+            {membro.id !== utilizador?.id ? (
+              <button
+                type="button"
+                onClick={() => void darAcesso('password')}
+                disabled={gerarPassword.isPending}
+                style={botaoSecundario}
+              >
+                Gerar palavra-passe temporária
+              </button>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       {aEditar && membro ? (
         <button

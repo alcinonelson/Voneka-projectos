@@ -29,6 +29,8 @@ export interface UtilizadorSessao {
   funcao: string;
   departamentoId: string | null;
   nivelAcesso: Sessao['nivel'];
+  /** Entrou com palavra-passe temporaria: o interface so mostra a troca obrigatoria. */
+  deveMudarPassword: boolean;
   /** Empresa a que a conta pertence, com o que o interface precisa para se identificar. */
   empresa: {
     id: string;
@@ -66,6 +68,7 @@ async function comEmpresa(u: {
   funcao: string;
   departamentoId: string | null;
   nivelAcesso: Sessao['nivel'];
+  deveMudarPassword: boolean;
 }): Promise<UtilizadorSessao> {
   const [empresa] = await db
     .select({
@@ -88,6 +91,7 @@ async function comEmpresa(u: {
     funcao: u.funcao,
     departamentoId: u.departamentoId,
     nivelAcesso: u.nivelAcesso,
+    deveMudarPassword: u.deveMudarPassword,
     empresa,
   };
 }
@@ -113,6 +117,7 @@ async function emitirSessao(
       nivel: u.nivelAcesso,
       nome: u.nome,
       org: u.empresa.id,
+      ...(u.deveMudarPassword ? { tmp: true as const } : {}),
     }),
     refreshToken: token,
   };
@@ -246,6 +251,7 @@ export async function aceitarConvite(
     .set({
       passwordHash,
       estado: 'activo',
+      deveMudarPassword: false,
       conviteTokenHash: null,
       conviteExpiraEm: null,
       updatedAt: new Date(),
@@ -301,7 +307,7 @@ export async function alterarPassword(
 
   await db
     .update(users)
-    .set({ passwordHash, updatedAt: new Date() })
+    .set({ passwordHash, deveMudarPassword: false, updatedAt: new Date() })
     .where(eq(users.id, utilizador.id));
 
   // Apagar e nao marcar: ver `removerSessoes`. Marcar deixaria o cookie antigo de outro
@@ -311,7 +317,8 @@ export async function alterarPassword(
     logModulo('auth', `Palavra-passe alterada por ${utilizador.id}; sessoes terminadas`),
   );
 
-  return emitirSessao(await comEmpresa(utilizador), userAgent);
+  // A sessao nova ja sai sem a marca de temporaria: a linha lida acima ainda a tinha.
+  return emitirSessao(await comEmpresa({ ...utilizador, deveMudarPassword: false }), userAgent);
 }
 
 export const MENSAGEM_RECUPERACAO =
@@ -384,6 +391,7 @@ export async function reporPassword(
     .update(users)
     .set({
       passwordHash,
+      deveMudarPassword: false,
       recuperacaoTokenHash: null,
       recuperacaoExpiraEm: null,
       updatedAt: new Date(),

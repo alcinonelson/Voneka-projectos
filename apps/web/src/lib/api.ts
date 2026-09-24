@@ -12,6 +12,7 @@ import { reviverDatas } from './datas';
 
 let accessToken: string | null = null;
 let aoSessaoExpirada: (() => void) | null = null;
+let aoPasswordTemporaria: (() => void) | null = null;
 
 export function definirToken(token: string | null): void {
   accessToken = token;
@@ -20,6 +21,14 @@ export function definirToken(token: string | null): void {
 /** Chamado quando o refresh falha: o portal tem de sair, nao ficar "dentro" a falhar. */
 export function definirAoSessaoExpirada(fn: (() => void) | null): void {
   aoSessaoExpirada = fn;
+}
+
+/**
+ * Chamado quando o servidor recusa um pedido porque a conta ainda tem palavra-passe temporaria.
+ * O portal troca para o ecra de escolher a palavra-passe em vez de mostrar erros ecra a ecra.
+ */
+export function definirAoPasswordTemporaria(fn: (() => void) | null): void {
+  aoPasswordTemporaria = fn;
 }
 
 export function temToken(): boolean {
@@ -101,6 +110,8 @@ export async function pedir<T>(caminho: string, opcoes: Opcoes = {}): Promise<T>
     accessToken = null;
     aoSessaoExpirada?.();
   }
+
+  if (dados.error.code === 'PASSWORD_TEMPORARIA') aoPasswordTemporaria?.();
 
   throw new ErroApi(dados.error.code, dados.error.message, resposta.status, dados.error.fields);
 }

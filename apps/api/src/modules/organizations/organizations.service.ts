@@ -25,7 +25,13 @@ export async function registarEmpresa(
   dados: RegistarEmpresaInput,
   userAgent?: string,
 ): Promise<{
-  utilizador: { id: string; nome: string; email: string; nivelAcesso: 'administrador' };
+  utilizador: {
+    id: string;
+    nome: string;
+    email: string;
+    nivelAcesso: 'administrador';
+    deveMudarPassword: false;
+  };
   empresa: { id: string; nome: string; moeda: string; slug: string };
   accessToken: string;
   refreshToken: string;
@@ -103,6 +109,8 @@ export async function registarEmpresa(
       nome: criado.administrador.nome,
       email: criado.administrador.email,
       nivelAcesso: 'administrador',
+      // Quem cria a empresa escolheu a propria palavra-passe.
+      deveMudarPassword: false,
     },
     empresa: {
       id: criado.empresa.id,

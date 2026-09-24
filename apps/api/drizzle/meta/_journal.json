@@ -15,6 +15,13 @@
       "when": 1788117600000,
       "tag": "0001_recuperacao_password",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790277093939,
+      "tag": "0002_password_temporaria",
+      "breakpoints": true
     }
   ]
 }

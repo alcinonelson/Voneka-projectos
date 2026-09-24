@@ -48,10 +48,15 @@ export const pt = {
   },
   avisos: {
     titulo: 'Avisos',
+    subtitulo: 'Prazos a vencer e em atraso nas tarefas que são suas',
     vazio: 'Nenhum aviso por agora.',
+    vazioPorLer: 'Leu tudo. Os avisos novos aparecem aqui todas as manhãs.',
     porLer: (n: number) => `${n} por ler`,
     marcarLido: 'Marcar como lido',
-    abrir: 'Abrir avisos',
+    marcarTodos: 'Marcar todos como lidos',
+    filtroPorLer: 'Por ler',
+    filtroTodos: 'Todos',
+    verTarefas: 'Ver tarefas',
   },
   vocabulario: {
     arrastar: 'Arrastar para reordenar',

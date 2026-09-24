@@ -1,12 +1,13 @@
 import bcrypt from 'bcryptjs';
 import { and, asc, eq, inArray, ne, sql } from 'drizzle-orm';
 import {
+  type AcessoEmitido,
   type ActualizarMembroInput,
   type CriarMembroInput,
   type NivelAcesso,
   deIso,
 } from '@nexora/shared';
-import { DIAS_VALIDADE_CONVITE, env } from '../../config/env';
+import { BCRYPT_ROUNDS, DIAS_VALIDADE_CONVITE, env, temEmail } from '../../config/env';
 import { db } from '../../db/db';
 import { projectMembers } from '../../db/schema/projects.schema';
 import { tasks } from '../../db/schema/tasks.schema';
@@ -15,10 +16,11 @@ import { users } from '../../db/schema/users.schema';
 import { erros } from '../../utils/errors';
 import { logModulo, logger } from '../../utils/logger';
 import { enviarEmail, textoConvite } from '../../utils/mailer';
-import { gerarTokenConvite } from '../../utils/tokens';
+import { gerarPasswordTemporaria, gerarTokenConvite } from '../../utils/tokens';
 import type { Sessao } from '../../utils/tokens';
 import { exigirProjectosDaEmpresa, exigirTaxonomia } from '../access';
 import { registar } from '../audit.service';
+import { removerSessoes } from '../auth/auth.service';
 
 /**
  * Horas de trabalho de referencia num mes, a tempo inteiro.
@@ -170,25 +172,78 @@ export async function listarParaSelector(sessao: Sessao) {
   return pessoas.map((p) => ({ ...p, tarefasAbertas: contagem.get(p.id) ?? 0 }));
 }
 
-async function enviarConvite(
-  userId: string,
-  nome: string,
-  email: string,
-): Promise<void> {
+/**
+ * Emite um convite e devolve a ligacao ao Administrador.
+ *
+ * A ligacao sai sempre na resposta, e nao so por email: sem SMTP e a unica forma de a fazer
+ * chegar, e com SMTP deixa-a partilhar por outro canal quando o email tarda. Na base de dados fica
+ * so o hash, como a palavra-passe.
+ */
+async function emitirConvite(userId: string, nome: string, email: string): Promise<AcessoEmitido> {
   const { token, hash } = gerarTokenConvite();
   const expiraEm = new Date(Date.now() + DIAS_VALIDADE_CONVITE * 86_400_000);
 
   await db
     .update(users)
-    .set({ conviteTokenHash: hash, conviteExpiraEm: expiraEm, estado: 'convite_pendente' })
+    .set({
+      conviteTokenHash: hash,
+      conviteExpiraEm: expiraEm,
+      estado: 'convite_pendente',
+      passwordHash: null,
+      deveMudarPassword: false,
+      updatedAt: new Date(),
+    })
     .where(eq(users.id, userId));
 
   const ligacao = `${env.WEB_ORIGIN}/convite?token=${token}`;
-  await enviarEmail({
-    para: email,
-    assunto: 'Acesso ao Voneka Projectos',
-    texto: textoConvite(nome, ligacao, DIAS_VALIDADE_CONVITE),
-  });
+  if (temEmail) {
+    await enviarEmail({
+      para: email,
+      assunto: 'Acesso ao Voneka Projectos',
+      texto: textoConvite(nome, ligacao, DIAS_VALIDADE_CONVITE),
+    });
+  }
+
+  return { email, ligacao, expiraEm: expiraEm.toISOString(), enviadoPorEmail: temEmail };
+}
+
+/**
+ * Da a conta uma palavra-passe temporaria, que a pessoa troca no primeiro acesso.
+ *
+ * Qualquer convite pendente deixa de valer: duas portas abertas para a mesma conta sao uma a mais.
+ * As sessoes existentes sao apagadas, porque quem pediu uma temporaria nova quer que a antiga
+ * deixe de servir.
+ */
+async function emitirPasswordTemporaria(userId: string, email: string): Promise<AcessoEmitido> {
+  const password = gerarPasswordTemporaria();
+  const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+
+  await db
+    .update(users)
+    .set({
+      passwordHash,
+      deveMudarPassword: true,
+      estado: 'activo',
+      conviteTokenHash: null,
+      conviteExpiraEm: null,
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, userId));
+
+  await removerSessoes(userId);
+
+  return { email, password, enviadoPorEmail: false };
+}
+
+/** O que a resposta de criar devolve do membro: nunca a linha inteira, que traz os hashes. */
+function membroPublico(u: typeof users.$inferSelect) {
+  return {
+    id: u.id,
+    nome: u.nome,
+    email: u.email,
+    nivelAcesso: u.nivelAcesso,
+    estado: u.estado,
+  };
 }
 
 /**
@@ -248,16 +303,26 @@ export async function criarMembro(sessao: Sessao, dados: CriarMembroInput) {
     return utilizador;
   });
 
-  if (dados.enviarConvite) {
-    await enviarConvite(criado.id, criado.nome, criado.email);
+  let acesso: AcessoEmitido | null = null;
+  if (dados.acesso === 'ligacao') {
+    acesso = await emitirConvite(criado.id, criado.nome, criado.email);
+  } else if (dados.acesso === 'password') {
+    acesso = await emitirPasswordTemporaria(criado.id, criado.email);
+    await registar(db, {
+      organizationId: sessao.org,
+      actorId: sessao.sub,
+      accao: 'membro.password_temporaria',
+      entidade: 'utilizador',
+      entidadeId: criado.id,
+    });
   }
 
   logger.info(logModulo('utilizadores', `Conta criada: ${criado.id}`));
-  return criado;
+  return { membro: membroPublico(criado), acesso };
 }
 
-/** Reenvia o convite, renovando o token e o prazo. */
-export async function reenviarConvite(sessao: Sessao, userId: string) {
+/** Membro desta empresa, pronto a receber acesso. */
+async function membroParaAcesso(sessao: Sessao, userId: string) {
   const [utilizador] = await db
     .select()
     .from(users)
@@ -265,11 +330,21 @@ export async function reenviarConvite(sessao: Sessao, userId: string) {
     .limit(1);
   if (!utilizador) throw erros.naoEncontrado('Esta conta');
 
+  if (!utilizador.activo) {
+    throw erros.conflito('Esta conta está desactivada. Reactive-a antes de lhe dar acesso.');
+  }
+  return utilizador;
+}
+
+/** Gera uma ligacao de convite nova, renovando o token e o prazo. */
+export async function reenviarConvite(sessao: Sessao, userId: string): Promise<AcessoEmitido> {
+  const utilizador = await membroParaAcesso(sessao, userId);
+
   if (utilizador.estado === 'activo') {
-    throw erros.conflito('Esta conta já foi activada.');
+    throw erros.conflito('Esta conta já foi activada. Para repor o acesso, gere uma palavra-passe temporária.');
   }
 
-  await enviarConvite(utilizador.id, utilizador.nome, utilizador.email);
+  const acesso = await emitirConvite(utilizador.id, utilizador.nome, utilizador.email);
 
   await registar(db, {
     organizationId: sessao.org,
@@ -279,7 +354,34 @@ export async function reenviarConvite(sessao: Sessao, userId: string) {
     entidadeId: userId,
   });
 
-  return { email: utilizador.email };
+  return acesso;
+}
+
+/**
+ * Da a um membro uma palavra-passe temporaria: para quem ainda nao entrou, ou para quem perdeu a
+ * sua. O Administrador nao a pode usar na propria conta - para isso ha a alteracao de
+ * palavra-passe, que exige a actual.
+ */
+export async function reporAcessoTemporario(
+  sessao: Sessao,
+  userId: string,
+): Promise<AcessoEmitido> {
+  if (userId === sessao.sub) {
+    throw erros.semPermissao('Para mudar a sua palavra-passe, use "Alterar a palavra-passe".');
+  }
+
+  const utilizador = await membroParaAcesso(sessao, userId);
+  const acesso = await emitirPasswordTemporaria(utilizador.id, utilizador.email);
+
+  await registar(db, {
+    organizationId: sessao.org,
+    actorId: sessao.sub,
+    accao: 'membro.password_temporaria',
+    entidade: 'utilizador',
+    entidadeId: userId,
+  });
+
+  return acesso;
 }
 
 export async function actualizarMembro(

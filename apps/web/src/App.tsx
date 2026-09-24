@@ -5,7 +5,9 @@ import { useSessao } from './lib/auth';
 import { useEstadoArranque } from './lib/queries';
 import { AceitarConvite } from './screens/AceitarConvite';
 import { Arranque } from './screens/Arranque';
+import { Avisos } from './screens/Avisos';
 import { CriarEmpresa } from './screens/CriarEmpresa';
+import { DefinirPassword } from './screens/DefinirPassword';
 import { Empresa } from './screens/Empresa';
 import { Equipa } from './screens/Equipa';
 import { Landing } from './screens/Landing';
@@ -61,6 +63,9 @@ export function App() {
       </Routes>
     );
   }
+
+  // Com palavra-passe temporaria o servidor recusa tudo excepto a troca; o portal nao abre.
+  if (utilizador.deveMudarPassword) return <DefinirPassword />;
 
   return <PortalAutenticado ehDireccao={ehDireccao} ehAdministrador={ehAdministrador} />;
 }
@@ -121,8 +126,9 @@ function PortalAutenticado({
           </>
         ) : null}
 
-        {/* O roteiro e o unico ecra comum aos dois perfis. */}
+        {/* O roteiro e os avisos sao comuns aos dois perfis. */}
         <Route path="/roteiro" element={<Roteiro />} />
+        <Route path="/avisos" element={<Avisos />} />
 
         <Route path="*" element={<Navigate to={inicio} replace />} />
       </Route>

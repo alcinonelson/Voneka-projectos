@@ -22,6 +22,7 @@ export type NomeIcone =
   | 'equipa'
   | 'vocabulario'
   | 'empresa'
+  | 'avisos'
   | 'recolher'
   | 'expandir'
   | 'menu';
@@ -106,6 +107,13 @@ const DESENHOS: Record<NomeIcone, JSX.Element> = {
       <path d="M14 11h4.5A1.5 1.5 0 0120 12.5V21" />
       <path d="M2.5 21h19" />
       <path d="M7 9h4M7 13h4M7 17h4M17 15h1M17 18h1" />
+    </>
+  ),
+  // Um sino: os avisos de prazo.
+  avisos: (
+    <>
+      <path d="M6 16.5V11a6 6 0 0112 0v5.5l1.5 2h-15z" />
+      <path d="M10 21a2.2 2.2 0 004 0" />
     </>
   ),
   menu: (

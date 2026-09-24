@@ -9,7 +9,13 @@ import {
 } from 'react';
 import type { NivelAcesso } from '@nexora/shared';
 import { useQueryClient } from '@tanstack/react-query';
-import { api, definirAoSessaoExpirada, definirToken, retomarSessao } from './api';
+import {
+  api,
+  definirAoPasswordTemporaria,
+  definirAoSessaoExpirada,
+  definirToken,
+  retomarSessao,
+} from './api';
 import type { Empresa, Utilizador } from './tipos';
 
 /**
@@ -57,7 +63,13 @@ export function ProvedorSessao({ children }: { children: ReactNode }) {
       setUtilizador(null);
       consultas.clear();
     });
-    return () => definirAoSessaoExpirada(null);
+    definirAoPasswordTemporaria(() => {
+      setUtilizador((u) => (u ? { ...u, deveMudarPassword: true } : u));
+    });
+    return () => {
+      definirAoSessaoExpirada(null);
+      definirAoPasswordTemporaria(null);
+    };
   }, [consultas]);
 
   useEffect(() => {

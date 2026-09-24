@@ -43,6 +43,8 @@ export interface Utilizador {
   funcao: string;
   departamentoId: string | null;
   nivelAcesso: NivelAcesso;
+  /** Entrou com palavra-passe temporaria: so pode escolher a sua. */
+  deveMudarPassword: boolean;
   empresa: Empresa;
 }
 
