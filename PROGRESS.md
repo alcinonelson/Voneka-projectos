@@ -333,6 +333,13 @@ a meio, entrada (recuperar palavra-passe) e o minimo de operacao que uma casa se
 - `LIMIT 200` nas listagens; `X-Request-Id` no log HTTP; rate-limit no refresh
 - `pnpm tables` e so `migrate`; o campo morto `pnpm.onlyBuiltDependencies` saiu
 
+## Fase 19 - Deploy da SPA
+
+- [x] `.github/workflows/deploy-web.yml`: build pnpm (shared + web), artefacto, SSH para o
+      document root de `projects.get.co.mz`, smoke em `/`, `/entrar`, `/recuperar`
+- [x] `apps/web/public/.htaccess`: reescreve rotas do React; deixa `/api` para o proxy
+- [x] `docs/deploy-web.md`: secrets e a regra da mesma origem (cookie de refresh)
+
 ## Por fazer
 
 - Politica de SMTP real (hoje a ligacao vai para o log quando nao ha servidor)

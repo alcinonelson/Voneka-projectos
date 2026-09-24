@@ -57,6 +57,17 @@ Idempotente: nao apaga dados. Quem perdeu a palavra-passe de uma conta normal us
 
 ## Producao
 
+A SPA publica-se em [https://projects.get.co.mz](https://projects.get.co.mz) pelo workflow
+`.github/workflows/deploy-web.yml` (SSH para o document root do subdominio). Detalhes e
+secrets em `docs/deploy-web.md`.
+
+O portal fala com `/api` na mesma origem. No processo da API:
+
+```
+WEB_ORIGIN=https://projects.get.co.mz
+NODE_ENV=production
+```
+
 - `NODE_ENV=production` recusa os segredos JWT de exemplo do `.env.example`.
 - `GET /api/health` faz `select 1` e devolve 503 se a base nao responder.
 - O historico (`audit_log`) retém 24 meses; o cron das 03:30 de Maputo apaga o resto, juntamente

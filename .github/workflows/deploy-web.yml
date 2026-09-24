@@ -1,0 +1,208 @@
+# Deploy da SPA Voneka Projectos → https://projects.get.co.mz
+#
+# Reutiliza os secrets de outros deploys no mesmo alojamento:
+#   SSH_PRIVATE_KEY, REMOTE_HOST, REMOTE_USER, REMOTE_PORT (opcional)
+#
+# Secret deste workflow:
+#   PROJECTS_REMOTE_PATH  — document root do subdomínio
+#                           (cPanel → Domains → Subdomains → projects)
+#                           ex.: /home/UTILIZADOR/projects.get.co.mz
+#
+# Opcional:
+#   PROJECTS_PUBLIC_URL   — smoke test (default https://projects.get.co.mz)
+#
+# O cliente fala com /api na mesma origem. A API tem de estar proxied nesse
+# caminho (WEB_ORIGIN=https://projects.get.co.mz no processo Node).
+# Este workflow so publica o dist da SPA.
+#
+# Documentação: docs/deploy-web.md
+
+name: Deploy Voneka web
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'apps/web/**'
+      - 'packages/shared/**'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'package.json'
+      - '.github/workflows/deploy-web.yml'
+
+concurrency:
+  group: deploy-voneka-web-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      - name: Instalar
+        run: pnpm install --frozen-lockfile
+
+      - name: Compilar shared e web
+        run: pnpm --filter @nexora/shared build && pnpm --filter @nexora/web build
+
+      - name: Validar dist
+        run: |
+          test -f apps/web/dist/index.html
+          test -f apps/web/dist/.htaccess
+          test -d apps/web/dist/assets
+          test -f apps/web/dist/favicon.svg
+          echo "dist/ OK ($(du -sh apps/web/dist | cut -f1))"
+
+      - name: Enviar artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: voneka-web-dist
+          path: apps/web/dist/
+          retention-days: 3
+
+  deploy:
+    needs: build
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Descarregar artefacto
+        uses: actions/download-artifact@v4
+        with:
+          name: voneka-web-dist
+          path: dist/
+
+      - name: Validar chave SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          if [ -z "$SSH_PRIVATE_KEY" ]; then
+            echo "ERRO: SSH_PRIVATE_KEY está vazio. Configure o secret no GitHub Actions." >&2
+            exit 1
+          fi
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keygen -y -f ~/.ssh/id_rsa >/dev/null
+
+      - name: Validar destino
+        env:
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          PROJECTS_REMOTE_PATH: ${{ secrets.PROJECTS_REMOTE_PATH }}
+          PROJECTS_PUBLIC_URL: ${{ secrets.PROJECTS_PUBLIC_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${REMOTE_HOST:-}" ]; then
+            echo "ERRO: REMOTE_HOST está vazio." >&2
+            exit 1
+          fi
+          if [ -z "${PROJECTS_REMOTE_PATH:-}" ]; then
+            echo "::error::PROJECTS_REMOTE_PATH está vazio." >&2
+            echo "Defina o document root de projects.get.co.mz (cPanel → Subdomains → projects)." >&2
+            echo "Ex.: /home/UTILIZADOR/projects.get.co.mz" >&2
+            exit 1
+          fi
+          SPA_URL="${PROJECTS_PUBLIC_URL:-https://projects.get.co.mz}"
+          echo "Deploy → $PROJECTS_REMOTE_PATH"
+          echo "Smoke  → $SPA_URL"
+          {
+            echo "PROJECTS_REMOTE_PATH=$PROJECTS_REMOTE_PATH"
+            echo "PROJECTS_PUBLIC_URL=$SPA_URL"
+          } >> "$GITHUB_ENV"
+
+      - name: Diagnosticar SSH
+        env:
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+        run: |
+          PORT="${REMOTE_PORT:-22}"
+          echo "Porta SSH: $PORT"
+          RESOLVED_HOST="$REMOTE_HOST"
+          if getent ahostsv4 "$REMOTE_HOST" >/dev/null 2>&1; then
+            RESOLVED_HOST="$(getent ahostsv4 "$REMOTE_HOST" | awk '{print $1; exit}')"
+          fi
+          if timeout 15 bash -c "exec 3<>/dev/tcp/${RESOLVED_HOST}/${PORT}" 2>/dev/null; then
+            echo "Porta acessível"
+          else
+            echo "::error::SSH inacessível em $REMOTE_HOST:$PORT" >&2
+            if [ "$PORT" = "22" ] && [ -z "${REMOTE_PORT:-}" ]; then
+              echo "Defina REMOTE_PORT (cPanel costuma usar 21098 ou similar)." >&2
+            fi
+            echo "Ver docs/deploy-web.md" >&2
+            exit 1
+          fi
+
+      - name: Publicar dist via SSH
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_PORT: ${{ secrets.REMOTE_PORT || '22' }}
+          TARGET: ${{ env.PROJECTS_REMOTE_PATH }}
+          SOURCE: 'dist/'
+          SSH_CMD_ARGS: '-o StrictHostKeyChecking=no, -o AddressFamily=inet'
+          EXCLUDE: '.git'
+
+      - name: Confirmar ficheiros no servidor
+        env:
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+          PROJECTS_REMOTE_PATH: ${{ env.PROJECTS_REMOTE_PATH }}
+        run: |
+          PORT="${REMOTE_PORT:-22}"
+          ssh -o StrictHostKeyChecking=no -o AddressFamily=inet -p "$PORT" \
+            "${REMOTE_USER}@${REMOTE_HOST}" \
+            "set -euo pipefail
+             cd '${PROJECTS_REMOTE_PATH}'
+             test -f index.html
+             test -f .htaccess
+             test -d assets
+             echo 'Servidor: index.html, .htaccess e assets/ presentes'
+             ls -la | head -15"
+
+      - name: Smoke test da SPA
+        env:
+          SPA_URL: ${{ env.PROJECTS_PUBLIC_URL }}
+        run: |
+          echo "A verificar $SPA_URL ..."
+          for path in / /entrar /recuperar /favicon.svg; do
+            ok=0
+            code=000
+            for attempt in 1 2 3 4 5 6; do
+              code=$(curl -sS -o /dev/null -w '%{http_code}' "${SPA_URL}${path}")
+              echo "${path} → HTTP ${code} (tentativa ${attempt})"
+              if [ "$code" = "200" ]; then
+                ok=1
+                break
+              fi
+              sleep 5
+            done
+            if [ "$ok" != "1" ]; then
+              echo "::error::Smoke test falhou em ${SPA_URL}${path} (HTTP ${code})" >&2
+              echo "Se HTTP 404 em /entrar: o .htaccess nao esta a reescrever para index.html." >&2
+              echo "Se HTTP 500: verificar mod_rewrite no cPanel." >&2
+              exit 1
+            fi
+          done
+          echo "SPA online"
