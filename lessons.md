@@ -135,6 +135,31 @@ reescrita para `index.html`.
 indistinguiveis - e recolhido o icone e a unica informacao que resta. Icones de navegacao sao SVG
 proprios, a traco, com `currentColor`, e testam-se no estado mais pobre em que vao aparecer.
 
+## Largura minima e a confissao de que nao se fez responsividade
+`Layout` tinha `minWidth: 1180` com `overflowX: auto` por cima: abaixo disso a aplicacao inteira -
+menu, cabecalho e conteudo - deslizava como uma peca so, e havia uma vista alternativa a substituir
+tudo em ecra pequeno. Uma largura minima numa aplicacao web e quase sempre isto: o adiar da
+reorganizacao, com uma saida de emergencia que acaba por servir mal toda a gente.
+
+## Somar as colunas antes de as declarar
+A tabela de Equipa pedia 830px de colunas fixas mais 98 de espacamento e 40 de padding - 968px -
+dentro dos 888px que a pagina tinha. Como o cartao levava `overflow: hidden`, as ultimas colunas
+eram cortadas em silencio: nem cabiam, nem havia barra para as alcancar. Ao declarar uma grelha de
+larguras fixas, somar e comparar com a largura util; e usar `minmax(0, …)`, sem o qual o conteudo
+longo alarga a coluna para la do que foi declarado.
+
+## Eventos de rato deixam metade dos dispositivos de fora
+O Roteiro registava `mousemove`/`mouseup` e so respondia a `onMouseDown`. Num tablet o gantt
+aparecia e nao se arrastava - existia sem funcionar, que e pior do que nao existir. Eventos de
+ponteiro cobrem rato, dedo e caneta com o mesmo codigo. E um alvo de 8px de largura nao se acerta
+com o dedo: o traco desenhado pode ser fino, o alvo tem de ser largo.
+
+## Um seletor de atributo com `!important` e uma rede que apanha o que nao devia
+Escrevi `[style*='grid-template-columns'] { grid-template-columns: 1fr !important }` para empilhar
+os campos dos modais no telemovel. Apanhava tambem as linhas do editor de fases, que tem de
+continuar horizontais. Quando o alvo e um conjunto especifico de elementos, a resposta e uma
+classe, e nao um selector que adivinha pela aparencia do atributo.
+
 ## `tsc` com `moduleResolution: Bundler` nao produz JS que o Node execute
 O build da API era `tsc` e o `start` era `node dist/server.js`. Em desenvolvimento o `tsx` escondia
 dois defeitos que o Render expos: os imports relativos saem sem extensao (`./app`), que o Node em

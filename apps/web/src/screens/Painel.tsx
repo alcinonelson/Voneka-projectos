@@ -240,7 +240,7 @@ export function Painel() {
           </section>
 
           {/* Avanço da carteira e Prazos a vencer */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 20, alignItems: 'start' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: 20, alignItems: 'start' }}>
             <section>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 12 }}>
                 <span style={{ ...tituloSeccao, display: 'flex', alignItems: 'center', gap: 9 }}>

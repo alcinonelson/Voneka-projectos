@@ -20,7 +20,6 @@ import { Relatorios } from './screens/Relatorios';
 import { Roteiro } from './screens/Roteiro';
 import { Tarefas } from './screens/Tarefas';
 import { Vocabulario } from './screens/Vocabulario';
-import { VistaTerreno, useEcraEstreito } from './screens/VistaTerreno';
 
 /**
  * Encaminhamento.
@@ -29,13 +28,18 @@ import { VistaTerreno, useEcraEstreito } from './screens/VistaTerreno';
  * faz, e o que um colaborador faz. Quem tenta uma rota que nao e do seu nivel e reenviado para o
  * seu inicio - o servidor recusaria na mesma, mas ser reenviado e mais util do que ver um erro.
  *
+ * Nao ha vista alternativa para ecra pequeno. Havia - a vista de terreno, que abaixo dos 900px
+ * substituia a aplicacao inteira por uma lista de tarefas sem navegacao. Era util para quem so
+ * fecha tarefas e inutil para todos os outros: um gestor no telemovel ficava sem painel, sem
+ * carteira e sem roteiro. Agora todos os ecras se reorganizam, e o colaborador continua a cair
+ * nas suas tarefas porque e essa a sua rota inicial.
+ *
  * Uma empresa recem-criada e enviada para o assistente ate ter vocabulario com que classificar um
  * projecto. Sem isso o painel abriria vazio e sem accao possivel, que e a pior primeira
  * impressao que um produto pode dar.
  */
 export function App() {
   const { utilizador, aCarregar, ehDireccao, ehAdministrador } = useSessao();
-  const estreito = useEcraEstreito();
 
   if (aCarregar) {
     return (
@@ -57,10 +61,6 @@ export function App() {
       </Routes>
     );
   }
-
-  // Em ecra estreito a aplicacao passa para a vista de terreno, sem router: o que interessa de
-  // pe, no local de trabalho, e ver a tarefa e reportar.
-  if (estreito) return <VistaTerreno />;
 
   return <PortalAutenticado ehDireccao={ehDireccao} ehAdministrador={ehAdministrador} />;
 }

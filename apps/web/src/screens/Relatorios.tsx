@@ -66,7 +66,7 @@ export function Relatorios() {
       subtitulo="O que a equipa reportou ao fechar cada tarefa"
       larguraMaxima={1320}
     >
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20, alignItems: 'start' }}>
+      <div className="vn-relatorios" style={{ alignItems: 'start' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {isLoading ? (
             <Carregando />

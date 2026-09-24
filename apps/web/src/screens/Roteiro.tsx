@@ -121,7 +121,7 @@ export function Roteiro() {
     [linhas],
   );
 
-  const aoMover = useCallback((evento: MouseEvent) => {
+  const aoMover = useCallback((evento: PointerEvent) => {
     const dg = arrasto.current;
     if (!dg) return;
     const delta = Math.round((evento.clientX - dg.xInicial) * dg.diasPorPixel);
@@ -177,13 +177,59 @@ export function Roteiro() {
   }, [reagendar, toast]);
 
   useEffect(() => {
-    window.addEventListener('mousemove', aoMover);
-    window.addEventListener('mouseup', aoLargar);
+    // Eventos de ponteiro e nao de rato: cobrem rato, dedo e caneta com o mesmo codigo. Com
+    // `mousemove` o gantt aparecia no tablet e nao se arrastava - existia sem funcionar.
+    window.addEventListener('pointermove', aoMover);
+    window.addEventListener('pointerup', aoLargar);
+    window.addEventListener('pointercancel', aoLargar);
     return () => {
-      window.removeEventListener('mousemove', aoMover);
-      window.removeEventListener('mouseup', aoLargar);
+      window.removeEventListener('pointermove', aoMover);
+      window.removeEventListener('pointerup', aoLargar);
+      window.removeEventListener('pointercancel', aoLargar);
     };
   }, [aoMover, aoLargar]);
+
+  /**
+   * Replaneamento pelo teclado.
+   *
+   * Sem isto, mover uma fase exigia rato ou dedo. As setas movem um dia, com Shift uma semana;
+   * com Alt mudam a duracao em vez do inicio.
+   */
+  const aoTeclado = useCallback(
+    (evento: React.KeyboardEvent, fase: { id: string; nome: string }, inicio: number, duracao: number) => {
+      const passo = evento.shiftKey ? 7 : 1;
+      let delta = 0;
+      if (evento.key === 'ArrowRight') delta = passo;
+      else if (evento.key === 'ArrowLeft') delta = -passo;
+      else return;
+
+      evento.preventDefault();
+      const novoInicio = evento.altKey ? inicio : Math.max(0, inicio + delta);
+      const novaDuracao = evento.altKey ? Math.max(2, duracao + delta) : duracao;
+
+      const de = dataDeOffset(novoInicio);
+      const ate = dataDeOffset(novoInicio + novaDuracao);
+      setAjustes((a) => ({ ...a, [fase.id]: { inicio: novoInicio, duracao: novaDuracao } }));
+
+      void reagendar
+        .mutateAsync({ faseId: fase.id, startsOn: paraIso(de), endsOn: paraIso(ate) })
+        .then(() => {
+          toast.mostrar(`${fase.nome} → ${dataCurta(de)} a ${dataCurta(ate)} · plano actualizado`);
+          setAjustes((a) => {
+            const { [fase.id]: _removido, ...resto } = a;
+            return resto;
+          });
+        })
+        .catch(() => {
+          toast.mostrar('Não foi possível gravar o novo plano.');
+          setAjustes((a) => {
+            const { [fase.id]: _removido, ...resto } = a;
+            return resto;
+          });
+        });
+    },
+    [reagendar, toast],
+  );
 
   const rotuloJanela =
     escala === 'mes'
@@ -482,7 +528,7 @@ export function Roteiro() {
                       const activa = aArrastar === fase.id;
 
                       function iniciarArrasto(modo: 'mover' | 'redimensionar') {
-                        return (evento: React.MouseEvent) => {
+                        return (evento: React.PointerEvent) => {
                           evento.preventDefault();
                           evento.stopPropagation();
                           const pista = (evento.currentTarget as HTMLElement).closest('[data-pista]');
@@ -504,12 +550,21 @@ export function Roteiro() {
                       return (
                         <div
                           key={fase.id}
-                          onMouseDown={iniciarArrasto('mover')}
+                          className="vn-barra-fase"
+                          onPointerDown={iniciarArrasto('mover')}
+                          onKeyDown={(e) => aoTeclado(e, fase, inicio, fim - inicio)}
+                          role="slider"
+                          tabIndex={0}
+                          aria-label={`Fase ${fase.nome}`}
+                          aria-valuemin={0}
+                          aria-valuenow={inicio}
+                          aria-valuemax={inicioJanela + largura}
+                          aria-valuetext={`${dataCurta(dataDeOffset(inicio))} a ${dataCurta(dataDeOffset(fim))}`}
                           title={`${fase.nome} · ${dataCurta(dataDeOffset(inicio))} a ${dataCurta(dataDeOffset(fim))}`}
                           style={{
                             position: 'absolute',
                             top: 0,
-                            height: 24,
+                            height: 28,
                             left: `${((visivelDe - inicioJanela) / largura) * 100}%`,
                             width: `${Math.max(1.2, ((visivelAte - visivelDe) / largura) * 100)}%`,
                             borderRadius: RAIO.botao,
@@ -531,15 +586,19 @@ export function Roteiro() {
                         >
                           <span style={{ flex: 1, minWidth: 0, ...textoTruncado }}>{fase.nome}</span>
                           <span
-                            onMouseDown={iniciarArrasto('redimensionar')}
-                            role="presentation"
+                            onPointerDown={iniciarArrasto('redimensionar')}
+                            aria-hidden="true"
                             style={{
                               position: 'absolute',
                               top: 0,
                               right: 0,
-                              width: 8,
-                              height: 24,
+                              // O traco continua fino, mas o alvo e largo: 8px nao se acerta
+                              // com o dedo. O `touch-action` impede a pagina de deslizar
+                              // enquanto se redimensiona.
+                              width: 22,
+                              height: '100%',
                               cursor: 'col-resize',
+                              touchAction: 'none',
                             }}
                           />
                         </div>

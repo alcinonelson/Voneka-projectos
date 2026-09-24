@@ -53,21 +53,43 @@ export const ESPACO = {
   pagina: 28,
 } as const;
 
+/**
+ * Faixas de ecra.
+ *
+ * Uma so definicao, consumida pelo CSS e pelo JavaScript. Duas listas de breakpoints divergem a
+ * terceira alteracao, e a divergencia aparece sempre como um ecra que muda de forma a meio.
+ *
+ * Os valores nao sao arbitrarios: 680 e onde uma tabela deixa de caber sem mentir, 1024 e o
+ * tablet em paisagem, e 1440 e onde a densidade completa volta a ser confortavel.
+ */
+export const ECRA = {
+  /** Abaixo disto e telemovel: tudo empilha e os modais viram folhas. */
+  movel: 680,
+  /** Abaixo disto a barra lateral e uma gaveta, nao uma coluna. */
+  tablet: 1024,
+  /** A partir daqui cabe a densidade completa das tabelas. */
+  largo: 1440,
+} as const;
+
+export type FaixaEcra = 'movel' | 'tablet' | 'amplo';
+
 export const LARGURA = {
   sidebar: 236,
   /** Menu recolhido: so os icones, com alvo de toque a manter-se confortavel. */
   sidebarRecolhida: 64,
   cabecalho: 64,
-  /**
-   * Largura minima da aplicacao em ambiente de trabalho.
-   * Desceu de 1440 para 1180 quando o menu passou a recolher: recolher tem de comprar espaco
-   * real, e nao apenas deslocar a barra de deslocamento horizontal.
-   */
-  minima: 1180,
   conteudoMax: 1320,
   /** Coluna de nomes no roteiro. */
   roteiroNomes: 232,
 } as const;
+
+/**
+ * Os alvos de toque nao tem token.
+ *
+ * A altura minima de 44px e aplicada em `styles.css`, sob `@media (pointer: coarse)`, e nao aqui:
+ * depende do tipo de ponteiro e nao da largura, e resolvida em CSS nao obriga a re-renderizar
+ * nada quando alguem liga um rato a um tablet.
+ */
 
 /**
  * A unica sombra do sistema, e so nos tres sitios onde o design a admite:

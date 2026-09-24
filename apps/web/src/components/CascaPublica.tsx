@@ -45,8 +45,8 @@ export function CascaPublica({
 
         <div style={{ marginTop: 'auto', maxWidth: '34ch' }}>
           <p
-            className="vn-display"
-            style={{ margin: 0, fontSize: 27, lineHeight: 1.35, color: COR.branco }}
+            className="vn-display vn-display-citacao"
+            style={{ margin: 0, lineHeight: 1.35, color: COR.branco }}
           >
             {citacao}
           </p>

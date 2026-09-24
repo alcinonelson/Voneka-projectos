@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import * as Dialog from '@radix-ui/react-dialog';
 import { NavLink } from 'react-router-dom';
 import { NIVEL_ACESSO } from '@nexora/shared';
 import { useSessao } from '../lib/auth';
@@ -6,6 +7,7 @@ import { useNotificacoes, useTarefas } from '../lib/queries';
 import { COR, FONTE, LARGURA, MARCA, PESO, RAIO, numerico, textoTruncado } from '../design/tokens';
 import { Avatar, Marca, MarcaCompleta } from './base';
 import { Icone, type NomeIcone } from './icones';
+import { useNavegacao } from './Layout';
 import { InboxAvisos } from './InboxAvisos';
 import { ModalPassword } from './ModalPassword';
 
@@ -64,6 +66,7 @@ function lerRecolhido(): boolean {
 
 export function Sidebar() {
   const { utilizador, empresa, ehDireccao, ehAdministrador, sair } = useSessao();
+  const { emGaveta, gavetaAberta, fecharGaveta } = useNavegacao();
 
   const { data: atrasadas } = useTarefas('atrasadas', !ehDireccao);
   const { data: minhas } = useTarefas('abertas', true);
@@ -143,34 +146,38 @@ export function Sidebar() {
         },
       ];
 
-  const largura = recolhido ? LARGURA.sidebarRecolhida : LARGURA.sidebar;
+  // Na gaveta o menu abre sempre por extenso: quem a abriu quer ler os nomes, e nao ha aqui
+  // largura a poupar - a gaveta esta por cima do conteudo, nao ao lado dele.
+  const compacto = recolhido && !emGaveta;
+  const largura = emGaveta ? 280 : compacto ? LARGURA.sidebarRecolhida : LARGURA.sidebar;
 
-  return (
+  const conteudo = (
     <aside
       style={{
         width: largura,
         flex: `0 0 ${largura}px`,
         background: MARCA.verdeEscuro,
         color: COR.branco,
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         transition: 'width .16s ease',
       }}
     >
-      <div style={{ padding: recolhido ? '16px 8px 12px' : '16px 14px 12px' }}>
+      <div style={{ padding: compacto ? '16px 8px 12px' : '16px 14px 12px' }}>
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: recolhido ? 'center' : 'flex-start',
-            padding: recolhido ? '6px 0' : '8px 10px',
+            justifyContent: compacto ? 'center' : 'flex-start',
+            padding: compacto ? '6px 0' : '8px 10px',
             border: `1px solid rgba(255,255,255,.10)`,
             borderRadius: RAIO.medio,
             background: 'rgba(255,255,255,.04)',
           }}
-          title={recolhido ? `Voneka Projectos · ${empresa?.nome ?? ''}` : undefined}
+          title={compacto ? `Voneka Projectos · ${empresa?.nome ?? ''}` : undefined}
         >
-          {recolhido ? (
+          {compacto ? (
             <Marca tamanho={26} tom="claro" />
           ) : (
             <MarcaCompleta tamanho={28} tom="claro" empresa={empresa?.nome ?? null} />
@@ -178,10 +185,10 @@ export function Sidebar() {
         </div>
       </div>
 
-      <nav style={{ flex: 1, overflowY: 'auto', padding: recolhido ? '0 8px 12px' : '0 10px 12px' }}>
+      <nav style={{ flex: 1, overflowY: 'auto', padding: compacto ? '0 8px 12px' : '0 10px 12px' }}>
         {grupos.map((grupo) => (
           <div key={grupo.titulo}>
-            {recolhido ? (
+            {compacto ? (
               <div
                 aria-hidden="true"
                 style={{ height: 1, background: 'rgba(255,255,255,.10)', margin: '14px 6px 10px' }}
@@ -214,8 +221,8 @@ export function Sidebar() {
                 to={item.para}
                 // Recolhido, o rotulo sai do ecra mas nao do acesso: fica no titulo, que o rato
                 // mostra, e no nome acessivel, que o leitor de ecra anuncia.
-                title={recolhido ? item.rotulo : undefined}
-                aria-label={recolhido ? item.rotulo : undefined}
+                title={compacto ? item.rotulo : undefined}
+                aria-label={compacto ? item.rotulo : undefined}
                 style={({ isActive }) => ({
                   position: 'relative',
                   display: 'flex',
@@ -223,8 +230,8 @@ export function Sidebar() {
                   gap: 11,
                   height: 38,
                   marginBottom: 2,
-                  padding: recolhido ? 0 : '0 10px',
-                  justifyContent: recolhido ? 'center' : 'flex-start',
+                  padding: compacto ? 0 : '0 10px',
+                  justifyContent: compacto ? 'center' : 'flex-start',
                   borderRadius: RAIO.campo,
                   fontSize: FONTE.base,
                   textDecoration: 'none',
@@ -241,7 +248,7 @@ export function Sidebar() {
                         aria-hidden="true"
                         style={{
                           position: 'absolute',
-                          left: recolhido ? 2 : 0,
+                          left: compacto ? 2 : 0,
                           top: 8,
                           bottom: 8,
                           width: 3,
@@ -255,10 +262,10 @@ export function Sidebar() {
                       <Icone nome={item.icone} tamanho={18} />
                     </span>
 
-                    {recolhido ? null : <span style={{ flex: 1 }}>{item.rotulo}</span>}
+                    {compacto ? null : <span style={{ flex: 1 }}>{item.rotulo}</span>}
 
                     {item.distintivo ? (
-                      recolhido ? (
+                      compacto ? (
                         // Recolhido nao cabe o numero; fica um ponto, e o rotulo acessivel diz
                         // quantas sao - antes era um <span> vazio, que nao dizia nada a ninguem.
                         <span
@@ -304,21 +311,22 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <div style={{ borderTop: `1px solid rgba(255,255,255,.10)`, padding: recolhido ? '8px' : '8px 12px' }}>
-        <InboxAvisos recolhido={recolhido} />
+      <div style={{ borderTop: `1px solid rgba(255,255,255,.10)`, padding: compacto ? '8px' : '8px 12px' }}>
+        <InboxAvisos recolhido={compacto} />
+        {emGaveta ? null : (
         <button
           type="button"
           onClick={alternar}
-          aria-expanded={!recolhido}
-          title={recolhido ? 'Mostrar o menu' : 'Recolher o menu'}
+          aria-expanded={!compacto}
+          title={compacto ? 'Mostrar o menu' : 'Recolher o menu'}
           style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: recolhido ? 'center' : 'flex-start',
+            justifyContent: compacto ? 'center' : 'flex-start',
             gap: 11,
             width: '100%',
             height: 32,
-            padding: recolhido ? 0 : '0 10px',
+            padding: compacto ? 0 : '0 10px',
             border: 'none',
             background: 'transparent',
             borderRadius: RAIO.campo,
@@ -328,23 +336,24 @@ export function Sidebar() {
             cursor: 'pointer',
           }}
         >
-          <Icone nome={recolhido ? 'expandir' : 'recolher'} tamanho={18} />
-          {recolhido ? null : <span>Recolher menu</span>}
+          <Icone nome={compacto ? 'expandir' : 'recolher'} tamanho={18} />
+          {compacto ? null : <span>Recolher menu</span>}
         </button>
+        )}
       </div>
 
       <div
         style={{
           borderTop: `1px solid rgba(255,255,255,.10)`,
-          padding: recolhido ? '12px 8px' : '12px 14px',
+          padding: compacto ? '12px 8px' : '12px 14px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: recolhido ? 'center' : 'flex-start',
+          justifyContent: compacto ? 'center' : 'flex-start',
           gap: 10,
         }}
       >
         <Avatar nome={utilizador?.nome ?? ''} />
-        {recolhido ? null : (
+        {compacto ? null : (
           <>
             <button
               type="button"
@@ -407,5 +416,36 @@ export function Sidebar() {
 
       <ModalPassword aberto={passwordAberto} onFechar={() => setPasswordAberto(false)} />
     </aside>
+  );
+
+  if (!emGaveta) return conteudo;
+
+  return (
+    <Dialog.Root open={gavetaAberta} onOpenChange={(v) => !v && fecharGaveta()}>
+      <Dialog.Portal>
+        <Dialog.Overlay
+          style={{ position: 'fixed', inset: 0, background: 'rgba(14,46,35,.44)', animation: 'nx-fade .16s ease' }}
+        />
+        <Dialog.Content
+          aria-label="Menu"
+          style={{
+            position: 'fixed',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            width: 280,
+            maxWidth: '86vw',
+            outline: 'none',
+            animation: 'vn-gaveta .2s cubic-bezier(.22,.61,.36,1)',
+            paddingLeft: 'env(safe-area-inset-left)',
+          }}
+        >
+          <Dialog.Title style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>
+            Menu de navegação
+          </Dialog.Title>
+          {conteudo}
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }

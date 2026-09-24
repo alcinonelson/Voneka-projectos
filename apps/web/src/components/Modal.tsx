@@ -1,5 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import type { ReactNode } from 'react';
+import { useEhMovel } from '../lib/ecra';
 import { COR, ESPACO, FONTE,
   MARCA, PESO, RAIO, SOMBRA, botaoPrincipal, botaoSecundario } from '../design/tokens';
 
@@ -9,6 +10,11 @@ import { COR, ESPACO, FONTE,
  * O Radix entra apenas pelo comportamento - foco preso dentro do dialogo, Esc a fechar, atributos
  * ARIA, deslocamento da pagina travado por baixo. Nao traz um pixel de estilo: a aparencia
  * continua a ser a do design, escrita aqui.
+ *
+ * Em telemovel o modal deixa de ser uma caixa centrada e passa a folha ancorada em baixo, com a
+ * largura toda. Nao e moda: um modal centrado num telemovel fica preso por cima do teclado
+ * virtual assim que se toca num campo, e o rodape com o botao de gravar sai do ecra. Ancorado em
+ * baixo, o conteudo sobe com o teclado e a accao continua alcancavel com o polegar.
  */
 
 const sobreposicao = {
@@ -64,29 +70,49 @@ export function Modal({
   accaoAnterior?: { rotulo: string; onClick: () => void };
   passos?: PassosModal;
 }) {
+  const movel = useEhMovel();
+
   return (
     <Dialog.Root open={aberto} onOpenChange={(v) => !v && onFechar()}>
       <Dialog.Portal>
         <Dialog.Overlay style={sobreposicao} />
         <Dialog.Content
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: largura,
-            maxWidth: 'calc(100vw - 48px)',
-            maxHeight: 'calc(100vh - 64px)',
-            display: 'flex',
-            flexDirection: 'column',
-            background: COR.branco,
-            borderRadius: RAIO.cartao,
-            boxShadow: SOMBRA.modal,
-            animation: 'nx-modal .18s ease',
-            outline: 'none',
-          }}
+          style={
+            movel
+              ? {
+                  position: 'fixed',
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  maxHeight: '92dvh',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  background: COR.branco,
+                  borderRadius: `${RAIO.cartao}px ${RAIO.cartao}px 0 0`,
+                  boxShadow: SOMBRA.modal,
+                  animation: 'vn-folha .22s cubic-bezier(.22,.61,.36,1)',
+                  outline: 'none',
+                  paddingBottom: 'env(safe-area-inset-bottom)',
+                }
+              : {
+                  position: 'fixed',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: largura,
+                  maxWidth: 'calc(100vw - 48px)',
+                  maxHeight: 'calc(100vh - 64px)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  background: COR.branco,
+                  borderRadius: RAIO.cartao,
+                  boxShadow: SOMBRA.modal,
+                  animation: 'nx-modal .18s ease',
+                  outline: 'none',
+                }
+          }
         >
-          <div style={{ padding: `20px ${ESPACO.pagina}px 16px`, borderBottom: `1px solid ${COR.borda}` }}>
+          <div className="vn-modal-topo" style={{ borderBottom: `1px solid ${COR.borda}` }}>
             <Dialog.Title
               style={{ fontSize: FONTE.titulo, fontWeight: PESO.forte, letterSpacing: '-0.01em', margin: 0 }}
             >
@@ -104,6 +130,8 @@ export function Modal({
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
+                  rowGap: 6,
+                  flexWrap: 'wrap',
                   listStyle: 'none',
                   margin: '14px 0 0',
                   padding: 0,
@@ -152,15 +180,17 @@ export function Modal({
             ) : null}
           </div>
 
-          <div style={{ flex: 1, overflowY: 'auto', padding: `20px ${ESPACO.pagina}px` }}>{children}</div>
+          <div className="vn-modal-corpo" style={{ flex: 1, overflowY: 'auto' }}>
+            {children}
+          </div>
 
           {accao ? (
             <div
+              className="vn-modal-rodape"
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
-                padding: `14px ${ESPACO.pagina}px`,
                 borderTop: `1px solid ${COR.borda}`,
               }}
             >
@@ -215,6 +245,8 @@ export function Gaveta({
   children: ReactNode;
   largura?: number;
 }) {
+  const movelGaveta = useEhMovel();
+
   return (
     <Dialog.Root open={aberta} onOpenChange={(v) => !v && onFechar()}>
       <Dialog.Portal>
@@ -227,7 +259,7 @@ export function Gaveta({
             right: 0,
             bottom: 0,
             width: largura,
-            maxWidth: 'calc(100vw - 80px)',
+            maxWidth: movelGaveta ? '100vw' : 'calc(100vw - 80px)',
             background: COR.fundo,
             boxShadow: SOMBRA.gaveta,
             animation: 'nx-drawer .2s ease',

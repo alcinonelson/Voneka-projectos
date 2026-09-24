@@ -185,7 +185,7 @@ export function ModalMembro({
         aCarregar: criar.isPending || actualizar.isPending,
       }}
     >
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 18 }}>
+      <div className="vn-campos vn-campos-2" style={{ marginBottom: 18 }}>
         <div>
           <label style={rotuloCampo} htmlFor="mb-nome">
             Nome completo
@@ -221,7 +221,7 @@ export function ModalMembro({
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 18 }}>
+      <div className="vn-campos vn-campos-3" style={{ marginBottom: 18 }}>
         <div>
           <label style={rotuloCampo} htmlFor="mb-funcao">
             Função
@@ -257,7 +257,7 @@ export function ModalMembro({
         />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 18 }}>
+      <div className="vn-campos vn-campos-2" style={{ marginBottom: 18 }}>
         <div>
           <span style={rotuloCampo}>Departamento</span>
           {departamentos?.length ? (

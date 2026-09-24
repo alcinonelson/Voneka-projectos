@@ -233,7 +233,7 @@ export function ModalTarefa({
 
       {passo === 1 ? (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+          <div className="vn-campos vn-campos-2" style={{ marginBottom: 20 }}>
             <div>
               <label style={rotuloCampo} htmlFor="tarefa-projecto">
                 Em que projecto
@@ -276,7 +276,7 @@ export function ModalTarefa({
 
           <div>
             <span style={rotuloCampo}>Quem vai fazer isto</span>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div className="vn-campos vn-campos-2" style={{ gap: 8 }}>
               {pessoas?.map((p) => {
                 const activo = responsavelId === p.id;
                 const carga = leituraCarga(p.tarefasAbertas);
@@ -325,7 +325,7 @@ export function ModalTarefa({
 
       {passo === 2 ? (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+          <div className="vn-campos vn-campos-2" style={{ marginBottom: 20 }}>
             <CampoData
               id="tarefa-data"
               rotulo="Até quando"
@@ -375,7 +375,7 @@ export function ModalTarefa({
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+          <div className="vn-campos vn-campos-2" style={{ marginBottom: 20 }}>
             <div>
               <span style={rotuloCampo}>Prioridade</span>
               <div style={{ display: 'flex', gap: 6 }}>

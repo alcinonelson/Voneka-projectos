@@ -157,7 +157,7 @@ export function Arranque() {
               Isto é o que vai aparecer no menu, nos emails de aviso e no cabeçalho dos relatórios.
             </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px', gap: 16, marginBottom: 20 }}>
+            <div className="vn-campos vn-campos-empresa" style={{ marginBottom: 20 }}>
               <div>
                 <label style={rotuloCampo} htmlFor="ar-nome">
                   Nome da empresa

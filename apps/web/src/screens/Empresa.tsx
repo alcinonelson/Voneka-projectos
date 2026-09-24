@@ -97,7 +97,7 @@ export function Empresa() {
       ) : null}
 
       <section style={{ ...cartao, padding: 24 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 110px 90px', gap: 16, marginBottom: 20 }}>
+        <div className="vn-campos vn-campos-empresa" style={{ marginBottom: 20 }}>
           <div>
             <label style={rotuloCampo} htmlFor="emp-nome">
               Nome da empresa

@@ -318,10 +318,13 @@ select:focus {
     border-color 0.18s ease;
 }
 
-.vn-cartao:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 28px -14px rgba(14, 46, 35, 0.28);
-  border-color: #cfe3d3;
+/* So quem tem rato ve estados de rato: no toque ficariam colados depois do toque. */
+@media (hover: hover) {
+  .vn-cartao:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px -14px rgba(14, 46, 35, 0.28);
+    border-color: #cfe3d3;
+  }
 }
 
 /* Botoes da pagina publica. */
@@ -332,9 +335,11 @@ select:focus {
     background 0.14s ease;
 }
 
-.vn-botao:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 18px -10px rgba(14, 46, 35, 0.5);
+@media (hover: hover) {
+  .vn-botao:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px -10px rgba(14, 46, 35, 0.5);
+  }
 }
 
 .vn-botao:active {
@@ -348,12 +353,281 @@ select:focus {
   touch-action: none;
 }
 
-.vn-fase:hover {
-  filter: brightness(1.06);
+@media (hover: hover) {
+  .vn-fase:hover {
+    filter: brightness(1.06);
+  }
 }
 
 .vn-fase[data-arrastar='sim'] {
   cursor: grabbing;
   filter: brightness(1.1);
   box-shadow: 0 6px 16px rgba(14, 46, 35, 0.28);
+}
+
+/* ---------------------------------------------------------------------------
+ * Responsividade da aplicacao.
+ *
+ * As faixas sao as de design/tokens.ts: 680 telemovel, 1024 tablet, 1440 amplo.
+ * Aqui vive o que o CSS resolve melhor do que o JavaScript - espacamento,
+ * tipografia e o numero de colunas de uma grelha. O que exige trocar de
+ * componente ou de estrutura de dados fica no hook useFaixaEcra.
+ * ------------------------------------------------------------------------- */
+
+.vn-cabecalho {
+  min-height: 64px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.vn-titulo-pagina {
+  font-size: 16px;
+}
+
+.vn-accoes-pagina {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
+.vn-conteudo {
+  padding: 24px 28px 48px;
+}
+
+/* Grelha generica de cartoes: enche a largura com colunas que nunca ficam
+ * estreitas demais para o que levam dentro. */
+.vn-grelha-cartoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 14px;
+}
+
+/* Uma tabela que tem mesmo de ser tabela desliza sozinha, dentro do seu cartao,
+ * em vez de arrastar a pagina inteira com ela. */
+.vn-tabela-rolavel {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 1023px) {
+  .vn-conteudo {
+    padding: 18px 18px 40px;
+  }
+
+  .vn-cabecalho {
+    flex-wrap: wrap;
+    row-gap: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  /* As accoes passam para uma segunda linha, com largura inteira: um titulo e
+   * dois botoes na mesma linha nao cabem, e o que cede primeiro e o titulo. */
+  .vn-accoes-pagina {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .vn-accoes-pagina > button {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 679px) {
+  .vn-conteudo {
+    padding: 14px 14px 36px;
+  }
+
+  .vn-titulo-pagina {
+    font-size: 15px;
+  }
+}
+
+/*
+ * Alvos de toque.
+ *
+ * Aplicado por tipo de ponteiro e nao por largura: um portatil com ecra tactil
+ * tem dedos e muita largura, e um rato num ecra pequeno continua a ser preciso.
+ * A densidade com rato fica intacta.
+ */
+@media (pointer: coarse) {
+  .vn-alvo,
+  button,
+  [role='button'],
+  input:not([type='checkbox']):not([type='radio']),
+  select,
+  a.vn-botao {
+    min-height: 44px;
+  }
+
+  /* O que e so um icone fica quadrado, para o alvo nao ser uma tira fina. */
+  .vn-alvo-icone {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* Tipografia fluida das paginas publicas: cresce com o ecra, sem saltos. */
+.vn-titulo-heroi {
+  font-size: clamp(30px, 6.4vw, 46px);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+
+.vn-titulo-seccao {
+  font-size: clamp(22px, 3.6vw, 34px);
+}
+
+.vn-display-citacao {
+  font-size: clamp(19px, 2.4vw, 27px);
+}
+
+.vn-relatorio-texto {
+  font-size: clamp(17px, 2vw, 21px);
+}
+
+/* A tabela de acessos da landing: era um estilo inline, que vencia a media
+ * query por especificidade e a mantinha a tres colunas ate aos 320px. */
+.vn-acessos {
+  display: grid;
+  grid-template-columns: minmax(0, 190px) minmax(0, 220px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: baseline;
+}
+
+@media (max-width: 900px) {
+  .vn-acessos {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+}
+
+/* O cabecalho da landing envolve em vez de espremer os dois CTAs. */
+@media (max-width: 560px) {
+  .vn-cabecalho-publico {
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+
+  .vn-cabecalho-publico nav {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+
+  .vn-cabecalho-publico nav > a {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* A gaveta do menu entra pela esquerda. */
+@keyframes vn-gaveta {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* Modal: caixa centrada com rato, folha ancorada em baixo no telemovel. */
+@keyframes vn-folha {
+  from {
+    transform: translateY(14px);
+    opacity: 0.6;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.vn-modal-topo {
+  padding: 20px 28px 16px;
+}
+
+.vn-modal-corpo {
+  padding: 20px 28px;
+}
+
+.vn-modal-rodape {
+  padding: 14px 28px;
+}
+
+/*
+ * Grelha de campos de formulario. Duas ou tres colunas com espaco, uma sem ele.
+ * E uma classe e nao um selector de atributo de proposito: um `[style*=grid]`
+ * apanharia tambem as linhas do editor de fases, que tem de continuar horizontais.
+ */
+.vn-campos {
+  display: grid;
+  gap: 16px;
+}
+
+.vn-campos-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.vn-campos-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 679px) {
+  .vn-campos-2,
+  .vn-campos-3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .vn-modal-topo {
+    padding: 16px 18px 14px;
+  }
+
+  .vn-modal-corpo {
+    padding: 16px 18px;
+  }
+
+  /* O rodape empilha: a nota em cima, os botoes com largura inteira por baixo,
+   * ao alcance do polegar. */
+  .vn-modal-rodape {
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    gap: 10px;
+  }
+
+  .vn-modal-rodape > span {
+    flex: 1 0 100%;
+  }
+
+  .vn-modal-rodape > button {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* Nome longo com campos curtos ao lado: moeda, iniciais, largura. */
+.vn-campos-empresa {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 110px) minmax(0, 90px);
+}
+
+/* Relatorios: o feed e a tipologia ao lado; empilhados quando nao ha largura. */
+.vn-relatorios {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 300px);
+  gap: 20px;
+}
+
+@media (max-width: 1023px) {
+  .vn-campos-empresa,
+  .vn-relatorios {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Barras do roteiro: o arrasto nao pode competir com o deslize da pagina. */
+.vn-barra-fase {
+  touch-action: none;
 }

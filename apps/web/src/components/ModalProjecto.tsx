@@ -201,7 +201,7 @@ export function ModalProjecto({ aberto, onFechar }: { aberto: boolean; onFechar:
     >
       {passo === 0 ? (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 18 }}>
+          <div className="vn-campos vn-campos-2" style={{ marginBottom: 18 }}>
             <div>
               <label style={rotuloCampo} htmlFor="np-nome">
                 Nome do projecto
@@ -315,7 +315,7 @@ export function ModalProjecto({ aberto, onFechar }: { aberto: boolean; onFechar:
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 18 }}>
+          <div className="vn-campos vn-campos-3" style={{ marginBottom: 18 }}>
             <CampoData
               id="np-inicio"
               rotulo="Quando arranca"

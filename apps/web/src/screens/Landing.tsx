@@ -214,8 +214,8 @@ function CartaoRelatorio() {
       </div>
 
       <blockquote
-        className="vn-display"
-        style={{ margin: 0, fontSize: 21, lineHeight: 1.5, color: COR.tinta, letterSpacing: 0 }}
+        className="vn-display vn-relatorio-texto"
+        style={{ margin: 0, lineHeight: 1.5, color: COR.tinta, letterSpacing: 0 }}
       >
         {linhas.map((linha, i) => (
           <p
@@ -268,6 +268,7 @@ export function Landing() {
             alignItems: 'center',
             gap: 16,
           }}
+          className="vn-cabecalho-publico"
         >
           <MarcaCompleta tamanho={30} />
           <nav style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -286,18 +287,10 @@ export function Landing() {
             <div>
               <Rotulo>O follow-up à Direcção</Rotulo>
               <h1
-                style={{
-                  margin: 0,
-                  fontSize: 46,
-                  lineHeight: 1.1,
-                  letterSpacing: '-0.03em',
-                  fontWeight: PESO.forte,
-                  color: COR.tinta,
-                }}
+                className="vn-titulo-heroi"
+                style={{ margin: 0, fontWeight: PESO.forte, color: COR.tinta, textWrap: 'balance' }}
               >
-                Um projecto não avança
-                <br />
-                porque alguém escreveu{' '}
+                Um projecto não avança porque alguém escreveu{' '}
                 <span style={{ color: MARCA.verdeTexto }}>70%</span>.
               </h1>
               <p
@@ -393,7 +386,6 @@ export function Landing() {
                 <h2
                   style={{
                     margin: 0,
-                    fontSize: 27,
                     fontWeight: PESO.forte,
                     letterSpacing: '-0.02em',
                     color: COR.tinta,
@@ -480,11 +472,8 @@ export function Landing() {
               {NIVEIS.map((n, i) => (
                 <div
                   key={n.nome}
-                  className="vn-tres"
+                  className="vn-acessos"
                   style={{
-                    gridTemplateColumns: 'minmax(0,190px) minmax(0,220px) minmax(0,1fr)',
-                    gap: 20,
-                    alignItems: 'baseline',
                     padding: '18px 20px',
                     borderTop: i === 0 ? 'none' : `1px solid ${COR.linha}`,
                   }}
@@ -565,8 +554,8 @@ export function Landing() {
         >
           <Revelar>
             <h2
-              className="vn-display"
-              style={{ margin: 0, fontSize: 34, color: COR.tinta, letterSpacing: '-0.01em' }}
+              className="vn-display vn-titulo-seccao"
+              style={{ margin: 0, color: COR.tinta, letterSpacing: '-0.01em' }}
             >
               Comece por criar a sua empresa.
             </h2>
