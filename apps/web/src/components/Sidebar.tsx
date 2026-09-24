@@ -1,58 +1,35 @@
 import { useCallback, useEffect, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { NIVEL_ACESSO } from '@nexora/shared';
 import { useSessao } from '../lib/auth';
-import { useNotificacoes, useTarefas } from '../lib/queries';
+import { useDestinos } from '../lib/navegacao';
 import { COR, FONTE, LARGURA, MARCA, PESO, RAIO, SOMBRA, numerico, textoTruncado } from '../design/tokens';
 import { Avatar, Marca, MarcaCompleta } from './base';
-import { Icone, type NomeIcone } from './icones';
+import { Icone } from './icones';
 import { useNavegacao } from './Layout';
+import { CAMADA_DIALOGO } from './Modal';
 import { ModalPassword } from './ModalPassword';
 
 /**
  * Navegacao lateral.
  *
- * Cada nivel de acesso tem a sua navegacao, e nao a mesma navegacao com itens escondidos. A
- * diferenca nao e cosmetica: o colaborador nao tem uma versao reduzida da carteira, tem outro
- * trabalho - as suas tarefas, os seus projectos, os seus relatorios.
+ * Os destinos vem de `lib/navegacao.ts`, partilhados com a barra inferior do telemovel.
  *
  * Nao ha "Ver como". Um Administrador via no seu proprio menu a vertente de Colaborador, que nao
  * e dele: ou se responde por carteira, ou se executa.
  *
- * **Fundo escuro, na cor da casa.** Faz tres coisas de uma vez: veste a identidade Voneka, da ao
- * portal a cor que lhe faltava, e resolve o motivo por que os icones nao se viam recolhidos - um
- * traco branco sobre `#0E2E23` da 14.65:1, contra os 2.1:1 do cinzento claro sobre branco que
- * aqui estava.
+ * **Fundo escuro, na cor da casa.** Veste a identidade Voneka e resolve o motivo por que os
+ * icones nao se viam recolhidos - um traco branco sobre `#0E2E23` da 14.65:1.
  *
- * Cada grupo tem o seu acento, o mesmo que o Painel usa nos titulos de seccao, para o menu e o
- * conteudo falarem a mesma lingua.
+ * **Por faixa de ecra:**
+ * - amplo: coluna fixa, recolhivel pelo botao na fronteira; a preferencia fica guardada.
+ * - tablet: sempre em icones, para o conteudo ter a largura toda. Expandir abre o menu por cima
+ *   do conteudo, com um veu que o fecha; escolher um destino fecha-o tambem.
+ * - movel: gaveta completa, aberta pelo "Mais" da barra inferior.
  */
 
 const CHAVE_RECOLHIDO = 'voneka.sidebar.recolhido';
-
-/** Acentos por grupo, escolhidos pelo contraste sobre o fundo escuro. */
-const ACENTO = {
-  carteira: MARCA.verde,
-  execucao: COR.ambarVivo,
-  /** O violeta normal daria 3.24:1 sobre o fundo escuro; esta variante clara chega a 6.2:1. */
-  empresa: '#C3B5FD',
-  trabalho: MARCA.verde,
-} as const;
-
-interface Item {
-  para: string;
-  rotulo: string;
-  icone: NomeIcone;
-  distintivo?: number;
-  alarme?: boolean;
-}
-
-interface Grupo {
-  titulo: string;
-  acento: string;
-  itens: Item[];
-}
 
 /** Le a preferencia sem rebentar quando o armazenamento esta fechado (janela privada, politica). */
 function lerRecolhido(): boolean {
@@ -64,15 +41,16 @@ function lerRecolhido(): boolean {
 }
 
 export function Sidebar() {
-  const { utilizador, empresa, ehDireccao, ehAdministrador, sair } = useSessao();
-  const { emGaveta, gavetaAberta, fecharGaveta } = useNavegacao();
-
-  const { data: atrasadas } = useTarefas('atrasadas', !ehDireccao);
-  const { data: minhas } = useTarefas('abertas', true);
-  const { data: avisos } = useNotificacoes();
+  const { utilizador, empresa, sair } = useSessao();
+  const { faixa, emGaveta, gavetaAberta, fecharGaveta } = useNavegacao();
+  const { grupos } = useDestinos();
+  const local = useLocation();
 
   const [recolhido, setRecolhido] = useState(lerRecolhido);
+  const [expandidoTablet, setExpandidoTablet] = useState(false);
   const [passwordAberto, setPasswordAberto] = useState(false);
+
+  const emTablet = faixa === 'tablet';
 
   useEffect(() => {
     try {
@@ -82,83 +60,31 @@ export function Sidebar() {
     }
   }, [recolhido]);
 
-  const alternar = useCallback(() => setRecolhido((v) => !v), []);
+  // No tablet o menu aberto esta por cima do conteudo: escolher um destino fecha-o.
+  useEffect(() => {
+    setExpandidoTablet(false);
+  }, [local.pathname, faixa]);
 
-  const grupos: Grupo[] = ehDireccao
-    ? [
-        {
-          titulo: 'Carteira',
-          acento: ACENTO.carteira,
-          itens: [
-            { para: '/painel', rotulo: 'Painel', icone: 'painel' },
-            { para: '/projectos', rotulo: 'Projectos', icone: 'projectos' },
-            { para: '/roteiro', rotulo: 'Roteiro', icone: 'roteiro' },
-          ],
-        },
-        {
-          titulo: 'Execução',
-          acento: ACENTO.execucao,
-          itens: [
-            {
-              para: '/tarefas',
-              rotulo: 'Tarefas',
-              icone: 'tarefas',
-              distintivo: atrasadas?.length,
-              alarme: true,
-            },
-            { para: '/relatorios', rotulo: 'Relatórios', icone: 'relatorios' },
-            { para: '/avisos', rotulo: 'Avisos', icone: 'avisos', distintivo: avisos?.porLer },
-          ],
-        },
-        ...(ehAdministrador
-          ? [
-              {
-                titulo: 'Empresa',
-                acento: ACENTO.empresa,
-                itens: [
-                  { para: '/equipa', rotulo: 'Equipa e acessos', icone: 'equipa' as NomeIcone },
-                  { para: '/vocabulario', rotulo: 'Vocabulário', icone: 'vocabulario' as NomeIcone },
-                  { para: '/empresa', rotulo: 'Dados da empresa', icone: 'empresa' as NomeIcone },
-                ],
-              },
-            ]
-          : []),
-      ]
-    : [
-        {
-          titulo: 'O meu trabalho',
-          acento: ACENTO.trabalho,
-          itens: [
-            {
-              para: '/minhas-tarefas',
-              rotulo: 'As minhas tarefas',
-              icone: 'tarefas',
-              distintivo: minhas?.length,
-            },
-            { para: '/meus-projectos', rotulo: 'Os meus projectos', icone: 'projectos' },
-            { para: '/meus-relatorios', rotulo: 'Os meus relatórios', icone: 'relatorios' },
-            { para: '/avisos', rotulo: 'Avisos', icone: 'avisos', distintivo: avisos?.porLer },
-          ],
-        },
-        {
-          titulo: 'Equipa',
-          acento: ACENTO.carteira,
-          itens: [{ para: '/roteiro', rotulo: 'Roteiro', icone: 'roteiro' }],
-        },
-      ];
+  const alternar = useCallback(() => {
+    if (emTablet) setExpandidoTablet((v) => !v);
+    else setRecolhido((v) => !v);
+  }, [emTablet]);
 
-  // Na gaveta o menu abre sempre por extenso: quem a abriu quer ler os nomes, e nao ha aqui
-  // largura a poupar - a gaveta esta por cima do conteudo, nao ao lado dele.
-  const compacto = recolhido && !emGaveta;
+  // Na gaveta o menu abre sempre por extenso: quem a abriu quer ler os nomes.
+  const compacto = emGaveta ? false : emTablet ? !expandidoTablet : recolhido;
   const largura = emGaveta ? 280 : compacto ? LARGURA.sidebarRecolhida : LARGURA.sidebar;
+  const sobreposto = emTablet && expandidoTablet;
 
   const conteudo = (
     <aside
       style={{
         // Relativo e acima do conteudo: o botao de recolher assenta na fronteira e tem de ficar
         // por cima da metade que invade o cabecalho da pagina.
-        position: 'relative',
-        zIndex: 2,
+        position: sobreposto ? 'absolute' : 'relative',
+        top: 0,
+        left: 0,
+        bottom: 0,
+        zIndex: sobreposto ? 40 : 2,
         width: largura,
         flex: `0 0 ${largura}px`,
         background: MARCA.verdeEscuro,
@@ -167,6 +93,7 @@ export function Sidebar() {
         display: 'flex',
         flexDirection: 'column',
         transition: 'width .16s ease',
+        boxShadow: sobreposto ? '12px 0 32px rgba(14,46,35,.28)' : undefined,
       }}
     >
       {emGaveta ? null : (
@@ -261,7 +188,7 @@ export function Sidebar() {
               </div>
             )}
 
-            {grupo.itens.map((item) => (
+            {grupo.destinos.map((item) => (
               <NavLink
                 key={item.para}
                 to={item.para}
@@ -432,18 +359,48 @@ export function Sidebar() {
     </aside>
   );
 
+  if (emTablet) {
+    // O lugar da coluna em icones fica reservado; aberto, o menu passa por cima do conteudo.
+    return (
+      <div style={{ position: 'relative', flex: `0 0 ${LARGURA.sidebarRecolhida}px`, zIndex: 3 }}>
+        {conteudo}
+        {sobreposto ? (
+          <div
+            aria-hidden="true"
+            onClick={() => setExpandidoTablet(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              left: LARGURA.sidebar,
+              background: 'rgba(14,46,35,.28)',
+              zIndex: 39,
+              animation: 'nx-fade .16s ease',
+            }}
+          />
+        ) : null}
+      </div>
+    );
+  }
+
   if (!emGaveta) return conteudo;
 
   return (
     <Dialog.Root open={gavetaAberta} onOpenChange={(v) => !v && fecharGaveta()}>
       <Dialog.Portal>
         <Dialog.Overlay
-          style={{ position: 'fixed', inset: 0, background: 'rgba(14,46,35,.44)', animation: 'nx-fade .16s ease' }}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: CAMADA_DIALOGO,
+            background: 'rgba(14,46,35,.44)',
+            animation: 'nx-fade .16s ease',
+          }}
         />
         <Dialog.Content
           aria-label="Menu"
           style={{
             position: 'fixed',
+            zIndex: CAMADA_DIALOGO + 1,
             top: 0,
             bottom: 0,
             left: 0,

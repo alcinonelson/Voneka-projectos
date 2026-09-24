@@ -386,6 +386,7 @@ function LinhaVocabulario({
   return (
     <li
       ref={setNodeRef}
+      className="vn-entrada-vocab"
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -457,9 +458,9 @@ function LinhaVocabulario({
         </span>
       ) : null}
 
-      <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
+      <span className="vn-entrada-fim" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
         {emUso ? (
-          <span style={{ fontSize: FONTE.nota, color: COR.suave }}>
+          <span style={{ fontSize: FONTE.nota, color: COR.suave, whiteSpace: 'nowrap' }}>
             em uso em {emUso} registo{emUso === 1 ? '' : 's'}
           </span>
         ) : null}

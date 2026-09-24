@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import { ECRA, type FaixaEcra } from '../design/tokens';
 
 /**
@@ -78,4 +78,34 @@ export function usePonteiroGrosso(): boolean {
   }, []);
 
   return grosso;
+}
+
+/**
+ * A largura de um elemento, e nao da janela.
+ *
+ * Uma tabela nao sabe se tem o ecra todo: a 1024px com o menu aberto o conteudo tem os mesmos
+ * ~730px que um tablet em retrato. Decidir pela janela punha a tabela completa onde ela ja nao
+ * cabe. Decidir pelo contentor acerta nos dois casos, e acompanha o menu a abrir e a fechar.
+ *
+ * O valor inicial e a largura da janela, para a primeira pintura nao escolher o formato mais
+ * pequeno e saltar logo a seguir.
+ */
+export function useLarguraDe<T extends HTMLElement>(): [RefObject<T>, number] {
+  const ref = useRef<T>(null);
+  const [largura, setLargura] = useState(() => (typeof window === 'undefined' ? 1280 : window.innerWidth));
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    setLargura(el.clientWidth);
+    if (typeof ResizeObserver === 'undefined') return;
+    const observador = new ResizeObserver((entradas) => {
+      const entrada = entradas[0];
+      if (entrada) setLargura(Math.round(entrada.contentRect.width));
+    });
+    observador.observe(el);
+    return () => observador.disconnect();
+  }, []);
+
+  return [ref, largura];
 }

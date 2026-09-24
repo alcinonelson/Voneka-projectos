@@ -179,7 +179,7 @@ export function ModalRelatorio({
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: 16 }}>
+      <div className="vn-campos-horas">
         <div>
           <label style={rotuloCampo} htmlFor="horas">
             Esforço real

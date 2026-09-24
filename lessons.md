@@ -192,3 +192,23 @@ A `0001` foi escrita a mao e nao deixou `meta/0001_snapshot.json`. O `drizzle-ki
 seguinte comparou com a `0000` e voltou a criar as colunas da `0001`, o que falharia ao aplicar.
 Ler sempre o SQL gerado antes de o aceitar; ao escrever uma migracao a mao, gerar tambem o
 snapshot (ou gerar pela ferramenta e editar so o SQL).
+
+## Estilo em linha vence a media query
+Tres vezes na mesma ronda: o rodape do modal com `flex: 1` na nota, o cabecalho do cartao com
+`alignItems: 'center'`, a gaveta com `padding` em linha. A media query estava certa e nao fazia
+nada, porque o estilo em linha ganha a qualquer seletor. Regra: uma propriedade que muda com a
+largura do ecra vive na classe, nunca no `style`. O `!important` so como remendo documentado.
+
+## `z.coerce.boolean()` numa query string e um defeito a espera
+`Boolean('false')` e verdadeiro. `?minhas=false` devolvia so as tarefas de quem pedia, e a
+Direccao via "Tarefas" e "Relatorios" vazios sem erro nenhum. Booleanos de query usam
+`zBooleanoQuery`; e um ecra vazio numa conta com dados e sempre de verificar na API com curl.
+
+## O hash "falso" do login tem de ser um hash verdadeiro
+Um sal de zeros escrito a mao e invalido: o bcrypt recusa-o em 0ms, e o tempo de resposta passa
+a dizer quais os emails registados. O hash para contas inexistentes gera-se com o mesmo custo dos
+reais, e um teste mede a diferenca de tempo.
+
+## Decidir o formato pela janela engana com o menu aberto
+A 1024px com o menu lateral aberto o conteudo tem ~730px, a largura de um tablet. Tabelas e
+listas decidem o formato pela largura do proprio contentor (`useLarguraDe`), nao da janela.

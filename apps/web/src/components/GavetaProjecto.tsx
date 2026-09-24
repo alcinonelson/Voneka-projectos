@@ -6,7 +6,7 @@ import {
   dataCurta,
   formatarMetical,
 } from '@nexora/shared';
-import { COR, ESPACO, FONTE,
+import { COR, FONTE,
   MARCA, PESO, RAIO, botaoPrincipal, botaoSecundario, cartao, etiquetaMaiuscula, numerico, textoTruncado } from '../design/tokens';
 import { useProjecto } from '../lib/queries';
 import { Avatar, BarraAvanco, Carregando, Etiqueta, EtiquetaVocabulario, PastilhaAlerta, Ponto, Vazio } from './base';
@@ -46,7 +46,7 @@ export function GavetaProjecto({
             style={{
               background: COR.branco,
               borderBottom: `1px solid ${COR.borda}`,
-              padding: `20px ${ESPACO.pagina}px 18px`,
+              padding: `20px var(--vn-margem-gaveta) 18px`,
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
@@ -78,11 +78,13 @@ export function GavetaProjecto({
               {projecto.nome}
             </TituloGaveta>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 12 }}>
+            <div
+              style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', columnGap: 12, rowGap: 10, marginTop: 12 }}
+            >
               <span style={{ fontSize: FONTE.corpo, color: COR.textoSuave }}>{projecto.cliente}</span>
               <EtiquetaVocabulario valor={projecto.estagio} />
               <PastilhaAlerta alerta={alertaPrazo(projecto.deadline)} />
-              <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span className="vn-gaveta-avanco" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
                 <BarraAvanco pct={projecto.avancoPct} cor={corBarraAvanco(projecto.saude)} largura={120} />
                 <span style={{ fontSize: FONTE.media, fontWeight: PESO.forte, ...numerico }}>
                   {projecto.avancoPct}%
@@ -91,9 +93,9 @@ export function GavetaProjecto({
             </div>
           </header>
 
-          <div style={{ flex: 1, overflowY: 'auto', padding: `20px ${ESPACO.pagina}px 32px` }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '20px var(--vn-margem-gaveta) 32px' }}>
             {/* Factos */}
-            <div style={{ ...cartao, display: 'flex', padding: '16px 20px', marginBottom: 20 }}>
+            <div className="vn-factos" style={{ ...cartao, marginBottom: 20 }}>
               {[
                 { k: 'Deadline de entrega', v: dataCurta(projecto.deadline) },
                 {
@@ -106,7 +108,7 @@ export function GavetaProjecto({
                 { k: 'Pessoas alocadas', v: String(projecto.equipa.length) },
                 { k: 'Responsável', v: projecto.responsavel.nome },
               ].map((facto) => (
-                <div key={facto.k} style={{ flex: 1, minWidth: 0 }}>
+                <div key={facto.k} style={{ minWidth: 0 }}>
                   <div style={{ fontSize: FONTE.nota, color: COR.suave }}>{facto.k}</div>
                   <div
                     style={{

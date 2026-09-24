@@ -1,5 +1,5 @@
 import { SITUACAO, VALIDACAO, corSituacao, dataLonga } from '@nexora/shared';
-import { COR, ESPACO, FONTE, PESO, cartao, numerico } from '../design/tokens';
+import { COR, FONTE, PESO, cartao, numerico } from '../design/tokens';
 import { Carregando, Etiqueta, Vazio } from '../components/base';
 import { Pagina } from '../components/Layout';
 import { useRelatorios } from '../lib/queries';
@@ -32,7 +32,7 @@ export function MeusRelatorios() {
             const porValidar = r.validacao === 'a_espera';
 
             return (
-              <article key={r.id} style={{ ...cartao, padding: `18px ${ESPACO.cartao}px` }}>
+              <article key={r.id} className="vn-cartao-lista" style={cartao}>
                 <header style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                   <span style={{ flex: 1, minWidth: 0 }}>
                     <span style={{ display: 'block', fontSize: FONTE.linha, fontWeight: PESO.medio }}>
@@ -55,6 +55,8 @@ export function MeusRelatorios() {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
+                    flexWrap: 'wrap',
+                    rowGap: 6,
                     gap: 12,
                     paddingTop: 12,
                     borderTop: `1px solid ${COR.linha}`,

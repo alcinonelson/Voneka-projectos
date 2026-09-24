@@ -423,17 +423,11 @@ select:focus {
     padding-bottom: 10px;
   }
 
-  /* As accoes passam para uma segunda linha, com largura inteira: um titulo e
-   * dois botoes na mesma linha nao cabem, e o que cede primeiro e o titulo. */
+  /* No tablet as accoes ficam ao lado do titulo enquanto cabem; so descem para
+   * uma segunda linha quando o titulo precisar do espaco. No telemovel a accao
+   * principal nem esta aqui: e o botao flutuante. */
   .vn-accoes-pagina {
-    order: 3;
-    width: 100%;
-    margin-left: 0;
-  }
-
-  .vn-accoes-pagina > button {
-    flex: 1;
-    justify-content: center;
+    margin-left: auto;
   }
 }
 
@@ -598,8 +592,10 @@ select:focus {
     gap: 10px;
   }
 
+  /* !important porque o estilo em linha do rodape poe `flex: 1` na nota, e o estilo
+   * em linha venceria a media query. */
   .vn-modal-rodape > span {
-    flex: 1 0 100%;
+    flex: 1 0 100% !important;
   }
 
   .vn-modal-rodape > button {
@@ -630,4 +626,467 @@ select:focus {
 /* Barras do roteiro: o arrasto nao pode competir com o deslize da pagina. */
 .vn-barra-fase {
   touch-action: none;
+}
+
+/* ---------------------------------------------------------------------------
+ * Telemovel e tablet.
+ * Primitivas partilhadas pelos ecras: cada uma reorganiza, e nao encolhe. O
+ * que fica lado a lado no desktop empilha na ordem em que se le.
+ * ------------------------------------------------------------------------- */
+
+/* Barra inferior: icone por cima, rotulo curto por baixo, alvo com a altura toda. */
+.vn-barra-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.vn-barra-item > span:last-child {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* O botao flutuante nao pode ficar com o realce azul do toque. */
+.vn-flutuante {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.vn-flutuante:active {
+  transform: scale(0.97);
+}
+
+/* Duas colunas no desktop, uma abaixo de 1024. */
+.vn-grelha-duas {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1023px) {
+  .vn-grelha-duas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Cartoes que se repartem pela largura: uma coluna no telemovel, duas ou tres
+ * conforme couberem. Nunca um numero fixo de colunas. */
+.vn-grelha-cartoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: 16px;
+}
+
+/* Filtros: no telemovel uma so linha que desliza de lado, com a pastilha
+ * seguinte a espreitar, em vez de tres linhas de pastilhas a empurrar a lista. */
+.vn-filtros {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 679px) {
+  .vn-filtros {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-left: -14px;
+    margin-right: -14px;
+    padding: 0 14px 2px;
+    scroll-padding: 0 14px;
+  }
+
+  .vn-filtros::-webkit-scrollbar {
+    display: none;
+  }
+
+  .vn-filtros > * {
+    flex: 0 0 auto;
+  }
+}
+
+/* Linha de lista: titulo e meta a esquerda, estado e accao a direita. No
+ * telemovel o titulo fica com a largura toda e o resto desce para baixo dele. */
+.vn-linha-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.vn-linha-item > .vn-linha-corpo {
+  flex: 1;
+  min-width: 0;
+}
+
+.vn-linha-item > .vn-linha-fim {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 679px) {
+  .vn-linha-item {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .vn-linha-item > .vn-linha-fim {
+    flex: 1 0 100%;
+    justify-content: space-between;
+  }
+}
+
+/* Os numeros do painel: tres lado a lado sempre - cabem em 390px se forem
+ * compactos -, e a faixa de foco empilha o texto por cima deles. */
+.vn-foco {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.vn-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 168px));
+  gap: 12px;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 1023px) {
+  .vn-foco {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .vn-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 679px) {
+  .vn-kpis {
+    gap: 8px;
+  }
+
+  .vn-kpis > * {
+    padding: 12px 12px !important;
+    min-width: 0 !important;
+  }
+}
+
+/* Contentor que desliza de lado dentro do seu cartao, com a coluna fixa a
+ * esquerda (roteiro). A pagina nunca desliza de lado. */
+.vn-rolavel-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+.vn-fixo-esquerda {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+
+/* Cabecalho de cartao: titulo e metadados a esquerda, estado e avanco a
+ * direita; empilham no telemovel para o titulo nao ficar numa coluna de uma
+ * palavra por linha. */
+.vn-cartao-topo {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+/* Centrado na vertical no desktop; no telemovel empilha e estica (abaixo). */
+.vn-cartao-topo-centro {
+  align-items: center;
+}
+
+.vn-cartao-topo > .vn-cartao-titulo {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 679px) {
+  .vn-cartao-topo,
+  .vn-cartao-topo-centro {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+}
+
+/* O que so faz sentido com largura desaparece no telemovel, e vice-versa. */
+@media (max-width: 679px) {
+  .vn-so-largo {
+    display: none !important;
+  }
+}
+
+@media (min-width: 680px) {
+  .vn-so-movel {
+    display: none !important;
+  }
+}
+
+/* Painel: faixa de foco e linhas de avanco. */
+.vn-faixa-foco {
+  padding: 26px 28px;
+  align-items: flex-end;
+  gap: 40px;
+}
+
+.vn-foco-titulo {
+  font-size: 23px;
+}
+
+.vn-avanco-linha {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.vn-avanco-nome {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 1023px) {
+  .vn-faixa-foco {
+    align-items: stretch;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 679px) {
+  .vn-faixa-foco {
+    padding: 20px 18px;
+  }
+
+  .vn-foco-titulo {
+    font-size: 19px;
+  }
+
+  /* O nome do projecto fica com a linha toda; a barra, a percentagem e o ponto
+   * descem para a linha de baixo, com a barra a esticar. */
+  .vn-avanco-linha {
+    flex-wrap: wrap;
+    row-gap: 8px;
+    column-gap: 12px;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .vn-avanco-nome {
+    flex: 1 0 100%;
+  }
+
+  .vn-avanco-linha .vn-barra-avanco {
+    flex: 1 1 auto !important;
+    width: auto !important;
+  }
+
+  .vn-linha-decisao {
+    padding: 16px !important;
+  }
+
+  /* O semaforo acompanha o bloco de texto, e nao a linha de botoes. */
+  .vn-linha-decisao > span:first-child {
+    align-self: stretch;
+    height: auto !important;
+  }
+}
+
+/* Barra de avanco que ocupa o espaco que sobra (cartoes do telemovel). */
+.vn-barra-fluida {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+}
+
+.vn-barra-fluida > .vn-barra-avanco {
+  flex: 1 1 auto !important;
+  width: auto !important;
+}
+
+/* Cartao de abertura das paginas do colaborador. */
+.vn-cartao-foco {
+  padding: 22px 24px;
+}
+
+.vn-cartao-foco .vn-foco-titulo {
+  font-size: 19px;
+}
+
+@media (max-width: 679px) {
+  .vn-cartao-foco {
+    padding: 18px;
+  }
+
+  .vn-cartao-foco .vn-foco-titulo {
+    font-size: 17px;
+  }
+}
+
+/* Cartao de lista (os meus projectos, relatorios): estagio e avanco a direita
+ * do titulo no desktop, por baixo dele no telemovel, com a barra a esticar. */
+.vn-cartao-lista {
+  padding: 18px 20px;
+}
+
+.vn-cartao-estado {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 679px) {
+  .vn-cartao-lista {
+    padding: 16px;
+  }
+
+  .vn-cartao-estado .vn-barra-avanco {
+    flex: 1 1 auto !important;
+    width: auto !important;
+  }
+}
+
+/* Relatorios: no telemovel a validacao desce para baixo da origem e ocupa a
+ * largura toda, com os dois botoes lado a lado. */
+@media (max-width: 679px) {
+  .vn-rodape-relatorio {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .vn-validar {
+    align-items: stretch !important;
+  }
+
+  .vn-validar textarea {
+    width: 100% !important;
+  }
+
+  .vn-validar > div {
+    display: flex;
+  }
+
+  .vn-validar > div > button {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* Roteiro: escala, navegacao e periodo numa linha; a legenda ao fim, ou numa
+ * linha propria quando a largura nao chega. */
+.vn-ferramentas-roteiro {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  margin-bottom: 16px;
+}
+
+.vn-legenda-roteiro {
+  margin-left: auto;
+}
+
+@media (max-width: 1023px) {
+  .vn-legenda-roteiro {
+    margin-left: 0;
+    width: 100%;
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+}
+
+@media (max-width: 679px) {
+  .vn-janela-roteiro {
+    flex: 1 0 100%;
+    order: -1;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+  }
+}
+
+/* Vocabulario: no telemovel o nome e o prefixo numa linha, o uso e o botao
+ * numa segunda, alinhados com o nome e nao com o puxador. */
+@media (max-width: 679px) {
+  .vn-entrada-vocab {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .vn-entrada-vocab > .vn-entrada-fim {
+    flex: 1 0 100%;
+    justify-content: space-between;
+    padding-left: 50px;
+    margin-left: 0 !important;
+  }
+}
+
+/* Margem lateral da gaveta do projecto: a do desktop, e mais estreita no
+ * telemovel, onde a gaveta ja ocupa o ecra todo. */
+:root {
+  --vn-margem-gaveta: 28px;
+}
+
+@media (max-width: 679px) {
+  :root {
+    --vn-margem-gaveta: 16px;
+  }
+}
+
+/* Esforco real e prova de execucao, no mini relatorio. */
+.vn-campos-horas {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 679px) {
+  .vn-campos-horas {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Gaveta do projecto: factos em quatro colunas, dois a dois no telemovel; o
+ * avanco ganha linha propria para a barra ter largura. */
+.vn-factos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  padding: 16px 20px;
+}
+
+@media (max-width: 679px) {
+  .vn-factos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 14px;
+    padding: 14px 16px;
+  }
+
+  .vn-gaveta-avanco {
+    flex: 1 0 100%;
+    margin-left: 0 !important;
+  }
+
+  .vn-gaveta-avanco .vn-barra-avanco {
+    flex: 1 1 auto !important;
+    width: auto !important;
+  }
 }

@@ -66,12 +66,9 @@ export function Painel() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: ESPACO.seccao }}>
           {/* Faixa de foco: serena quando nada esta atrasado, quente quando esta. */}
           <div
+            className="vn-foco vn-faixa-foco"
             style={{
               ...cartao,
-              padding: '26px 28px',
-              display: 'flex',
-              alignItems: 'flex-end',
-              gap: 40,
               borderLeft: `3px solid ${
                 data.resumo.foraDePrazo > 0 ? COR.vermelhoVivo : COR.turquesaVivo
               }`,
@@ -80,7 +77,7 @@ export function Painel() {
               } 0%, ${COR.branco} 42%)`,
             }}
           >
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ flex: 1, minWidth: 0, alignSelf: 'stretch' }}>
               <div
                 style={{
                   fontSize: FONTE.nota,
@@ -93,8 +90,8 @@ export function Painel() {
                 {data.hoje}
               </div>
               <div
+                className="vn-foco-titulo"
                 style={{
-                  fontSize: FONTE.numero,
                   fontWeight: PESO.forte,
                   letterSpacing: '-0.02em',
                   lineHeight: 1.32,
@@ -118,7 +115,7 @@ export function Painel() {
                 {data.foco.nota}
               </div>
             </div>
-            <div style={{ display: 'flex', gap: 12, flex: '0 0 auto' }}>
+            <div className="vn-kpis">
               <CartaoNumero
                 rotulo="Avanço médio"
                 valor={`${data.resumo.avancoMedio}%`}
@@ -185,16 +182,14 @@ export function Painel() {
                 data.decisoes.map((item, i) => (
                   <div
                     key={item.id}
+                    className="vn-linha-item vn-linha-decisao"
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 18,
                       padding: '18px 20px',
                       borderBottom: i === data.decisoes.length - 1 ? 'none' : `1px solid ${COR.linha}`,
                     }}
                   >
                     <Semaforo cor={item.alerta.cor} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="vn-linha-corpo">
                       <div style={{ fontSize: FONTE.media, fontWeight: PESO.medio, letterSpacing: '-0.005em' }}>
                         {item.titulo}
                       </div>
@@ -202,6 +197,7 @@ export function Painel() {
                         {item.detalhe}
                       </div>
                     </div>
+                    <div className="vn-linha-fim">
                     <PastilhaAlerta alerta={item.alerta} />
                     {item.origem === 'prorrogacao' ? (
                       <span style={{ display: 'flex', gap: 8 }}>
@@ -233,6 +229,7 @@ export function Painel() {
                         {item.accao}
                       </button>
                     )}
+                    </div>
                   </div>
                 ))
               )}
@@ -240,7 +237,7 @@ export function Painel() {
           </section>
 
           {/* Avanço da carteira e Prazos a vencer */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: 20, alignItems: 'start' }}>
+          <div className="vn-grelha-duas">
             <section>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 12 }}>
                 <span style={{ ...tituloSeccao, display: 'flex', alignItems: 'center', gap: 9 }}>
@@ -271,12 +268,10 @@ export function Painel() {
                   <button
                     key={p.id}
                     type="button"
+                    className="vn-avanco-linha"
                     onClick={() => navegar(`/projectos?id=${p.id}`)}
                     style={{
                       width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 16,
                       padding: `${ESPACO.linha}px 20px`,
                       borderBottom: i === data.avancos.length - 1 ? 'none' : `1px solid ${COR.linha}`,
                       border: 'none',
@@ -286,7 +281,7 @@ export function Painel() {
                       font: 'inherit',
                     }}
                   >
-                    <span style={{ flex: 1, minWidth: 0 }}>
+                    <span className="vn-avanco-nome">
                       <span style={{ display: 'block', fontSize: FONTE.linha, fontWeight: PESO.medio, ...textoTruncado }}>
                         {p.nome}
                       </span>

@@ -201,8 +201,9 @@ export function BarraAvanco({
   cor: string;
   largura?: number;
 }) {
+  // A classe deixa o CSS alargar a barra no telemovel, onde ela ocupa uma linha propria.
   return (
-    <span style={barra(largura)}>
+    <span className="vn-barra-avanco" style={barra(largura)}>
       <span
         style={{
           display: 'block',
@@ -241,7 +242,7 @@ export function CartaoNumero({
 }) {
   const c = chip(tom);
   return (
-    <div style={{ ...superficie(tom), padding: '16px 18px', minWidth: 168 }}>
+    <div style={{ ...superficie(tom), padding: '16px 18px', minWidth: 0 }}>
       <div style={{ fontSize: FONTE.nota, color: c.fg, fontWeight: PESO.medio }}>{rotulo}</div>
       <div
         style={{

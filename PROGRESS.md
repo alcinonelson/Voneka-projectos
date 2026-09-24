@@ -398,6 +398,37 @@ typecheck e build limpos. Percurso no browser (Playwright): criar membro com tem
 noutra janela, troca obrigatoria, portal abre e sobrevive a recarregar; ligacao gerada; avisos
 de uma colaboradora; menu recolhido e expandido; gaveta no telemovel sem o botao da fronteira.
 
+## Fase 23 - Telemovel e tablet
+
+Auditoria com Playwright a 390 e 820px: o Painel tinha 613px num ecra de 390, a carteira era uma
+tabela cortada, as tarefas tinham duas colunas fixas, o roteiro 722px de barra de ferramentas.
+
+- [x] Tres faixas, tres navegacoes (`Layout.tsx`): amplo com barra lateral; tablet com o menu
+      sempre em icones, que abre por cima do conteudo; telemovel com `BarraInferior` (4 destinos
+      + "Mais" para a gaveta) e a accao principal como botao flutuante
+- [x] `lib/navegacao.ts`: destinos partilhados pelos dois menus
+- [x] `useLarguraDe` (`lib/ecra.ts`): o formato das listas decide-se pela largura do contentor e
+      nao da janela - a 1024px com o menu aberto o conteudo tem a largura de um tablet
+- [x] Projectos e Tarefas: tabela, tabela compacta ou cartoes, conforme a largura
+- [x] Painel, Os meus projectos/relatorios, Relatorios, Vocabulario, gaveta do projecto, modais:
+      reorganizados com primitivas em `styles.css` (`vn-foco`, `vn-kpis`, `vn-linha-item`,
+      `vn-grelha-duas`, `vn-grelha-cartoes`, `vn-filtros`, `vn-cartao-topo`, `vn-factos`)
+- [x] Roteiro: abre na semana no telemovel; gantt com largura minima por escala, a deslizar
+      dentro do cartao com a coluna de nomes fixa
+- [x] Dialogos acima da barra inferior e do botao flutuante (`CAMADA_DIALOGO`)
+
+Defeitos encontrados pelo caminho:
+- **Tarefas e Relatorios da Direccao sempre vazios**: `z.coerce.boolean()` lia `?minhas=false`
+  como verdadeiro. `zBooleanoQuery` em `common.schema.ts`, tambem em `incluirArquivadas`
+- **Enumeracao de emails pelo tempo do login**: o hash das contas inexistentes era invalido e o
+  bcrypt respondia em 0ms contra ~400ms. Passa a hash real, gerado uma vez
+- **Refresh sob o limite do login**: cada abertura da aplicacao gastava uma das 20 tentativas por
+  IP. Limite proprio de 300 / 15 min
+
+**Prova**: sem elementos fora da largura (medido) a 360, 390, 820 e 1440px, Direccao e
+Colaborador, com gaveta, modais e editor de fases abertos; 1440px sem regressao. 54 testes do
+shared, 71 da API (novos `limites`, `tempo-login`, `booleano-query`), typecheck e build limpos.
+
 ## Por fazer
 
 - Politica de SMTP real (hoje a ligacao vai para o log quando nao ha servidor)

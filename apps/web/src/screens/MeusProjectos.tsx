@@ -1,5 +1,5 @@
 import { corBarraAvanco, dataCurta } from '@nexora/shared';
-import { COR, ESPACO, FONTE, PESO, cartao, numerico } from '../design/tokens';
+import { COR, FONTE, PESO, cartao, numerico } from '../design/tokens';
 import { BarraAvanco, Carregando, EtiquetaVocabulario, Vazio } from '../components/base';
 import { Pagina } from '../components/Layout';
 import { useCarteira, useTarefas } from '../lib/queries';
@@ -38,19 +38,21 @@ export function MeusProjectos() {
             const minhaParte = porProjecto.get(p.id) ?? [];
 
             return (
-              <article key={p.id} style={{ ...cartao, padding: `18px ${ESPACO.cartao}px` }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: FONTE.media, fontWeight: PESO.medio }}>{p.nome}</div>
+              <article key={p.id} className="vn-cartao-lista" style={cartao}>
+                <div className="vn-cartao-topo vn-cartao-topo-centro" style={{ marginBottom: 12 }}>
+                  <div className="vn-cartao-titulo">
+                    <div style={{ fontSize: FONTE.media, fontWeight: PESO.medio, lineHeight: 1.4 }}>{p.nome}</div>
                     <div style={{ fontSize: FONTE.nota, color: COR.suave, marginTop: 4 }}>
                       {p.cliente} · responsável {p.responsavel.nome} · entrega {dataCurta(p.deadline)}
                     </div>
                   </div>
-                  <EtiquetaVocabulario valor={p.estagio} />
-                  <BarraAvanco pct={p.avancoPct} cor={corBarraAvanco(p.saude)} largura={120} />
-                  <span style={{ fontSize: FONTE.base, fontWeight: PESO.forte, width: 40, textAlign: 'right', ...numerico }}>
-                    {p.avancoPct}%
-                  </span>
+                  <div className="vn-cartao-estado">
+                    <EtiquetaVocabulario valor={p.estagio} />
+                    <BarraAvanco pct={p.avancoPct} cor={corBarraAvanco(p.saude)} largura={120} />
+                    <span style={{ fontSize: FONTE.base, fontWeight: PESO.forte, width: 40, textAlign: 'right', ...numerico }}>
+                      {p.avancoPct}%
+                    </span>
+                  </div>
                 </div>
 
                 <div

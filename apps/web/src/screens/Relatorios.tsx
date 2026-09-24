@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { SITUACAO, VALIDACAO, corSituacao } from '@nexora/shared';
 import {
   COR,
-  ESPACO,
   FONTE,
   PESO,
   RAIO,
@@ -80,7 +79,7 @@ export function Relatorios() {
               const porValidar = r.validacao === 'a_espera';
 
               return (
-                <article key={r.id} style={{ ...cartao, padding: `18px ${ESPACO.cartao}px` }}>
+                <article key={r.id} className="vn-cartao-lista" style={cartao}>
                   <header style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 12 }}>
                     <Avatar nome={r.autor.nome} />
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -108,6 +107,7 @@ export function Relatorios() {
                   </p>
 
                   <footer
+                    className="vn-rodape-relatorio"
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -124,7 +124,7 @@ export function Relatorios() {
                     </span>
 
                     {porValidar ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
+                      <div className="vn-validar" style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
                         <textarea
                           value={notas[r.id] ?? ''}
                           onChange={(e) => setNotas((actual) => ({ ...actual, [r.id]: e.target.value }))}
@@ -132,7 +132,7 @@ export function Relatorios() {
                           rows={2}
                           style={{
                             ...campo,
-                            width: 280,
+                            width: 'min(280px, 100%)',
                             minHeight: 56,
                             resize: 'vertical',
                             borderRadius: RAIO.campo,

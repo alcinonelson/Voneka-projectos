@@ -23,6 +23,7 @@ export type NomeIcone =
   | 'vocabulario'
   | 'empresa'
   | 'avisos'
+  | 'mais'
   | 'recolher'
   | 'expandir'
   | 'menu';
@@ -114,6 +115,14 @@ const DESENHOS: Record<NomeIcone, JSX.Element> = {
     <>
       <path d="M6 16.5V11a6 6 0 0112 0v5.5l1.5 2h-15z" />
       <path d="M10 21a2.2 2.2 0 004 0" />
+    </>
+  ),
+  // Tres pontos: o resto do menu.
+  mais: (
+    <>
+      <circle cx="5.5" cy="12" r="1.3" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none" />
+      <circle cx="18.5" cy="12" r="1.3" fill="currentColor" stroke="none" />
     </>
   ),
   menu: (

@@ -40,8 +40,8 @@ export function MinhasTarefas() {
         abertas.length ? { rotulo: 'Reportar avanço', onClick: () => setAConcluir(abertas[0]!) } : undefined
       }
     >
-      <div style={{ ...cartao, padding: '22px 24px', marginBottom: 20 }}>
-        <div style={{ fontSize: 19, fontWeight: PESO.forte, letterSpacing: '-0.015em', lineHeight: 1.4 }}>
+      <div className="vn-cartao-foco" style={{ ...cartao, marginBottom: 20 }}>
+        <div className="vn-foco-titulo" style={{ fontWeight: PESO.forte, letterSpacing: '-0.015em', lineHeight: 1.4 }}>
           {foco}
         </div>
         <div style={{ fontSize: FONTE.base, color: COR.textoSuave, marginTop: 8, lineHeight: 1.6, maxWidth: '68ch' }}>
@@ -55,7 +55,7 @@ export function MinhasTarefas() {
       ) : !abertas.length && !concluidas.length ? (
         <Vazio style={{ ...cartao, padding: 40 }}>Não tem tarefas atribuídas neste momento.</Vazio>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+        <div className="vn-grelha-cartoes">
           {[...abertas, ...concluidas].map((t) => {
             const concluida = t.estado === 'concluida';
             const alerta = alertaPrazo(t.deadline, concluida);
@@ -88,23 +88,37 @@ export function MinhasTarefas() {
                   <div style={{ fontSize: FONTE.corpo, color: COR.texto, lineHeight: 1.6 }}>{t.descricao}</div>
                 ) : null}
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14, fontSize: FONTE.nota, color: COR.suave }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    columnGap: 14,
+                    rowGap: 6,
+                    fontSize: FONTE.nota,
+                    color: COR.suave,
+                  }}
+                >
                   <Etiqueta fg={estado.fg} bg={estado.bg}>
                     {ESTADO_TAREFA[t.estado]}
                   </Etiqueta>
                   <span style={numerico}>vence {dataLonga(t.deadline)}</span>
                   <span style={numerico}>{t.esforcoEstimadoHoras}h estimadas</span>
-                  <span style={{ marginLeft: 'auto' }}>atribuída por {t.atribuidoPor.nome}</span>
+                  <span>atribuída por {t.atribuidoPor.nome}</span>
                 </div>
 
                 {!concluida ? (
-                  <div style={{ display: 'flex', gap: 8, borderTop: `1px solid ${COR.linha}`, paddingTop: 12 }}>
-                    <button type="button" style={botaoSecundario} onClick={() => setAProrrogar(t)}>
+                  <div style={{ display: 'flex', gap: 8, borderTop: `1px solid ${COR.linha}`, paddingTop: 12, marginTop: 'auto' }}>
+                    <button
+                      type="button"
+                      style={{ ...botaoSecundario, flex: 1, justifyContent: 'center' }}
+                      onClick={() => setAProrrogar(t)}
+                    >
                       Pedir prorrogação
                     </button>
                     <button
                       type="button"
-                      style={{ ...botaoPrincipal, marginLeft: 'auto' }}
+                      style={{ ...botaoPrincipal, flex: 1, justifyContent: 'center' }}
                       onClick={() => setAConcluir(t)}
                     >
                       Assinalar cumprida

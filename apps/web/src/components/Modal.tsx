@@ -17,9 +17,16 @@ import { COR, ESPACO, FONTE,
  * baixo, o conteudo sobe com o teclado e a accao continua alcancavel com o polegar.
  */
 
+/**
+ * Camadas: os dialogos ficam acima da barra inferior (25) e do botao flutuante (20) do telemovel,
+ * e abaixo so dos avisos passageiros (100).
+ */
+export const CAMADA_DIALOGO = 50;
+
 const sobreposicao = {
   position: 'fixed' as const,
   inset: 0,
+  zIndex: CAMADA_DIALOGO,
   background: 'rgba(16, 24, 40, 0.28)',
   animation: 'nx-fade .16s ease',
 };
@@ -81,6 +88,7 @@ export function Modal({
             movel
               ? {
                   position: 'fixed',
+                  zIndex: CAMADA_DIALOGO + 1,
                   left: 0,
                   right: 0,
                   bottom: 0,
@@ -96,6 +104,7 @@ export function Modal({
                 }
               : {
                   position: 'fixed',
+                  zIndex: CAMADA_DIALOGO + 1,
                   top: '50%',
                   left: '50%',
                   transform: 'translate(-50%, -50%)',
@@ -255,6 +264,7 @@ export function Gaveta({
           aria-describedby={undefined}
           style={{
             position: 'fixed',
+            zIndex: CAMADA_DIALOGO + 1,
             top: 0,
             right: 0,
             bottom: 0,
