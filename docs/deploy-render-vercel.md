@@ -21,7 +21,7 @@ Blueprint em `render.yaml`. Num servico criado a mao, aplicar as mesmas definico
 | Campo | Valor |
 |---|---|
 | Root Directory | *vazio* (raiz do repositorio) |
-| Build Command | `corepack enable && pnpm install --frozen-lockfile --prod=false && pnpm --filter @nexora/api build && pnpm --filter @nexora/api migrate:prod` |
+| Build Command | `pnpm install --frozen-lockfile --prod=false && pnpm --filter @nexora/api build && pnpm --filter @nexora/api migrate:prod` |
 | Start Command | `pnpm --filter @nexora/api start` |
 | Health Check Path | `/api/health` |
 

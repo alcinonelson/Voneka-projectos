@@ -7,8 +7,9 @@ services:
     name: voneka-api
     runtime: node
     plan: free
+    # Sem `corepack enable`: o Render ja traz o pnpm, que respeita o packageManager da raiz, e o
+    # corepack falha com EROFS ao tentar substituir /usr/bin/pnpm.
     buildCommand: >-
-      corepack enable &&
       pnpm install --frozen-lockfile --prod=false &&
       pnpm --filter @nexora/api build &&
       pnpm --filter @nexora/api migrate:prod

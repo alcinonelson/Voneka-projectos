@@ -147,3 +147,11 @@ Com a web no Vercel a reencaminhar `/api` para o Render, o pedido atravessa dois
 `trust proxy = 1`, o `req.ip` passa a ser o IP do Vercel, e todos os utilizadores partilham as 20
 tentativas de login. Ao mudar a topologia de alojamento, rever `TRUST_PROXY_HOPS` e prova-lo com dois
 `X-Forwarded-For` diferentes: as contagens de `RateLimit` tem de ser independentes.
+
+## Fixar o pnpm: uma so fonte, e sem `corepack enable` no Render
+Acrescentei `packageManager: pnpm@10.32.1` a raiz sem procurar quem mais fixava a versao. Os
+workflows tinham `pnpm/action-setup` com `version: 10`, e a action recusa arrancar com duas fontes.
+No Render, `corepack enable` falha com `EROFS` ao tentar substituir `/usr/bin/pnpm`, que e so de
+leitura; o pnpm da imagem ja respeita o `packageManager`. Antes de fixar uma versao, procurar nos
+`.github/workflows` e na configuracao de cada alojamento quem a fixa tambem, e nao escrever comandos
+de build para uma plataforma sem confirmar na documentacao dela o que ja vem instalado.
