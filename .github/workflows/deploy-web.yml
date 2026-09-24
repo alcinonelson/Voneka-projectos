@@ -200,8 +200,15 @@ jobs:
             done
             if [ "$ok" != "1" ]; then
               echo "::error::Smoke test falhou em ${SPA_URL}${path} (HTTP ${code})" >&2
-              echo "Se HTTP 404 em /entrar: o .htaccess nao esta a reescrever para index.html." >&2
-              echo "Se HTTP 500: verificar mod_rewrite no cPanel." >&2
+              if [ "$path" = "/" ] && [ "$code" = "404" ]; then
+                echo "A raiz tambem e 404: o document root do subdominio nao e PROJECTS_REMOTE_PATH." >&2
+                echo "No cPanel → Domains → projects.get.co.mz, copie o Document Root para o secret." >&2
+                echo "Ex.: /home/UTILIZADOR/projects.get.co.mz" >&2
+              elif [ "$code" = "404" ]; then
+                echo "Se so /entrar falha: o .htaccess nao esta a reescrever para index.html." >&2
+              elif [ "$code" = "500" ]; then
+                echo "HTTP 500: verificar mod_rewrite no cPanel." >&2
+              fi
               exit 1
             fi
           done

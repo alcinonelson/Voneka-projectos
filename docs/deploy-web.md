@@ -52,3 +52,23 @@ Push a `main` que toque em `apps/web`, `packages/shared` ou neste workflow; ou
 Se a porta 22 falhar, defina `REMOTE_PORT` com o valor do cPanel (o mesmo dos
 outros workflows). Confirme que o IP do GitHub Actions nao esta bloqueado no
 firewall do alojamento.
+
+## Smoke test: 404 na raiz
+
+O deploy chegou ao servidor (o passo "Confirmar ficheiros" passou) mas
+`https://projects.get.co.mz/` e `/index.html` devolvem 404 do Apache. Nao e o
+`.htaccess`: o virtual host aponta para **outra pasta**.
+
+1. cPanel → **Domains** → `projects.get.co.mz` → anotar o **Document Root**.
+2. Actualizar o secret `PROJECTS_REMOTE_PATH` com esse caminho exacto.
+3. Voltar a correr o workflow.
+
+Caminhos habituais no cPanel:
+
+```
+/home/UTILIZADOR/projects.get.co.mz
+/home/UTILIZADOR/public_html/projects
+```
+
+Se o subdominio ainda nao existir, crie-o primeiro. Sem isso o Apache responde
+404 mesmo com ficheiros noutro directorio.
