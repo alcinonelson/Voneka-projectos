@@ -373,7 +373,8 @@ responde 200 em `/api/health` e 401 no login com `RateLimit` activo. Com `X-Forw
 clientes atras do mesmo proxy, `TRUST_PROXY_HOPS=1` da contagens 19/18 (limite partilhado) e `2`
 da 19/19. `pnpm typecheck` limpo, 56 testes da API e 51 do shared a passar, web compila.
 
-Pendente: trocar `SUBSTITUIR-PELO-URL-DO-RENDER` em `apps/web/vercel.json` quando o Render der o URL.
+API no ar em `https://voneka-projectos.onrender.com` (`/api/health` 200). `apps/web/vercel.json`
+reencaminha `/api` para la.
 
 ## Por fazer
 

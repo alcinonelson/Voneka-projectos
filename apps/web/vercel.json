@@ -7,7 +7,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://SUBSTITUIR-PELO-URL-DO-RENDER.onrender.com/api/:path*"
+      "destination": "https://voneka-projectos.onrender.com/api/:path*"
     },
     {
       "source": "/(.*)",
