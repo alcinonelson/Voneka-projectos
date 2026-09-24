@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import { and, eq, isNull, lt, or } from 'drizzle-orm';
 import type {
@@ -50,8 +51,17 @@ export interface ResultadoAutenticacao {
 /**
  * Hash de uma palavra-passe que nunca corresponde a nada.
  * Serve para gastar o mesmo tempo de bcrypt quando a conta nao existe.
+ *
+ * Tem de ser um hash bcrypt verdadeiro, com o mesmo custo dos reais. O que aqui estava - um sal de
+ * zeros escrito a mao - era invalido, e o bcrypt recusava-o em 0ms contra ~400ms de uma conta
+ * real: o tempo de resposta dizia quais os emails registados. Gerado uma vez, a primeira vez que
+ * e preciso, a partir de bytes aleatorios que ninguem conhece.
  */
-const HASH_INEXISTENTE = '$2a$12$0000000000000000000000000000000000000000000000000000';
+let hashInexistente: Promise<string> | null = null;
+function hashParaContaInexistente(): Promise<string> {
+  hashInexistente ??= bcrypt.hash(randomBytes(32).toString('base64'), BCRYPT_ROUNDS);
+  return hashInexistente;
+}
 
 /**
  * Junta a conta a empresa a que pertence.
@@ -135,7 +145,7 @@ export async function entrar(dados: LoginInput, userAgent?: string): Promise<Res
 
   const correcta = await bcrypt.compare(
     dados.password,
-    utilizador?.passwordHash ?? HASH_INEXISTENTE,
+    utilizador?.passwordHash ?? (await hashParaContaInexistente()),
   );
 
   if (!utilizador || !utilizador.passwordHash || !correcta) {

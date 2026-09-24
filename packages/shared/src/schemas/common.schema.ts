@@ -55,6 +55,17 @@ export const zAntecedencia = z
 export const zId = z.string().uuid({ message: 'Identificador inválido.' });
 
 /**
+ * Booleano vindo de uma query string.
+ *
+ * `z.coerce.boolean()` e `Boolean(valor)`, e `Boolean('false')` e verdadeiro: o cliente pedia
+ * `?minhas=false` e o servidor respondia so com as tarefas de quem pedia. A Direccao abria
+ * "Tarefas atribuidas" e "Relatorios" e via os dois vazios. Aqui so `true` e `1` sao verdade.
+ */
+export const zBooleanoQuery = z
+  .union([z.boolean(), z.enum(['true', 'false', '1', '0', ''])])
+  .transform((v) => v === true || v === 'true' || v === '1');
+
+/**
  * Data de calendario no formato `aaaa-mm-dd`.
  * Recusa datas que nao existem, como 31 de Fevereiro, em vez de as deixar escorregar para o mes
  * seguinte como faz o construtor de `Date`.

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { zId, zSituacao, zTextoOpcional } from './common.schema';
+import { zBooleanoQuery, zId, zSituacao, zTextoOpcional } from './common.schema';
 
 /**
  * Minimo de caracteres do mini relatorio. Portado de `submeter()` no design.
@@ -38,7 +38,7 @@ export const listarRelatoriosSchema = z.object({
   autorId: zId.optional(),
   situacao: zSituacao.optional(),
   /** Quando verdadeiro devolve apenas os relatorios de quem faz o pedido. */
-  meus: z.coerce.boolean().default(false),
+  meus: zBooleanoQuery.default(false),
 });
 export type ListarRelatoriosInput = z.infer<typeof listarRelatoriosSchema>;
 

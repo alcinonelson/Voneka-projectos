@@ -34,6 +34,28 @@ const limiteCredenciais = rateLimit({
   },
 });
 
+/**
+ * O refresh tem limite proprio, mais largo.
+ *
+ * Cada abertura da aplicacao chama-o, e um escritorio inteiro pode estar atras de um so IP
+ * publico: sob o limite das credenciais, vinte aberturas em quinze minutos bloqueavam toda a
+ * gente. Nao ha aqui palavra-passe a adivinhar - o refresh exige um cookie de 384 bits -, por
+ * isso o limite so tem de travar abuso de volume.
+ */
+const limiteRenovacao = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 300,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: {
+      code: 'DEMASIADOS_PEDIDOS',
+      message: 'Demasiados pedidos. Aguarde alguns minutos antes de tentar de novo.',
+    },
+  },
+});
+
 export const authRouter: Router = Router();
 
 authRouter.post('/login', limiteCredenciais, validar(loginSchema), assincrono(controlador.login));
@@ -49,7 +71,7 @@ authRouter.post(
   validar(reporPasswordSchema),
   assincrono(controlador.reporPassword),
 );
-authRouter.post('/refresh', limiteCredenciais, assincrono(controlador.refresh));
+authRouter.post('/refresh', limiteRenovacao, assincrono(controlador.refresh));
 authRouter.post('/logout', assincrono(controlador.logout));
 authRouter.post(
   '/accept-invite',

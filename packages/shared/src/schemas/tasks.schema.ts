@@ -3,6 +3,7 @@ import { hoje, paraIso } from '../calendar';
 import { ESTADOS_TAREFA } from '../enums';
 import {
   zAntecedencia,
+  zBooleanoQuery,
   zDataIso,
   zEstadoTarefa,
   zId,
@@ -61,7 +62,7 @@ export const listarTarefasSchema = z.object({
   projectoId: zId.optional(),
   responsavelId: zId.optional(),
   /** Quando verdadeiro devolve apenas as tarefas de quem faz o pedido. */
-  minhas: z.coerce.boolean().default(false),
+  minhas: zBooleanoQuery.default(false),
 });
 export type ListarTarefasInput = z.infer<typeof listarTarefasSchema>;
 

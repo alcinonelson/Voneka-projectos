@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { MAX_SEMANAS_FASE } from '../phases';
 import {
   zCorChip,
+  zBooleanoQuery,
   zEmail,
   zId,
   zPassword,
@@ -84,7 +85,7 @@ export type ActualizarTaxonomiaInput = z.infer<typeof actualizarTaxonomiaSchema>
 export const listarTaxonomiasSchema = z.object({
   tipo: zTipoTaxonomia.optional(),
   /** Por omissão o arquivado fica de fora: só o ecrã de vocabulário o quer ver. */
-  incluirArquivadas: z.coerce.boolean().default(false),
+  incluirArquivadas: zBooleanoQuery.default(false),
 });
 export type ListarTaxonomiasInput = z.infer<typeof listarTaxonomiasSchema>;
 
