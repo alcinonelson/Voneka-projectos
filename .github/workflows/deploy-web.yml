@@ -75,6 +75,8 @@ jobs:
         with:
           name: voneka-web-dist
           path: apps/web/dist/
+          # Sem isto o .htaccess nao sobe: o upload-artifact v4 ignora ocultos.
+          include-hidden-files: true
           retention-days: 3
 
   deploy:
@@ -201,9 +203,9 @@ jobs:
             if [ "$ok" != "1" ]; then
               echo "::error::Smoke test falhou em ${SPA_URL}${path} (HTTP ${code})" >&2
               if [ "$path" = "/" ] && [ "$code" = "404" ]; then
-                echo "A raiz tambem e 404: o document root do subdominio nao e PROJECTS_REMOTE_PATH." >&2
-                echo "No cPanel → Domains → projects.get.co.mz, copie o Document Root para o secret." >&2
-                echo "Ex.: /home/UTILIZADOR/projects.get.co.mz" >&2
+                echo "A raiz e 404. Confirme no servidor: test -f \$PROJECTS_REMOTE_PATH/.htaccess" >&2
+                echo "e DirectoryIndex index.html. O artefacto tem de incluir ficheiros ocultos." >&2
+                echo "Se o ficheiro la esta e a pasta e outra: cPanel → Domains → Document Root." >&2
               elif [ "$code" = "404" ]; then
                 echo "Se so /entrar falha: o .htaccess nao esta a reescrever para index.html." >&2
               elif [ "$code" = "500" ]; then

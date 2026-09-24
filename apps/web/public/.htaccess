@@ -1,19 +1,19 @@
-# SPA no Apache (cPanel).
-#
-# As rotas do React (/entrar, /painel, /recuperar) nao existem como ficheiros:
-# sem isto o servidor devolve 404 e o portal so abre na raiz.
-# /api nao se reescreve: e a API, servida por proxy no mesmo dominio para o
-# cookie de refresh (path /api/auth) continuar na mesma origem.
+# SPA no Apache (cPanel / Hostinger).
+# DirectoryIndex e obrigatorio neste vhost: sem ele a raiz da 404 mesmo
+# com index.html no disco. O padrao e o mesmo da FarmApp.
+# /api nao se reescreve: o proxy do mesmo dominio trata a API.
+
+Options -MultiViews
+DirectoryIndex index.html
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
 
   RewriteRule ^api($|/) - [L]
+  RewriteRule ^index\.html$ - [L]
 
-  RewriteCond %{REQUEST_FILENAME} -f [OR]
-  RewriteCond %{REQUEST_FILENAME} -d
-  RewriteRule ^ - [L]
-
-  RewriteRule ^ index.html [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
 </IfModule>

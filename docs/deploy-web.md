@@ -55,9 +55,17 @@ firewall do alojamento.
 
 ## Smoke test: 404 na raiz
 
-O deploy chegou ao servidor (o passo "Confirmar ficheiros" passou) mas
-`https://projects.get.co.mz/` e `/index.html` devolvem 404 do Apache. Nao e o
-`.htaccess`: o virtual host aponta para **outra pasta**.
+Dois casos distintos:
+
+**1. O `.htaccess` nao chegou ao `dist`**
+
+O `upload-artifact@v4` ignora ficheiros ocultos. O workflow ja envia
+`include-hidden-files: true`. O `.htaccess` tem de ter `DirectoryIndex index.html`
+(neste vhost da Hostinger a raiz 404 sem isso).
+
+**2. Document root errado**
+
+O deploy chegou ao servidor mas o virtual host aponta para **outra pasta**.
 
 1. cPanel → **Domains** → `projects.get.co.mz` → anotar o **Document Root**.
 2. Actualizar o secret `PROJECTS_REMOTE_PATH` com esse caminho exacto.
