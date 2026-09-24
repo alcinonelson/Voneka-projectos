@@ -1,7 +1,12 @@
 # SPA no Apache (cPanel / Hostinger).
 # DirectoryIndex e obrigatorio neste vhost: sem ele a raiz da 404 mesmo
 # com index.html no disco. O padrao e o mesmo da FarmApp.
-# /api nao se reescreve: o proxy do mesmo dominio trata a API.
+#
+# Portas neste alojamento (nao reutilizar):
+#   store 3000 | mobility api 3010 / admin 3011 / web 3012 | voneka-api 3020
+#
+# /api vai para o processo Node. So [L] nao chega: em contexto de directorio
+# o Apache reinicia o rewrite e a SPA acaba por servir index.html.
 
 Options -MultiViews
 DirectoryIndex index.html
@@ -10,7 +15,7 @@ DirectoryIndex index.html
   RewriteEngine On
   RewriteBase /
 
-  RewriteRule ^api($|/) - [L]
+  RewriteRule ^api(/.*)?$ http://127.0.0.1:3020%{REQUEST_URI} [P,L]
   RewriteRule ^index\.html$ - [L]
 
   RewriteCond %{REQUEST_FILENAME} !-f

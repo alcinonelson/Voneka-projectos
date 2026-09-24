@@ -1,6 +1,6 @@
 import cron from 'node-cron';
 import { criarApp } from './app';
-import { env } from './config/env';
+import { ehProducao, env } from './config/env';
 import { fecharLigacao } from './db/db';
 import { limparAuditoriaAntiga } from './modules/audit.service';
 import { limparSessoes } from './modules/auth/auth.service';
@@ -8,8 +8,11 @@ import { correrAlertas } from './modules/notifications/notifications.service';
 import { logModulo, logger } from './utils/logger';
 
 const app = criarApp();
-const servidor = app.listen(env.PORT, () => {
-  logger.info(logModulo('servidor', `A escutar na porta ${env.PORT}`));
+// Em producao escuta so em localhost: o Apache e que expoe /api. Abrir a porta
+// ao mundo deixaria a API acessivel sem o proxy (e sem HTTPS).
+const host = ehProducao ? '127.0.0.1' : '0.0.0.0';
+const servidor = app.listen(env.PORT, host, () => {
+  logger.info(logModulo('servidor', `A escutar em ${host}:${env.PORT}`));
 });
 
 /**

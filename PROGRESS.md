@@ -337,8 +337,19 @@ a meio, entrada (recuperar palavra-passe) e o minimo de operacao que uma casa se
 
 - [x] `.github/workflows/deploy-web.yml`: build pnpm (shared + web), artefacto, SSH para o
       document root de `projects.get.co.mz`, smoke em `/`, `/entrar`, `/recuperar`
-- [x] `apps/web/public/.htaccess`: reescreve rotas do React; deixa `/api` para o proxy
-- [x] `docs/deploy-web.md`: secrets e a regra da mesma origem (cookie de refresh)
+- [x] `apps/web/public/.htaccess`: reescreve rotas do React; proxia `/api` para
+      `127.0.0.1:3020` (PM2 `voneka-api`)
+- [x] `docs/deploy-web.md`: secrets, mesma origem, porta 3020 e arranque PM2
+
+## Fase 20 - API no mesmo alojamento
+
+- [x] Processo Node fora do document root (`/home/voneka/voneka-projectos`)
+- [x] Escuta so em `127.0.0.1:3020` em producao; Apache expoe `/api`
+- [x] `ecosystem.config.cjs` + `.env` de producao (JWT proprios, `WEB_ORIGIN` do portal)
+- [x] `GET /api/health` e `POST /api/auth/register-company` devolvem JSON (ja nao HTML da SPA)
+- [ ] Pooler do Supabase recusa o tenant (`ENOTFOUND tenant/user`). Sem base, criar
+      empresa responde erro de base, nao cria a conta. Retomar ou criar o projecto
+      no painel e actualizar `apps/api/.env` no servidor.
 
 ## Por fazer
 

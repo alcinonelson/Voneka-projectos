@@ -3,10 +3,12 @@
 O portal e uma SPA Vite. O cliente chama sempre `/api` na mesma origem: o cookie de
 refresh (`path: /api/auth`, `sameSite: strict` em producao) nao sobrevive a outro
 dominio. Por isso a API tem de responder em `https://projects.get.co.mz/api`, via
-proxy Apache/cPanel para o processo Node.
+proxy Apache para o processo Node (`voneka-api` no PM2, porta **3020**).
 
-Este workflow so publica o `dist` da web. A API corre noutro processo, no mesmo
-alojamento ou atras do proxy.
+Este workflow so publica o `dist` da web. A API vive em
+`/home/voneka/voneka-projectos` e arranca com `ecosystem.config.cjs`. Sem esse
+processo, `/api` devolve HTML da SPA e o cliente mostra
+«O servidor não respondeu como esperado.»
 
 ## Secrets no GitHub
 
@@ -26,21 +28,30 @@ Deste produto:
 | `PROJECTS_REMOTE_PATH` | Document root do subdominio `projects` (ex. `/home/UTILIZADOR/projects.get.co.mz`) |
 | `PROJECTS_PUBLIC_URL` | Opcional. Default `https://projects.get.co.mz` |
 
-No processo da API (nao neste workflow):
+No processo da API (`apps/api/.env` no servidor, fora do document root):
 
 ```
-WEB_ORIGIN=https://projects.get.co.mz
 NODE_ENV=production
+PORT=3020
+WEB_ORIGIN=https://projects.get.co.mz
+```
+
+JWT e `DATABASE_URL` ficam so nesse ficheiro. Segredos de exemplo sao recusados
+em producao. Arranque:
+
+```
+pm2 start /home/voneka/voneka-projectos/ecosystem.config.cjs
+pm2 save
 ```
 
 ## cPanel
 
 1. Criar o subdominio `projects.get.co.mz` e anotar o document root.
 2. Colar esse caminho em `PROJECTS_REMOTE_PATH`.
-3. Proxiar `/api` para o Node (Application Manager / Reverse Proxy). Sem isto o
-   portal abre e o login falha.
-4. `mod_rewrite` ligado. O `.htaccess` do `dist` reescreve as rotas do React
-   para `index.html` e deixa `/api` em paz.
+3. O `.htaccess` proxia `/api` para `http://127.0.0.1:3020` (o mesmo padrao da
+   Mobility). Sem o processo `voneka-api`, criar empresa e entrar falham.
+4. `mod_rewrite` e `mod_proxy` ligados. Portas ocupadas neste alojamento:
+   store 3000, mobility 3010-3012, voneka-api 3020.
 
 ## Correr
 

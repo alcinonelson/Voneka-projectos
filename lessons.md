@@ -121,6 +121,15 @@ quem pediu menos movimento ficava com metade da pagina em branco. O bloco passa 
 `opacity: 1; transform: none` nas classes de revelacao. Menos movimento significa parado, nao
 invisivel.
 
+## `/api` a devolver HTML nao e a API a falhar o JSON
+O cliente trata qualquer corpo que nao seja JSON como
+«O servidor não respondeu como esperado.» No Apache, `RewriteRule ^api - [L]`
+nao impede a regra da SPA: em contexto de directorio o `[L]` reinicia o motor,
+`/api` nao e ficheiro, e o vhost serve `index.html`. Sem o processo Node (PM2
+`voneka-api` na porta 3020) criar empresa e entrar falham assim. A regra certa
+e o proxy `[P]` para `127.0.0.1:PORT`, no mesmo padrao da Mobility, *antes* da
+reescrita para `index.html`.
+
 ## Glifos Unicode nao servem de icones
 `◱ ▤ ▭ ✓ ✎ ◍ ≡ ⌂` a 12px dependiam da fonte instalada e, com o menu recolhido, `▭` e `▤` eram
 indistinguiveis - e recolhido o icone e a unica informacao que resta. Icones de navegacao sao SVG
