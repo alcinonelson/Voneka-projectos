@@ -351,6 +351,30 @@ a meio, entrada (recuperar palavra-passe) e o minimo de operacao que uma casa se
       empresa responde erro de base, nao cria a conta. Retomar ou criar o projecto
       no painel e actualizar `apps/api/.env` no servidor.
 
+## Fase 21 - API no Render, web no Vercel
+
+So no repositorio pessoal. O deploy do cPanel continua igual.
+
+- [x] `HOST` sobrepoe o `127.0.0.1` de producao da Fase 20: o Render so encontra a porta em
+      `0.0.0.0`. Sem `HOST`, o cPanel continua a escutar so em localhost (provado nos dois modos)
+
+- [x] `apps/api/build.mjs`: bundle esbuild de `server.ts` e `db/migrate.ts`, com o `shared`
+      embutido e as dependencias em `node_modules`. `build` = typecheck + bundle
+- [x] `migrate:prod` corre as migracoes a partir do bundle, sem `tsx`
+- [x] `TRUST_PROXY_HOPS` (por omissao 1). Vercel + Render sao 2
+- [x] `render.yaml`, `apps/web/vercel.json` (reencaminha `/api`, SPA, sem cache na CDN),
+      `packageManager` na raiz, `docs/deploy-render-vercel.md`
+
+Causa do erro no Render: `tsc` com `moduleResolution: Bundler` emite `import './app'` sem
+extensao, e o `shared` e `.ts` cru. Nenhum dos dois arranca em Node.
+
+**Prova** (Postgres local): `node dist/db/migrate.js` aplica as migracoes; `node dist/server.js`
+responde 200 em `/api/health` e 401 no login com `RateLimit` activo. Com `X-Forwarded-For` de dois
+clientes atras do mesmo proxy, `TRUST_PROXY_HOPS=1` da contagens 19/18 (limite partilhado) e `2`
+da 19/19. `pnpm typecheck` limpo, 56 testes da API e 51 do shared a passar, web compila.
+
+Pendente: trocar `SUBSTITUIR-PELO-URL-DO-RENDER` em `apps/web/vercel.json` quando o Render der o URL.
+
 ## Por fazer
 
 - Politica de SMTP real (hoje a ligacao vai para o log quando nao ha servidor)

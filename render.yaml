@@ -1,0 +1,46 @@
+# API Voneka Projectos no Render. Instrucoes em docs/deploy-render-vercel.md.
+#
+# O servico corre a partir da raiz do repositorio, onde esta o pnpm-lock.yaml: com a raiz em
+# apps/api o Render nao encontra o lockfile, cai para o yarn e nao entende `workspace:*`.
+services:
+  - type: web
+    name: voneka-api
+    runtime: node
+    plan: free
+    buildCommand: >-
+      corepack enable &&
+      pnpm install --frozen-lockfile --prod=false &&
+      pnpm --filter @nexora/api build &&
+      pnpm --filter @nexora/api migrate:prod
+    startCommand: pnpm --filter @nexora/api start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: '22'
+      # Em producao a API escuta so em 127.0.0.1 (o proxy do cPanel esta na mesma maquina).
+      # O proxy do Render esta noutra, por isso aqui tem de ser 0.0.0.0.
+      - key: HOST
+        value: 0.0.0.0
+      # Vercel + Render sao dois proxies a frente da API. Ver app.ts.
+      - key: TRUST_PROXY_HOPS
+        value: '2'
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      # URL da web no Vercel, sem barra final. Usado nas ligacoes dos emails e no CORS.
+      - key: WEB_ORIGIN
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false

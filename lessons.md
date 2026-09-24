@@ -134,3 +134,16 @@ reescrita para `index.html`.
 `◱ ▤ ▭ ✓ ✎ ◍ ≡ ⌂` a 12px dependiam da fonte instalada e, com o menu recolhido, `▭` e `▤` eram
 indistinguiveis - e recolhido o icone e a unica informacao que resta. Icones de navegacao sao SVG
 proprios, a traco, com `currentColor`, e testam-se no estado mais pobre em que vao aparecer.
+
+## `tsc` com `moduleResolution: Bundler` nao produz JS que o Node execute
+O build da API era `tsc` e o `start` era `node dist/server.js`. Em desenvolvimento o `tsx` escondia
+dois defeitos que o Render expos: os imports relativos saem sem extensao (`./app`), que o Node em
+ESM recusa com `ERR_MODULE_NOT_FOUND`, e o `@nexora/shared` entrega `.ts` cru. Um typecheck limpo
+nao prova que o resultado arranca. A API e agora empacotada com esbuild (`apps/api/build.mjs`) e o
+build so conta como verificado quando `node dist/server.js` responde em `/api/health`.
+
+## O numero de proxies de confianca decide quem partilha o rate limit
+Com a web no Vercel a reencaminhar `/api` para o Render, o pedido atravessa dois proxies. Com
+`trust proxy = 1`, o `req.ip` passa a ser o IP do Vercel, e todos os utilizadores partilham as 20
+tentativas de login. Ao mudar a topologia de alojamento, rever `TRUST_PROXY_HOPS` e prova-lo com dois
+`X-Forwarded-For` diferentes: as contagens de `RateLimit` tem de ser independentes.

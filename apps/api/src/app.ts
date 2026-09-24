@@ -12,8 +12,10 @@ export function criarApp(): Express {
   const app = express();
 
   // Atras de um proxy - Render, Fly, Nginx - o IP real vem no X-Forwarded-For. Sem isto o rate
-  // limit contaria todos os pedidos como vindos do mesmo endereco.
-  app.set('trust proxy', 1);
+  // limit contaria todos os pedidos como vindos do mesmo endereco. O numero de saltos tem de ser
+  // exacto: com a web no Vercel a reencaminhar para o Render sao dois, e um a menos poe todos os
+  // utilizadores atras do IP do Vercel; um a mais deixa o cliente escolher o proprio IP.
+  app.set('trust proxy', env.TRUST_PROXY_HOPS);
 
   app.use(helmet());
   app.use(

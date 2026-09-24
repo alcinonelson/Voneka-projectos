@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "NEXORA Projectos - sistema corporativo de gestao e acompanhamento de projectos",
+  "packageManager": "pnpm@10.32.1",
   "engines": {
     "node": ">=20"
   },
