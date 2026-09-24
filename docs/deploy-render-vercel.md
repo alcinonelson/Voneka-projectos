@@ -37,7 +37,7 @@ Variaveis de ambiente:
 |---|---|
 | `NODE_ENV` | `production` |
 | `NODE_VERSION` | `22` |
-| `HOST` | `0.0.0.0`. Sem isto, em producao a API escuta so em `127.0.0.1` (pensado para o cPanel) e o Render nao a encontra |
+| `HOST` | Opcional. A API detecta o Render pela variavel `RENDER`, que ele proprio define, e escuta em `0.0.0.0`. Fora do Render, em producao, escuta so em `127.0.0.1` (cPanel) |
 | `DATABASE_URL` | Supabase, *Session pooler* (porta 5432) |
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | 32+ caracteres cada, `openssl rand -base64 48`. Os de exemplo sao recusados |
 | `WEB_ORIGIN` | URL da web no Vercel, sem barra final. Vai nas ligacoes dos emails |

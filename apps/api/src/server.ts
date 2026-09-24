@@ -10,8 +10,10 @@ import { logModulo, logger } from './utils/logger';
 const app = criarApp();
 // Em producao escuta so em localhost: o Apache e que expoe /api. Abrir a porta
 // ao mundo deixaria a API acessivel sem o proxy (e sem HTTPS). No Render o proxy
-// esta noutra maquina e so chega a porta por 0.0.0.0, por isso HOST sobrepoe-se.
-const host = env.HOST ?? (ehProducao ? '127.0.0.1' : '0.0.0.0');
+// esta noutra maquina e so chega a porta por 0.0.0.0: detecta-se pela RENDER, que o
+// Render define sozinho, e HOST sobrepoe-se a tudo.
+const soLocal = ehProducao && !env.RENDER;
+const host = env.HOST ?? (soLocal ? '127.0.0.1' : '0.0.0.0');
 const servidor = app.listen(env.PORT, host, () => {
   logger.info(logModulo('servidor', `A escutar em ${host}:${env.PORT}`));
 });
