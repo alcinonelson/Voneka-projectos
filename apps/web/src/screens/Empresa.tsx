@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { chip } from '@nexora/shared';
 import { COR, FONTE, PESO, RAIO, botaoPrincipal, campo, cartao, numerico, rotuloCampo } from '../design/tokens';
-import { Carregando } from '../components/base';
+import { Carregando, FalhaCarregar } from '../components/base';
 import { Pagina } from '../components/Layout';
 import { useToast } from '../components/Toast';
 import { ErroApi } from '../lib/api';
@@ -18,7 +18,7 @@ const CORES_MARCA = ['azul', 'violeta', 'turquesa', 'verde', 'ambar', 'rosa', 't
  * saltou passos ter onde os retomar em vez de os perder.
  */
 export function Empresa() {
-  const { data: empresa, isLoading } = useEmpresa();
+  const { data: empresa, isLoading, isError } = useEmpresa();
   const { data: estado } = useEstadoArranque();
   const actualizar = useActualizarEmpresa();
   const toast = useToast();
@@ -50,6 +50,14 @@ export function Empresa() {
     } catch (e) {
       setErro(e instanceof ErroApi ? e.message : 'Não foi possível gravar.');
     }
+  }
+
+  if (isError) {
+    return (
+      <Pagina acento={'#C3B5FD'} titulo="Dados da empresa" subtitulo="" larguraMaxima={720}>
+        <FalhaCarregar de="os dados da empresa" />
+      </Pagina>
+    );
   }
 
   if (isLoading || !empresa) {

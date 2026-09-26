@@ -159,6 +159,8 @@ export interface ItemDecisao {
   projectoId: string;
   projectoNome: string;
   origem: 'tarefa' | 'relatorio' | 'prorrogacao';
+  idadeDias: number;
+  texto: string | null;
 }
 
 export interface Painel {
@@ -171,6 +173,7 @@ export interface Painel {
     projectosComAtraso: number;
   };
   decisoes: ItemDecisao[];
+  decisoesTotal: number;
   avancos: {
     id: string;
     nome: string;

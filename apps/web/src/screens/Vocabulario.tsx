@@ -1,6 +1,7 @@
 import { TIPO_TAXONOMIA_NOTA, type TipoTaxonomia } from '@nexora/shared';
 import { COR, FONTE, cartao } from '../design/tokens';
 import { EditorVocabulario } from '../components/EditorVocabulario';
+import { FalhaCarregar } from '../components/base';
 import { Pagina } from '../components/Layout';
 import { useVocabulario } from '../lib/queries';
 
@@ -14,9 +15,9 @@ import { useVocabulario } from '../lib/queries';
 const FAMILIAS: TipoTaxonomia[] = ['natureza', 'estagio', 'departamento'];
 
 export function Vocabulario() {
-  const { data: naturezas } = useVocabulario('natureza', true);
-  const { data: estagios } = useVocabulario('estagio', true);
-  const { data: departamentos } = useVocabulario('departamento', true);
+  const { data: naturezas, isError: falhouNaturezas } = useVocabulario('natureza', true);
+  const { data: estagios, isError: falhouEstagios } = useVocabulario('estagio', true);
+  const { data: departamentos, isError: falhouDepartamentos } = useVocabulario('departamento', true);
 
   const porTipo = { natureza: naturezas, estagio: estagios, departamento: departamentos };
 
@@ -34,16 +35,20 @@ export function Vocabulario() {
         </p>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-        {FAMILIAS.map((tipo) => (
-          <EditorVocabulario
-            key={tipo}
-            tipo={tipo}
-            nota={TIPO_TAXONOMIA_NOTA[tipo]}
-            entradas={porTipo[tipo]}
-          />
-        ))}
-      </div>
+      {falhouNaturezas || falhouEstagios || falhouDepartamentos ? (
+        <FalhaCarregar de="o vocabulário" />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {FAMILIAS.map((tipo) => (
+            <EditorVocabulario
+              key={tipo}
+              tipo={tipo}
+              nota={TIPO_TAXONOMIA_NOTA[tipo]}
+              entradas={porTipo[tipo]}
+            />
+          ))}
+        </div>
+      )}
     </Pagina>
   );
 }

@@ -343,7 +343,7 @@ a meio, entrada (recuperar palavra-passe) e o minimo de operacao que uma casa se
 
 ## Fase 20 - API no mesmo alojamento
 
-- [x] Processo Node fora do document root (`/home/voneka/voneka-projectos`)
+- [x] Processo Node fora do document root (`/home/voneka/apps/projects.get.co.mz`)
 - [x] Escuta so em `127.0.0.1:3020` em producao; Apache expoe `/api`
 - [x] `ecosystem.config.cjs` + `.env` de producao (JWT proprios, `WEB_ORIGIN` do portal)
 - [x] `GET /api/health` e `POST /api/auth/register-company` devolvem JSON (ja nao HTML da SPA)
@@ -428,6 +428,16 @@ Defeitos encontrados pelo caminho:
 **Prova**: sem elementos fora da largura (medido) a 360, 390, 820 e 1440px, Direccao e
 Colaborador, com gaveta, modais e editor de fases abertos; 1440px sem regressao. 54 testes do
 shared, 71 da API (novos `limites`, `tempo-login`, `booleano-query`), typecheck e build limpos.
+
+## Fase 24 - Decidir no sitio
+
+- [x] `tipologiaDaSemana` filtra sempre pela empresa; teste no isolamento
+- [x] Filtro Atrasadas entra no WHERE antes do LIMIT 200
+- [x] `FalhaCarregar` nas listas: falha de API ja nao parece vazio
+- [x] Pedir ponto de situacao cria aviso real (`POST /projects/:id/status-request`)
+- [x] Fila de decisoes: ate 20, `decisoesTotal`, idade e texto do relato
+- [x] Validar, escalar e alargar prazo no proprio cartao; as 3 primeiras + «faltam N»
+- [x] `avancoPct` no PATCH do projecto; juizo editavel na gaveta
 
 ## Por fazer
 

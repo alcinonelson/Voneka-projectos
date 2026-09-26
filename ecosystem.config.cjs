@@ -8,7 +8,7 @@ module.exports = {
   apps: [
     {
       name: 'voneka-api',
-      cwd: '/home/voneka/voneka-projectos/apps/api',
+      cwd: '/home/voneka/apps/projects.get.co.mz/apps/api',
       script: './src/server.ts',
       interpreter: 'node',
       interpreter_args: '--import tsx',

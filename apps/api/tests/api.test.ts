@@ -417,14 +417,45 @@ describe('painel', () => {
 
     expect(dados.foco.titulo).toBeTruthy();
     expect(dados.foco.nota).toBeTruthy();
-    expect(dados.decisoes.length).toBeLessThanOrEqual(3);
+    expect(dados.decisoes.length).toBeLessThanOrEqual(20);
+    expect(typeof dados.decisoesTotal).toBe('number');
+    expect(dados.decisoesTotal).toBeGreaterThanOrEqual(dados.decisoes.length);
     expect(typeof dados.resumo.avancoMedio).toBe('number');
 
-    // Cada decisao traz o seu alerta ja calculado, com texto e cores.
+    // Cada decisao traz o seu alerta ja calculado, com texto, cores e idade na fila.
     for (const decisao of dados.decisoes) {
       expect(decisao.alerta.texto).toBeTruthy();
       expect(decisao.alerta.nivel).toBeTruthy();
+      expect(typeof decisao.idadeDias).toBe('number');
+      expect(decisao.idadeDias).toBeGreaterThanOrEqual(0);
     }
+  });
+
+  it('grava o juizo de avanco no PATCH do projecto', async () => {
+    const lista = await request(app)
+      .get('/api/projects')
+      .set('Authorization', `Bearer ${direccao.token}`);
+    const projecto = lista.body.data.projectos[0] as { id: string; avancoPct: number };
+    expect(projecto).toBeTruthy();
+
+    const recusa = await request(app)
+      .patch(`/api/projects/${projecto.id}`)
+      .set('Authorization', `Bearer ${direccao.token}`)
+      .send({ avancoPct: 101 });
+    expect(recusa.status).toBe(400);
+
+    const novo = projecto.avancoPct === 62 ? 63 : 62;
+    const resposta = await request(app)
+      .patch(`/api/projects/${projecto.id}`)
+      .set('Authorization', `Bearer ${direccao.token}`)
+      .send({ avancoPct: novo });
+    expect(resposta.status).toBe(200);
+    expect(resposta.body.data.avancoPct).toBe(novo);
+
+    await request(app)
+      .patch(`/api/projects/${projecto.id}`)
+      .set('Authorization', `Bearer ${direccao.token}`)
+      .send({ avancoPct: projecto.avancoPct });
   });
 });
 

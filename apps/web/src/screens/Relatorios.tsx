@@ -11,7 +11,7 @@ import {
   numerico,
   tituloSeccao,
 } from '../design/tokens';
-import { Avatar, Carregando, Etiqueta, Vazio } from '../components/base';
+import { Avatar, Carregando, Etiqueta, FalhaCarregar, Vazio } from '../components/base';
 import { Pagina } from '../components/Layout';
 import { useToast } from '../components/Toast';
 import { ErroApi } from '../lib/api';
@@ -26,7 +26,7 @@ import type { Relatorio } from '../lib/tipos';
  * pela arrumacao.
  */
 export function Relatorios() {
-  const { data, isLoading } = useRelatorios();
+  const { data, isLoading, isError } = useRelatorios();
   const validar = useValidarRelatorio();
   const toast = useToast();
   const [notas, setNotas] = useState<Record<string, string>>({});
@@ -67,7 +67,9 @@ export function Relatorios() {
     >
       <div className="vn-relatorios" style={{ alignItems: 'start' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {isLoading ? (
+          {isError ? (
+            <FalhaCarregar de="os relatórios" />
+          ) : isLoading ? (
             <Carregando />
           ) : !data?.relatorios.length ? (
             <Vazio style={{ ...cartao, padding: 40 }}>

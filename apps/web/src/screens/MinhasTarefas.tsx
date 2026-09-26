@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ESTADO_TAREFA, alertaPrazo, corEstado, dataLonga, lerData, paraIso, somarDias } from '@nexora/shared';
 import { COR, FONTE, PESO, RAIO, botaoPrincipal, botaoSecundario, campo, cartao, numerico, rotuloCampo } from '../design/tokens';
-import { Carregando, Etiqueta, PastilhaAlerta, Semaforo, Vazio } from '../components/base';
+import { Carregando, Etiqueta, FalhaCarregar, PastilhaAlerta, Semaforo, Vazio } from '../components/base';
 import { CampoData } from '../components/CampoData';
 import { Pagina } from '../components/Layout';
 import { Modal } from '../components/Modal';
@@ -20,7 +20,7 @@ import type { Tarefa } from '../lib/tipos';
  */
 export function MinhasTarefas() {
   const { utilizador } = useSessao();
-  const { data: tarefas, isLoading } = useTarefas('todas', true);
+  const { data: tarefas, isLoading, isError } = useTarefas('todas', true);
   const [aConcluir, setAConcluir] = useState<Tarefa | null>(null);
   const [aProrrogar, setAProrrogar] = useState<Tarefa | null>(null);
 
@@ -50,7 +50,9 @@ export function MinhasTarefas() {
         </div>
       </div>
 
-      {isLoading ? (
+      {isError ? (
+        <FalhaCarregar de="as suas tarefas" />
+      ) : isLoading ? (
         <Carregando />
       ) : !abertas.length && !concluidas.length ? (
         <Vazio style={{ ...cartao, padding: 40 }}>Não tem tarefas atribuídas neste momento.</Vazio>

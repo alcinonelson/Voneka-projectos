@@ -11,7 +11,10 @@ import { enviarEmail, textoAlerta } from '../../utils/mailer';
 import type { Sessao } from '../../utils/tokens';
 
 export async function listar(sessao: Sessao, apenasPorLer = false) {
-  const condicoes = [eq(notifications.userId, sessao.sub)];
+  const condicoes = [
+    eq(notifications.userId, sessao.sub),
+    eq(notifications.organizationId, sessao.org),
+  ];
   if (apenasPorLer) condicoes.push(eq(notifications.lida, false));
 
   return db
@@ -26,7 +29,13 @@ export async function contarPorLer(sessao: Sessao): Promise<number> {
   const [linha] = await db
     .select({ n: sql<number>`count(*)` })
     .from(notifications)
-    .where(and(eq(notifications.userId, sessao.sub), eq(notifications.lida, false)));
+    .where(
+      and(
+        eq(notifications.userId, sessao.sub),
+        eq(notifications.organizationId, sessao.org),
+        eq(notifications.lida, false),
+      ),
+    );
   return Number(linha?.n ?? 0);
 }
 
@@ -34,7 +43,13 @@ export async function marcarLida(sessao: Sessao, notificationId: string) {
   const [actualizada] = await db
     .update(notifications)
     .set({ lida: true, lidaEm: new Date() })
-    .where(and(eq(notifications.id, notificationId), eq(notifications.userId, sessao.sub)))
+    .where(
+      and(
+        eq(notifications.id, notificationId),
+        eq(notifications.userId, sessao.sub),
+        eq(notifications.organizationId, sessao.org),
+      ),
+    )
     .returning();
 
   if (!actualizada) throw erros.naoEncontrado('Esta notificação');
@@ -45,7 +60,13 @@ export async function marcarTodasLidas(sessao: Sessao): Promise<number> {
   const linhas = await db
     .update(notifications)
     .set({ lida: true, lidaEm: new Date() })
-    .where(and(eq(notifications.userId, sessao.sub), eq(notifications.lida, false)))
+    .where(
+      and(
+        eq(notifications.userId, sessao.sub),
+        eq(notifications.organizationId, sessao.org),
+        eq(notifications.lida, false),
+      ),
+    )
     .returning({ id: notifications.id });
   return linhas.length;
 }

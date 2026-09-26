@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   ESTADO_FASE,
   alertaPrazo,
@@ -7,9 +8,12 @@ import {
   formatarMetical,
 } from '@nexora/shared';
 import { COR, FONTE,
-  MARCA, PESO, RAIO, botaoPrincipal, botaoSecundario, cartao, etiquetaMaiuscula, numerico, textoTruncado } from '../design/tokens';
-import { useProjecto } from '../lib/queries';
-import { Avatar, BarraAvanco, Carregando, Etiqueta, EtiquetaVocabulario, PastilhaAlerta, Ponto, Vazio } from './base';
+  MARCA, PESO, RAIO, botaoPrincipal, botaoSecundario, campo, cartao, etiquetaMaiuscula, numerico, textoTruncado } from '../design/tokens';
+import { ErroApi } from '../lib/api';
+import { useSessao } from '../lib/auth';
+import { useActualizarProjecto, usePedirPontoSituacao, useProjecto } from '../lib/queries';
+import { pt } from '../i18n/pt';
+import { Avatar, BarraAvanco, Carregando, Etiqueta, EtiquetaVocabulario, FalhaCarregar, PastilhaAlerta, Vazio } from './base';
 import { Gaveta, TituloGaveta } from './Modal';
 import { useToast } from './Toast';
 
@@ -31,14 +35,48 @@ export function GavetaProjecto({
   onAtribuirTarefa: (projectoId: string) => void;
   onEditarFases: (projectoId: string) => void;
 }) {
-  const { data: projecto, isLoading } = useProjecto(projectoId);
+  const { ehDireccao } = useSessao();
+  const { data: projecto, isLoading, isError } = useProjecto(projectoId);
+  const pedirPonto = usePedirPontoSituacao();
+  const actualizar = useActualizarProjecto();
   const toast = useToast();
+  const [rascunhoAvanco, setRascunhoAvanco] = useState<string | null>(null);
+
+  useEffect(() => {
+    setRascunhoAvanco(null);
+  }, [projectoId]);
 
   if (!projectoId) return null;
 
+  async function gravarAvanco() {
+    if (!projecto) return;
+    if (rascunhoAvanco === null || rascunhoAvanco.trim() === '') {
+      setRascunhoAvanco(null);
+      return;
+    }
+    const n = Number(rascunhoAvanco);
+    if (!Number.isInteger(n) || n < 0 || n > 100) {
+      toast.mostrar(pt.projecto.avancoInvalido);
+      return;
+    }
+    if (n === projecto.avancoPct) {
+      setRascunhoAvanco(null);
+      return;
+    }
+    try {
+      await actualizar.mutateAsync({ id: projecto.id, dados: { avancoPct: n } });
+      toast.mostrar(pt.projecto.avancoGravado);
+      setRascunhoAvanco(null);
+    } catch (e) {
+      toast.mostrar(e instanceof ErroApi ? e.message : pt.projecto.falhouAvanco);
+    }
+  }
+
   return (
     <Gaveta aberta onFechar={onFechar}>
-      {isLoading || !projecto ? (
+      {isError ? (
+        <FalhaCarregar de="o projecto" />
+      ) : isLoading || !projecto ? (
         <Carregando />
       ) : (
         <>
@@ -86,9 +124,43 @@ export function GavetaProjecto({
               <PastilhaAlerta alerta={alertaPrazo(projecto.deadline)} />
               <span className="vn-gaveta-avanco" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
                 <BarraAvanco pct={projecto.avancoPct} cor={corBarraAvanco(projecto.saude)} largura={120} />
-                <span style={{ fontSize: FONTE.media, fontWeight: PESO.forte, ...numerico }}>
-                  {projecto.avancoPct}%
-                </span>
+                {ehDireccao ? (
+                  <label
+                    title={pt.projecto.juizoNota}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+                  >
+                    <span style={{ fontSize: FONTE.minima, color: COR.suave }}>{pt.projecto.juizoAvanco}</span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      step={1}
+                      value={rascunhoAvanco ?? String(projecto.avancoPct)}
+                      disabled={actualizar.isPending}
+                      onChange={(e) => setRascunhoAvanco(e.target.value)}
+                      onBlur={() => void gravarAvanco()}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                      }}
+                      aria-label={pt.projecto.juizoAvanco}
+                      style={{
+                        ...campo,
+                        ...numerico,
+                        width: 56,
+                        height: 28,
+                        padding: '0 6px',
+                        textAlign: 'right',
+                        fontSize: FONTE.media,
+                        fontWeight: PESO.forte,
+                      }}
+                    />
+                    <span style={{ fontSize: FONTE.media, fontWeight: PESO.forte }}>%</span>
+                  </label>
+                ) : (
+                  <span style={{ fontSize: FONTE.media, fontWeight: PESO.forte, ...numerico }}>
+                    {projecto.avancoPct}%
+                  </span>
+                )}
               </span>
             </div>
           </header>
@@ -295,9 +367,15 @@ export function GavetaProjecto({
               <button
                 type="button"
                 style={botaoSecundario}
-                onClick={() =>
-                  toast.mostrar(`Ponto de situação pedido a ${projecto.responsavel.nome}`)
-                }
+                disabled={pedirPonto.isPending}
+                onClick={() => {
+                  void pedirPonto
+                    .mutateAsync(projecto.id)
+                    .then((r) => toast.mostrar(pt.projecto.pontoPedido(r.destinatario)))
+                    .catch((e: unknown) => {
+                      toast.mostrar(e instanceof ErroApi ? e.message : pt.projecto.falhouPonto);
+                    });
+                }}
               >
                 Pedir ponto de situação
               </button>

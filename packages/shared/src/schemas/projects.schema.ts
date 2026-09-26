@@ -55,6 +55,8 @@ export const actualizarProjectoSchema = z
     orcamentoCentavos: z.number().int().min(0).nullable(),
     consumidoCentavos: z.number().int().min(0).nullable(),
     antecedenciaAlerta: zAntecedencia,
+    /** Juízo declarado da gestora, 0 a 100. Não se deriva das tarefas. */
+    avancoPct: z.number().int().min(0).max(100),
   })
   .partial();
 export type ActualizarProjectoInput = z.infer<typeof actualizarProjectoSchema>;

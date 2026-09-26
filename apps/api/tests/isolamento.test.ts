@@ -367,6 +367,14 @@ describe('escrita entre empresas', () => {
     expect(resposta.status).toBe(422);
   });
 
+  it('nao se pede o ponto de situacao de um projecto de outra empresa', async () => {
+    const resposta = await request(app)
+      .post(`/api/projects/${b.projectoId}/status-request`)
+      .set('Authorization', `Bearer ${a.token}`);
+
+    expect([403, 404]).toContain(resposta.status);
+  });
+
   it('nao se valida o relatorio de outra empresa', async () => {
     const fechada = await request(app)
       .post(`/api/tasks/${b.tarefaId}/complete`)
@@ -386,6 +394,21 @@ describe('escrita entre empresas', () => {
       .send({ decisao: 'validar', observacao: '' });
 
     expect(resposta.status).toBe(404);
+
+    const daCasaA = await request(app)
+      .get('/api/reports')
+      .set('Authorization', `Bearer ${a.token}`);
+    expect(daCasaA.status).toBe(200);
+    expect(daCasaA.body.data.tipologia.total).toBe(0);
+    expect(daCasaA.body.data.tipologia.porSituacao.com_obstaculo).toBe(0);
+    expect(daCasaA.body.data.relatorios).toHaveLength(0);
+
+    const daCasaB = await request(app)
+      .get('/api/reports')
+      .set('Authorization', `Bearer ${b.token}`);
+    expect(daCasaB.status).toBe(200);
+    expect(daCasaB.body.data.tipologia.total).toBeGreaterThanOrEqual(1);
+    expect(daCasaB.body.data.tipologia.porSituacao.com_obstaculo).toBeGreaterThanOrEqual(1);
   });
 
   it('nao se arquiva uma entrada do vocabulario de outra empresa', async () => {

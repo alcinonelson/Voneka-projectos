@@ -5,9 +5,11 @@ refresh (`path: /api/auth`, `sameSite: strict` em producao) nao sobrevive a outr
 dominio. Por isso a API tem de responder em `https://projects.get.co.mz/api`, via
 proxy Apache para o processo Node (`voneka-api` no PM2, porta **3020**).
 
-Este workflow so publica o `dist` da web. A API vive em
-`/home/voneka/voneka-projectos` e arranca com `ecosystem.config.cjs`. Sem esse
-processo, `/api` devolve HTML da SPA e o cliente mostra
+Este workflow so publica o `dist` da web no document root
+(`/home/voneka/public_html/projects.get.co.mz`). A API nao vai para essa pasta:
+ficaria servida pelo Apache, com `.env` a vista. Vive em
+`/home/voneka/apps/projects.get.co.mz` e arranca com `ecosystem.config.cjs`. Sem
+esse processo, `/api` devolve HTML da SPA e o cliente mostra
 «O servidor não respondeu como esperado.»
 
 ## Secrets no GitHub
@@ -40,7 +42,7 @@ JWT e `DATABASE_URL` ficam so nesse ficheiro. Segredos de exemplo sao recusados
 em producao. Arranque:
 
 ```
-pm2 start /home/voneka/voneka-projectos/ecosystem.config.cjs
+pm2 start /home/voneka/apps/projects.get.co.mz/ecosystem.config.cjs
 pm2 save
 ```
 

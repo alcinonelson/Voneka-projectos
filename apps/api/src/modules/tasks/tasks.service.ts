@@ -1,4 +1,4 @@
-import { and, asc, eq, ne } from 'drizzle-orm';
+import { and, asc, eq, lt, ne } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import {
   type ActualizarTarefaInput,
@@ -67,8 +67,13 @@ export async function listar(sessao: Sessao, filtros: ListarTarefasInput): Promi
 
   if (filtros.filtro === 'concluidas') {
     condicoes.push(eq(tasks.estado, 'concluida'));
-  } else if (filtros.filtro === 'abertas' || filtros.filtro === 'atrasadas') {
+  } else if (filtros.filtro === 'abertas') {
     condicoes.push(ne(tasks.estado, 'concluida'));
+  } else if (filtros.filtro === 'atrasadas') {
+    // O atraso e derivado da deadline. Tem de entrar no WHERE antes do LIMIT 200:
+    // filtrar depois em memoria deixava o tecto ocupado por tarefas ainda no prazo.
+    condicoes.push(ne(tasks.estado, 'concluida'));
+    condicoes.push(lt(tasks.deadline, referencia));
   }
 
   const linhas = await db
@@ -119,10 +124,7 @@ export async function listar(sessao: Sessao, filtros: ListarTarefasInput): Promi
     atribuidoPor: { id: l.atribuidoPorId, nome: l.atribuidoPorNome },
   }));
 
-  // O filtro "Atrasadas" so pode ser aplicado depois de o estado efectivo ser calculado.
-  return filtros.filtro === 'atrasadas'
-    ? comEstado.filter((t) => t.estado === 'atrasada')
-    : comEstado;
+  return comEstado;
 }
 
 /** Atribui uma tarefa. Escrita por quem atribui, nunca pre-configurada. */

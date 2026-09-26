@@ -45,6 +45,11 @@ export async function actualizar(req: Request, res: Response): Promise<Response>
   return sucesso(res, projecto, 'Projecto actualizado');
 }
 
+export async function pedirPontoSituacao(req: Request, res: Response): Promise<Response> {
+  const resultado = await servico.pedirPontoSituacao(sessaoDe(req), String(req.params.id));
+  return sucesso(res, resultado, `Ponto de situação pedido a ${resultado.destinatario}`);
+}
+
 /** CSV da carteira visivel. Sai como ficheiro, nao como JSON. */
 export async function exportar(req: Request, res: Response): Promise<void> {
   const csv = await servico.exportarCsv(sessaoDe(req));

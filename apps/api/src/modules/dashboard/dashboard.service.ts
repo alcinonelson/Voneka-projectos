@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray, ne } from 'drizzle-orm';
+import { and, asc, eq, inArray, lt, ne } from 'drizzle-orm';
 import {
   type Alerta,
   type Situacao,
@@ -34,6 +34,10 @@ export interface ItemDecisao {
   projectoId: string;
   projectoNome: string;
   origem: 'tarefa' | 'relatorio' | 'prorrogacao';
+  /** Dias desde que o item entrou na fila. Zero e hoje. */
+  idadeDias: number;
+  /** Texto do mini relatorio, quando a origem e um relato. */
+  texto: string | null;
 }
 
 /**
@@ -124,14 +128,19 @@ async function decisoesPendentes(sessao: Sessao, referencia: Date): Promise<Item
     .from(tasks)
     .innerJoin(projects, eq(projects.id, tasks.projectId))
     .innerJoin(users, eq(users.id, tasks.responsavelId))
-    .where(and(ne(tasks.estado, 'concluida'), tarefasVisiveis(sessao)))
+    .where(
+      and(ne(tasks.estado, 'concluida'), lt(tasks.deadline, referencia), tarefasVisiveis(sessao)),
+    )
     .orderBy(asc(tasks.deadline));
 
   const bloqueados = await db
     .select({
       id: reports.id,
       situacao: reports.situacao,
+      texto: reports.texto,
+      createdAt: reports.createdAt,
       autor: users.nome,
+      tarefaId: tasks.id,
       tarefaTitulo: tasks.titulo,
       deadline: tasks.deadline,
       projectoId: projects.id,
@@ -156,6 +165,7 @@ async function decisoesPendentes(sessao: Sessao, referencia: Date): Promise<Item
       id: taskExtensions.id,
       novaDeadline: taskExtensions.novaDeadline,
       motivo: taskExtensions.motivo,
+      createdAt: taskExtensions.createdAt,
       titulo: tasks.titulo,
       deadline: tasks.deadline,
       projectoId: projects.id,
@@ -181,6 +191,8 @@ async function decisoesPendentes(sessao: Sessao, referencia: Date): Promise<Item
       projectoId: p.projectoId,
       projectoNome: p.cliente,
       origem: 'prorrogacao',
+      idadeDias: Math.max(0, diferencaEmDias(p.createdAt, referencia)),
+      texto: p.motivo,
     });
   }
 
@@ -195,13 +207,15 @@ async function decisoesPendentes(sessao: Sessao, referencia: Date): Promise<Item
       projectoId: r.projectoId,
       projectoNome: r.cliente,
       origem: 'relatorio',
+      idadeDias: Math.max(0, diferencaEmDias(r.createdAt, referencia)),
+      texto: r.texto,
     });
   }
 
-  const jaCitadas = new Set(bloqueados.map((r) => r.tarefaTitulo));
+  const jaCitadas = new Set(bloqueados.map((r) => r.tarefaId));
   for (const t of atrasadas) {
     if (estadoEfectivo(t.estado, t.deadline, referencia) !== 'atrasada') continue;
-    if (jaCitadas.has(t.titulo)) continue;
+    if (jaCitadas.has(t.id)) continue;
     itens.push({
       id: t.id,
       titulo: t.titulo,
@@ -211,6 +225,8 @@ async function decisoesPendentes(sessao: Sessao, referencia: Date): Promise<Item
       projectoId: t.projectoId,
       projectoNome: t.cliente,
       origem: 'tarefa',
+      idadeDias: Math.max(0, -alertaPrazo(t.deadline, false, referencia).dias),
+      texto: null,
     });
   }
 
@@ -218,7 +234,7 @@ async function decisoesPendentes(sessao: Sessao, referencia: Date): Promise<Item
     i.origem === 'prorrogacao' ? 0 : i.accao === 'Escalar' ? 1 : i.origem === 'relatorio' ? 2 : 3;
   itens.sort((a, b) => peso(a) - peso(b) || a.alerta.dias - b.alerta.dias);
 
-  return itens.slice(0, 3);
+  return itens;
 }
 
 export async function painel(sessao: Sessao) {
@@ -266,28 +282,33 @@ export async function painel(sessao: Sessao) {
     ? Math.round(previstos.reduce((a, b) => a + b, 0) / previstos.length)
     : null;
 
-  const abertas = await db
+  const atrasos = await db
+    .select({ id: tasks.id, projectoId: projects.id })
+    .from(tasks)
+    .innerJoin(projects, eq(projects.id, tasks.projectId))
+    .where(
+      and(ne(tasks.estado, 'concluida'), lt(tasks.deadline, referencia), tarefasVisiveis(sessao)),
+    );
+
+  const prazos = await db
     .select({
       id: tasks.id,
       titulo: tasks.titulo,
       deadline: tasks.deadline,
-      estado: tasks.estado,
-      projectoId: projects.id,
       responsavel: users.nome,
     })
     .from(tasks)
     .innerJoin(projects, eq(projects.id, tasks.projectId))
     .innerJoin(users, eq(users.id, tasks.responsavelId))
     .where(and(ne(tasks.estado, 'concluida'), tarefasVisiveis(sessao)))
-    .orderBy(asc(tasks.deadline));
+    .orderBy(asc(tasks.deadline))
+    .limit(5);
 
-  const foraDePrazo = abertas.filter(
-    (t) => estadoEfectivo(t.estado, t.deadline, referencia) === 'atrasada',
-  );
-  const projectosComAtraso = new Set(foraDePrazo.map((t) => t.projectoId)).size;
+  const foraDePrazo = atrasos.length;
+  const projectosComAtraso = new Set(atrasos.map((t) => t.projectoId)).size;
 
-  const decisoes = await decisoesPendentes(sessao, referencia);
-  const foco = frasesDeFoco(decisoes);
+  const fila = await decisoesPendentes(sessao, referencia);
+  const foco = frasesDeFoco(fila);
 
   return {
     hoje: dataExtensa(referencia),
@@ -295,10 +316,11 @@ export async function painel(sessao: Sessao) {
     resumo: {
       avancoMedio,
       previstoMedio,
-      foraDePrazo: foraDePrazo.length,
+      foraDePrazo,
       projectosComAtraso,
     },
-    decisoes,
+    decisoes: fila.slice(0, 20),
+    decisoesTotal: fila.length,
     avancos: carteira.slice(0, 5).map((p) => ({
       id: p.id,
       nome: p.nome,
@@ -308,7 +330,7 @@ export async function painel(sessao: Sessao) {
       avancoPct: p.avancoPct,
       deadline: p.deadline,
     })),
-    prazos: abertas.slice(0, 5).map((t) => ({
+    prazos: prazos.map((t) => ({
       id: t.id,
       titulo: t.titulo,
       responsavel: t.responsavel,

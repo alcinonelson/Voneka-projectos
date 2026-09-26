@@ -121,6 +121,17 @@ quem pediu menos movimento ficava com metade da pagina em branco. O bloco passa 
 `opacity: 1; transform: none` nas classes de revelacao. Menos movimento significa parado, nao
 invisivel.
 
+## A API nao vive no document root
+A SPA e `/home/voneka/public_html/projects.get.co.mz`. A API e
+`/home/voneka/apps/projects.get.co.mz`. Meter o processo Node (e o `.env`)
+dentro do document root e expo-lo ao Apache. O nome do dominio no caminho da
+API e o que a liga ao produto; a pasta publica e so a pele.
+
+## Agregado sem empresa e fuga, mesmo "so numeros"
+`tipologiaDaSemana` saltava o WHERE para o Administrador. Um agregado de
+contagens tambem e dado de outra casa. Qualquer `group by` novo passa por
+`projectosVisiveis` e por um caso em `isolamento.test.ts`.
+
 ## `/api` a devolver HTML nao e a API a falhar o JSON
 O cliente trata qualquer corpo que nao seja JSON como
 «O servidor não respondeu como esperado.» No Apache, `RewriteRule ^api - [L]`

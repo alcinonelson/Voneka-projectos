@@ -3,6 +3,8 @@ import type {
   AcessoEmitido,
   ActualizarEmpresaInput,
   ActualizarMembroInput,
+  ActualizarProjectoInput,
+  ActualizarTarefaInput,
   ConcluirTarefaInput,
   CriarMembroInput,
   CriarProjectoInput,
@@ -183,11 +185,38 @@ function useInvalidar() {
   };
 }
 
+export function useActualizarProjecto() {
+  const invalidar = useInvalidar();
+  return useMutation({
+    mutationFn: ({ id, dados }: { id: string; dados: ActualizarProjectoInput }) =>
+      api.patch(`/projects/${id}`, dados),
+    onSuccess: (_r, { id }) => invalidar([chaves.projectos, chaves.projecto(id), chaves.painel]),
+  });
+}
+
+export function useActualizarTarefa() {
+  const invalidar = useInvalidar();
+  return useMutation({
+    mutationFn: ({ id, dados }: { id: string; dados: ActualizarTarefaInput }) =>
+      api.patch(`/tasks/${id}`, dados),
+    onSuccess: () => invalidar([chaves.tarefas, chaves.painel, chaves.projectos]),
+  });
+}
+
 export function useCriarProjecto() {
   const invalidar = useInvalidar();
   return useMutation({
     mutationFn: (dados: CriarProjectoInput) => api.post<{ id: string; codigo: string }>('/projects', dados),
     onSuccess: () => invalidar([chaves.projectos, chaves.painel, chaves.fases, chaves.arranque]),
+  });
+}
+
+export function usePedirPontoSituacao() {
+  const invalidar = useInvalidar();
+  return useMutation({
+    mutationFn: (projectoId: string) =>
+      api.post<{ destinatario: string }>(`/projects/${projectoId}/status-request`),
+    onSuccess: () => invalidar([chaves.notificacoes, chaves.projectos]),
   });
 }
 

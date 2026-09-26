@@ -6,10 +6,12 @@ import {
   type ListarProjectosInput,
   deIso,
   encadearFases,
+  hoje,
   paraIso,
   percentagemConsumida,
 } from '@nexora/shared';
 import { db } from '../../db/db';
+import { notifications } from '../../db/schema/ops.schema';
 import { orgTaxonomies } from '../../db/schema/organizations.schema';
 import { phases, projectMembers, projects } from '../../db/schema/projects.schema';
 import { tasks } from '../../db/schema/tasks.schema';
@@ -405,6 +407,7 @@ export async function actualizar(
   if (dados.antecedenciaAlerta !== undefined) {
     alteracoes.antecedenciaAlerta = dados.antecedenciaAlerta;
   }
+  if (dados.avancoPct !== undefined) alteracoes.avancoPct = dados.avancoPct;
 
   const [actualizado] = await db
     .update(projects)
@@ -425,4 +428,69 @@ export async function actualizar(
   });
 
   return actualizado;
+}
+
+/**
+ * Pede o ponto de situacao ao responsavel do projecto.
+ *
+ * Nao e um toast: cria um aviso na caixa dele, uma vez por dia. Pedir a si proprio nao faz
+ * sentido - a gaveta ja e o ponto de situacao de quem gere o projecto.
+ */
+export async function pedirPontoSituacao(
+  sessao: Sessao,
+  projectId: string,
+): Promise<{ destinatario: string }> {
+  await exigirGestaoProjecto(sessao, projectId);
+
+  const [projecto] = await db
+    .select({
+      id: projects.id,
+      nome: projects.nome,
+      responsavelId: projects.responsavelId,
+      responsavelNome: users.nome,
+    })
+    .from(projects)
+    .innerJoin(users, eq(users.id, projects.responsavelId))
+    .where(and(eq(projects.id, projectId), eq(projects.organizationId, sessao.org)))
+    .limit(1);
+
+  if (!projecto) throw erros.naoEncontrado('Este projecto');
+
+  if (projecto.responsavelId === sessao.sub) {
+    throw erros.validacao('Este projecto já é seu. O ponto de situação está nesta gaveta.');
+  }
+
+  const referencia = hoje();
+  const chaveUnica = `projecto:${projecto.id}:ponto:${paraIso(referencia)}`;
+
+  const [criado] = await db
+    .insert(notifications)
+    .values({
+      organizationId: sessao.org,
+      userId: projecto.responsavelId,
+      tipo: 'ponto_situacao',
+      titulo: `Ponto de situação: ${projecto.nome}`,
+      detalhe: 'A Direcção pediu o ponto de situação deste projecto.',
+      projectId: projecto.id,
+      chaveUnica,
+      referenteA: referencia,
+    })
+    .onConflictDoNothing({ target: notifications.chaveUnica })
+    .returning({ id: notifications.id });
+
+  if (!criado) {
+    throw erros.validacao('O ponto de situação já foi pedido hoje a este responsável.');
+  }
+
+  await registar(db, {
+    organizationId: sessao.org,
+    actorId: sessao.sub,
+    accao: 'projecto.ponto_pedido',
+    entidade: 'projecto',
+    entidadeId: projecto.id,
+    projectId: projecto.id,
+    detalhe: { destinatarioId: projecto.responsavelId },
+  });
+
+  return { destinatario: projecto.responsavelNome };
 }

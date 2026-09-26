@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { corBarraAvanco, corSaude, dataCurta, hoje, paraIso } from '@nexora/shared';
 import {
   COR,
   ESPACO,
@@ -6,19 +8,28 @@ import {
   MARCA,
   PESO,
   RAIO,
+  botaoSecundario,
+  campo,
   cartao,
   chip,
   numerico,
   textoTruncado,
   tituloSeccao,
 } from '../design/tokens';
-import { corBarraAvanco, corSaude, dataCurta } from '@nexora/shared';
-import { BarraAvanco, Carregando, CartaoNumero, PastilhaAlerta, Ponto, Semaforo, Vazio } from '../components/base';
+import { BarraAvanco, Carregando, CartaoNumero, FalhaCarregar, PastilhaAlerta, Ponto, Semaforo, Vazio } from '../components/base';
 import { Pagina } from '../components/Layout';
-import { useDecidirProrrogacao, usePainel } from '../lib/queries';
 import { useToast } from '../components/Toast';
 import { ErroApi } from '../lib/api';
-import { botaoSecundario } from '../design/tokens';
+import { pt } from '../i18n/pt';
+import {
+  useActualizarTarefa,
+  useDecidirProrrogacao,
+  usePainel,
+  useValidarRelatorio,
+} from '../lib/queries';
+import type { ItemDecisao } from '../lib/tipos';
+
+const VISIVEIS_INICIAIS = 3;
 
 /**
  * Painel de acompanhamento.
@@ -27,25 +38,18 @@ import { botaoSecundario } from '../design/tokens';
  * operacao, depois o que precisa de decisao, e so entao os quadros de leitura. Um painel que
  * comeca por metricas obriga quem le a procurar o problema; este apresenta-o.
  *
- * A cor acompanha o que os dados dizem, e nao o contrario. A faixa de foco muda de temperatura
- * conforme ha ou nao trabalho fora de prazo, e o quadro do atraso muda de tom com ele. O que nao
- * muda e a semantica ja fixada: um projecto no prazo continua a ter a barra em tinta e nao em
- * verde, porque o verde e do que ja esta cumprido.
+ * Validar, escalar e alargar prazo acontecem no cartao. Ir a uma lista para decidir o que o
+ * proprio cartao ja nomeou e perder o eixo do produto.
  */
 export function Painel() {
   const { data, isLoading, isError } = usePainel();
   const navegar = useNavigate();
-  const decidirPrazo = useDecidirProrrogacao();
-  const toast = useToast();
+  const [mostrarTodas, setMostrarTodas] = useState(false);
 
-  async function decidirProrrogacao(id: string, aceitar: boolean) {
-    try {
-      await decidirPrazo.mutateAsync({ extensionId: id, aceitar });
-      toast.mostrar(aceitar ? 'Prazo alargado' : 'Pedido de prorrogação recusado');
-    } catch (e) {
-      toast.mostrar(e instanceof ErroApi ? e.message : 'Não foi possível decidir o pedido.');
-    }
-  }
+  const fila = data?.decisoes ?? [];
+  const total = data?.decisoesTotal ?? fila.length;
+  const visiveis = mostrarTodas ? fila : fila.slice(0, VISIVEIS_INICIAIS);
+  const restantes = Math.max(0, total - VISIVEIS_INICIAIS);
 
   return (
     <Pagina
@@ -59,12 +63,11 @@ export function Painel() {
       accaoPrincipal={{ rotulo: 'Registar projecto', onClick: () => navegar('/projectos?novo=1') }}
     >
       {isError ? (
-        <Vazio style={{ ...cartao, padding: 40 }}>Não foi possível carregar o painel. Tente de novo.</Vazio>
+        <FalhaCarregar de="o painel" />
       ) : isLoading || !data ? (
         <Carregando />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: ESPACO.seccao }}>
-          {/* Faixa de foco: serena quando nada esta atrasado, quente quando esta. */}
           <div
             className="vn-foco vn-faixa-foco"
             style={{
@@ -141,20 +144,13 @@ export function Painel() {
               />
               <CartaoNumero
                 rotulo="À sua espera"
-                valor={String(data.decisoes.length)}
-                tom={data.decisoes.length > 0 ? 'ambar' : 'neutro'}
-                nota={
-                  data.decisoes.length === 0
-                    ? 'nada por decidir'
-                    : data.decisoes.length === 1
-                      ? 'item por decidir'
-                      : 'itens por decidir'
-                }
+                valor={String(total)}
+                tom={total > 0 ? 'ambar' : 'neutro'}
+                nota={total === 0 ? 'nada por decidir' : total === 1 ? 'item por decidir' : 'itens por decidir'}
               />
             </div>
           </div>
 
-          {/* Precisa da sua decisão */}
           <section>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 12 }}>
               <span style={{ ...tituloSeccao, display: 'flex', alignItems: 'center', gap: 9 }}>
@@ -164,79 +160,45 @@ export function Painel() {
                     width: 3,
                     height: 13,
                     borderRadius: 2,
-                    background: data.decisoes.length ? COR.ambarVivo : COR.bordaForte,
+                    background: total ? COR.ambarVivo : COR.bordaForte,
                   }}
                 />
                 Precisa da sua decisão
               </span>
               <span style={{ fontSize: FONTE.pequena, color: COR.suave }}>
-                {data.decisoes.length === 0
+                {total === 0
                   ? 'nada em espera'
-                  : `${data.decisoes.length} ${data.decisoes.length === 1 ? 'item trava' : 'itens travam'} a operação`}
+                  : `${total} ${total === 1 ? 'item trava' : 'itens travam'} a operação`}
               </span>
             </div>
             <div style={{ ...cartao, overflow: 'hidden' }}>
-              {data.decisoes.length === 0 ? (
+              {fila.length === 0 ? (
                 <Vazio>Nenhuma tarefa passou do prazo e nenhum relatório ficou por responder.</Vazio>
               ) : (
-                data.decisoes.map((item, i) => (
-                  <div
-                    key={item.id}
-                    className="vn-linha-item vn-linha-decisao"
-                    style={{
-                      padding: '18px 20px',
-                      borderBottom: i === data.decisoes.length - 1 ? 'none' : `1px solid ${COR.linha}`,
-                    }}
-                  >
-                    <Semaforo cor={item.alerta.cor} />
-                    <div className="vn-linha-corpo">
-                      <div style={{ fontSize: FONTE.media, fontWeight: PESO.medio, letterSpacing: '-0.005em' }}>
-                        {item.titulo}
-                      </div>
-                      <div style={{ fontSize: FONTE.pequena, color: COR.textoSuave, marginTop: 5 }}>
-                        {item.detalhe}
-                      </div>
-                    </div>
-                    <div className="vn-linha-fim">
-                    <PastilhaAlerta alerta={item.alerta} />
-                    {item.origem === 'prorrogacao' ? (
-                      <span style={{ display: 'flex', gap: 8 }}>
-                        <button
-                          type="button"
-                          style={botaoSecundario}
-                          disabled={decidirPrazo.isPending}
-                          onClick={() => void decidirProrrogacao(item.id, false)}
-                        >
-                          Recusar
-                        </button>
-                        <button
-                          type="button"
-                          style={{ ...botaoSecundario, borderColor: COR.bordaForte }}
-                          disabled={decidirPrazo.isPending}
-                          onClick={() => void decidirProrrogacao(item.id, true)}
-                        >
-                          Aceitar
-                        </button>
-                      </span>
-                    ) : (
-                      <button
-                        type="button"
-                        style={{ ...botaoSecundario, borderColor: COR.bordaForte }}
-                        onClick={() => {
-                          navegar(item.origem === 'relatorio' ? '/relatorios' : '/tarefas');
-                        }}
-                      >
-                        {item.accao}
-                      </button>
-                    )}
-                    </div>
-                  </div>
+                visiveis.map((item, i) => (
+                  <CartaoDecisao key={item.id} item={item} ultimo={i === visiveis.length - 1} />
                 ))
               )}
             </div>
+            {restantes > 0 ? (
+              <button
+                type="button"
+                onClick={() => setMostrarTodas((v) => !v)}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  color: MARCA.turquesaTexto,
+                  fontSize: FONTE.corpo,
+                  fontWeight: PESO.medio,
+                  cursor: 'pointer',
+                  padding: '12px 2px',
+                }}
+              >
+                {mostrarTodas ? pt.painel.verMenos : pt.painel.faltam(restantes)}
+              </button>
+            ) : null}
           </section>
 
-          {/* Avanço da carteira e Prazos a vencer */}
           <div className="vn-grelha-duas">
             <section>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 12 }}>
@@ -381,12 +343,153 @@ export function Painel() {
   );
 }
 
-/**
- * O desvio entre o avanco declarado e o que o calendario ja consumiu.
- *
- * E a leitura que a percentagem sozinha nao da: 62% pode ser bom ou mau consoante o plano previa
- * 55% ou 80%. Sem plano de referencia nao ha nada honesto a dizer, e entao nao se diz nada.
- */
+function CartaoDecisao({ item, ultimo }: { item: ItemDecisao; ultimo: boolean }) {
+  const toast = useToast();
+  const decidirPrazo = useDecidirProrrogacao();
+  const validar = useValidarRelatorio();
+  const actualizarTarefa = useActualizarTarefa();
+  const [nota, setNota] = useState('');
+  const [novaDeadline, setNovaDeadline] = useState('');
+  const aDecidir = decidirPrazo.isPending || validar.isPending || actualizarTarefa.isPending;
+
+  async function decidirProrrogacao(aceitar: boolean) {
+    try {
+      await decidirPrazo.mutateAsync({ extensionId: item.id, aceitar });
+      toast.mostrar(aceitar ? pt.painel.prazoAlargado : 'Pedido de prorrogação recusado');
+    } catch (e) {
+      toast.mostrar(e instanceof ErroApi ? e.message : pt.painel.falhouDecisao);
+    }
+  }
+
+  async function decidirRelatorio(decisao: 'validar' | 'escalar') {
+    const observacao = nota.trim();
+    if (decisao === 'escalar' && !observacao) {
+      toast.mostrar(pt.painel.notaEscalar);
+      return;
+    }
+    try {
+      await validar.mutateAsync({ id: item.id, dados: { decisao, observacao } });
+      toast.mostrar(decisao === 'validar' ? pt.painel.validado : pt.painel.escalado);
+    } catch (e) {
+      toast.mostrar(e instanceof ErroApi ? e.message : pt.painel.falhouDecisao);
+    }
+  }
+
+  async function alargarPrazo() {
+    if (!novaDeadline) {
+      toast.mostrar(pt.painel.dataObrigatoria);
+      return;
+    }
+    try {
+      await actualizarTarefa.mutateAsync({ id: item.id, dados: { deadline: novaDeadline } });
+      toast.mostrar(pt.painel.prazoAlargado);
+      setNovaDeadline('');
+    } catch (e) {
+      toast.mostrar(e instanceof ErroApi ? e.message : pt.painel.falhouDecisao);
+    }
+  }
+
+  return (
+    <div
+      className="vn-linha-item vn-linha-decisao"
+      style={{
+        padding: '18px 20px',
+        borderBottom: ultimo ? 'none' : `1px solid ${COR.linha}`,
+      }}
+    >
+      <Semaforo cor={item.alerta.cor} />
+      <div className="vn-linha-corpo">
+        <div style={{ fontSize: FONTE.media, fontWeight: PESO.medio, letterSpacing: '-0.005em' }}>
+          {item.titulo}
+        </div>
+        <div style={{ fontSize: FONTE.pequena, color: COR.textoSuave, marginTop: 5 }}>
+          {item.detalhe} · {item.idadeDias <= 0 ? pt.painel.hojeNaFila : pt.painel.idade(item.idadeDias)}
+        </div>
+        {item.texto ? (
+          <p
+            style={{
+              fontSize: FONTE.corpo,
+              lineHeight: 1.6,
+              color: COR.tinta,
+              margin: '8px 0 0',
+              maxWidth: '68ch',
+              textWrap: 'pretty',
+            }}
+          >
+            {item.texto}
+          </p>
+        ) : null}
+        {item.origem === 'relatorio' ? (
+          <textarea
+            value={nota}
+            onChange={(e) => setNota(e.target.value)}
+            placeholder={pt.painel.notaEscalar}
+            rows={2}
+            style={{ ...campo, width: '100%', maxWidth: 320, minHeight: 52, height: 'auto', resize: 'vertical', marginTop: 10 }}
+          />
+        ) : null}
+        {item.origem === 'tarefa' ? (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
+            <label style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>
+              {pt.painel.novaDeadline}
+            </label>
+            <input
+              type="date"
+              value={novaDeadline}
+              min={paraIso(hoje())}
+              onChange={(e) => setNovaDeadline(e.target.value)}
+              style={{ ...campo, width: 148, height: 32 }}
+            />
+          </div>
+        ) : null}
+      </div>
+      <div className="vn-linha-fim">
+        <PastilhaAlerta alerta={item.alerta} />
+        {item.origem === 'prorrogacao' ? (
+          <span style={{ display: 'flex', gap: 8 }}>
+            <button type="button" style={botaoSecundario} disabled={aDecidir} onClick={() => void decidirProrrogacao(false)}>
+              Recusar
+            </button>
+            <button
+              type="button"
+              style={{ ...botaoSecundario, borderColor: COR.bordaForte }}
+              disabled={aDecidir}
+              onClick={() => void decidirProrrogacao(true)}
+            >
+              Aceitar
+            </button>
+          </span>
+        ) : null}
+        {item.origem === 'relatorio' ? (
+          <span style={{ display: 'flex', gap: 8 }}>
+            <button type="button" style={botaoSecundario} disabled={aDecidir} onClick={() => void decidirRelatorio('escalar')}>
+              {pt.painel.escalar}
+            </button>
+            <button
+              type="button"
+              style={{ ...botaoSecundario, borderColor: COR.bordaForte }}
+              disabled={aDecidir}
+              onClick={() => void decidirRelatorio('validar')}
+            >
+              {pt.painel.validar}
+            </button>
+          </span>
+        ) : null}
+        {item.origem === 'tarefa' ? (
+          <button
+            type="button"
+            style={{ ...botaoSecundario, borderColor: COR.bordaForte }}
+            disabled={aDecidir}
+            onClick={() => void alargarPrazo()}
+          >
+            {pt.painel.alargar}
+          </button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 function desvioDoPlano(
   declarado: number,
   previsto: number | null,

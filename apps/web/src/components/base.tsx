@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { type Alerta, type NomeChip, chip, iniciais } from '@nexora/shared';
-import { COR, FONTE, MARCA, PESO, RAIO, barra, etiqueta, numerico, ponto, superficie } from '../design/tokens';
+import { COR, FONTE, MARCA, PESO, RAIO, barra, cartao, etiqueta, numerico, ponto, superficie } from '../design/tokens';
+import { pt } from '../i18n/pt';
 
 /**
  * O simbolo Voneka.
@@ -317,4 +318,9 @@ export function Vazio({ children, style }: { children: ReactNode; style?: CSSPro
 
 export function Carregando({ children = 'A carregar…' }: { children?: ReactNode }) {
   return <Vazio>{children}</Vazio>;
+}
+
+/** Falha de consulta: diz o que nao veio, nunca finge uma lista vazia. */
+export function FalhaCarregar({ de }: { de: string }) {
+  return <Vazio style={{ ...cartao, padding: 40 }}>{pt.erros.consultaDe(de)}</Vazio>;
 }

@@ -1,4 +1,4 @@
-import { type SQL, and, count, desc, eq, gte } from 'drizzle-orm';
+import { and, count, desc, eq, gte } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import {
   type ListarRelatoriosInput,
@@ -108,12 +108,11 @@ export async function listar(
 export async function tipologiaDaSemana(sessao: Sessao) {
   const desde = somarDias(hoje(), -7);
 
-  // `projectosVisiveis` devolve `undefined` para a Direccao; `and` ignora esses valores.
-  const condicoes: (SQL | undefined)[] = [gte(reports.createdAt, desde)];
+  // A empresa entra sempre: `projectosVisiveis` nunca e undefined. Sem isto, o
+  // Administrador agregaria a tipologia de todas as casas.
+  const condicoes = [gte(reports.createdAt, desde), projectosVisiveis(sessao)];
   if (sessao.nivel === 'colaborador') {
     condicoes.push(eq(reports.autorId, sessao.sub));
-  } else if (!ehAdministrador(sessao)) {
-    condicoes.push(projectosVisiveis(sessao));
   }
 
   const linhas = await db

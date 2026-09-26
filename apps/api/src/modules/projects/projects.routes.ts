@@ -51,3 +51,8 @@ projectsRouter.post(
   exigirNivel('administrador', 'gestor'),
   assincrono(fases.repor),
 );
+projectsRouter.post(
+  '/:id/status-request',
+  exigirNivel('administrador', 'gestor'),
+  assincrono(controlador.pedirPontoSituacao),
+);
